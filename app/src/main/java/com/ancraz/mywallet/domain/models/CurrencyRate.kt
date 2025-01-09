@@ -1,14 +1,10 @@
 package com.ancraz.mywallet.domain.models
 
-data class CurrencyRate(
+import com.ancraz.mywallet.core.models.CurrencyCode
 
-    val updateDate: Long,
+data class CurrencyRate(
 
     val currencyCode: CurrencyCode,
 
     val rateValue: Float,
 )
-
-enum class CurrencyCode {
-    USD, EUR, RUB, GEL, KZT, UNKNOWN
-}

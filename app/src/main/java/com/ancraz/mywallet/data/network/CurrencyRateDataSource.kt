@@ -6,16 +6,14 @@ import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.core.utils.error.NetworkError
 import com.ancraz.mywallet.core.utils.map
 import com.ancraz.mywallet.core.utils.safeCall
-import com.ancraz.mywallet.data.mappers.toCurrencyRates
-import com.ancraz.mywallet.data.models.ApiResponseDto
+import com.ancraz.mywallet.data.mappers.toCurrencyData
+import com.ancraz.mywallet.domain.models.CurrencyData
 import com.ancraz.mywallet.domain.models.CurrencyRate
 import com.ancraz.mywallet.domain.network.NetworkDataSource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
 
 class CurrencyRateDataSource(
     private val httpClient: HttpClient,
@@ -25,7 +23,7 @@ class CurrencyRateDataSource(
     override suspend fun getDesiredCurrenciesRate(
         desiredCurrenciesString: String,
         baseCurrencyCode: String
-    ): Result<List<CurrencyRate>, NetworkError> {
+    ): Result<CurrencyData, NetworkError> {
         val response = httpClient.get(
             constructUrl("/rates/latest")
         ){
@@ -39,7 +37,7 @@ class CurrencyRateDataSource(
         return safeCall<String> {
             response
         }.map { responseStr ->
-            responseStr.toCurrencyRates()
+            responseStr.toCurrencyData()
         }
     }
 }

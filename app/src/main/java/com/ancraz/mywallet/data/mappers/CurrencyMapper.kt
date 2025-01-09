@@ -2,6 +2,7 @@ package com.ancraz.mywallet.data.mappers
 
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.models.CurrencyCode
+import com.ancraz.mywallet.domain.models.CurrencyData
 import com.ancraz.mywallet.domain.models.CurrencyRate
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
@@ -11,24 +12,24 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
 
-fun String.toCurrencyRates(): List<CurrencyRate>{
+fun String.toCurrencyData(): CurrencyData{
     try {
         val jsonResult = Json.parseToJsonElement(this).jsonObject
         val date = jsonResult["date"]?.jsonPrimitive?.content?.toTimestamp() ?: Calendar.getInstance().timeInMillis
         val rates = jsonResult["rates"]?.jsonObject ?: throw IllegalArgumentException("No rates found")
 
         val currencyRateList = rates.map { (key, value) ->
-            CurrencyRate(
-                updateDate = date,
-                currencyCode = key.toCurrencyCode(),
-                rateValue = value.jsonPrimitive.content.toFloat()
-            )
+            getCurrencyRate(key, value.jsonPrimitive.content.toFloat())
         }
-        return currencyRateList
+
+        return CurrencyData(
+            updateTime = date,
+            rates = currencyRateList
+        )
     }
     catch (e: Exception){
-        debugLog("getCurrencyRates exception: ${e.message}")
-        return emptyList()
+        debugLog("getCurrencyData exception: ${e.message}")
+        return CurrencyData()
     }
 }
 
@@ -42,6 +43,14 @@ fun String.toCurrencyCode(): CurrencyCode {
         "KZT" -> CurrencyCode.KZT
         else -> CurrencyCode.UNKNOWN
     }
+}
+
+
+private fun getCurrencyRate(currencyCodeStr: String, rate: Float): CurrencyRate{
+    return CurrencyRate(
+        currencyCode = currencyCodeStr.toCurrencyCode(),
+        rateValue = rate
+    )
 }
 
 

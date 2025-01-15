@@ -1,6 +1,8 @@
 package com.ancraz.mywallet.presentation.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -9,28 +11,61 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
+import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
+import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
 fun InputTextField(
     valueState: MutableState<String>,
+    title: String,
+    currencyCode: CurrencyCode,
     modifier: Modifier = Modifier
 ) {
-    Box(
+
+    Column(
         modifier = modifier
             .padding(12.dp)
     ) {
         Text(
-            text = valueState.value.toString(),
-            color = Color.White,
-            fontSize = 40.sp,
+            text = title,
+            color = onSurfaceColor,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
             modifier = Modifier
-                .align(Alignment.Center)
+                .align(Alignment.CenterHorizontally)
         )
+
+        HorizontalSpacer()
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = valueState.value,
+                color = onSurfaceColor,
+                fontSize = 40.sp,
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+            )
+
+            VerticalSpacer()
+            VerticalSpacer()
+
+            CurrencyDropDownMenu(
+                currentCurrency = CurrencyCode.USD,
+                modifier = Modifier
+                    .align(Alignment.Bottom)
+            )
+        }
+
     }
 
 }
@@ -39,10 +74,12 @@ fun InputTextField(
 @Preview
 @Composable
 fun InputTextFieldPreview(){
-    val valueState = remember { mutableStateOf(8000f.toString()) }
+    val valueState = remember { mutableStateOf(8000f.toFormattedString()) }
     MyWalletTheme {
         InputTextField(
-            valueState
+            valueState = valueState,
+            title = "Balance",
+            currencyCode = CurrencyCode.USD
         )
     }
 }

@@ -12,12 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,13 +29,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.presentation.states.TotalBalanceState
+import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
-import com.ancraz.mywallet.presentation.ui.theme.Pink40
+import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
+import com.ancraz.mywallet.presentation.ui.theme.primaryColor
+import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
+import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
+import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
 fun HomeScreen(
@@ -47,7 +53,21 @@ fun HomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .padding(14.dp)
     ) {
+        HorizontalSpacer()
+
+        Text(
+            text = "My Wallet",
+            color = onSurfaceColor,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        )
+
+        HorizontalSpacer()
+
         TotalBalanceCard(
             totalBalanceState = totalBalanceState,
             onTransaction = onTransaction,
@@ -69,7 +89,7 @@ private fun TotalBalanceCard(
         modifier = modifier
             .padding(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = primaryColor
         )
     ) {
         Column(
@@ -79,23 +99,32 @@ private fun TotalBalanceCard(
         ) {
             Text(
                 text = "Total balance",
-                fontSize = 12.sp,
-                color = Color.Black
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             if (totalBalanceState.isLoading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                )
             } else {
                 Text(
-                    text = "\$ ${totalBalanceState.balance}",
+                    text = "\$ ${totalBalanceState.balance.toFormattedString()}",
                     color = Color.Black,
-                    fontSize = 20.sp
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -113,13 +142,6 @@ private fun TotalBalanceCard(
                     icon = Icons.Filled.Remove
                 ) {
                     onTransaction(TransactionType.EXPENSE)
-                }
-
-                TotalBalanceActionButton(
-                    text = "Transfer",
-                    icon = Icons.Filled.SwapHoriz
-                ) {
-                    onTransaction(TransactionType.TRANSFER)
                 }
 
                 TotalBalanceActionButton(
@@ -147,8 +169,8 @@ private fun TotalBalanceActionButton(
     ) {
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(20.dp))
-                .background(Pink40)
+                .clip(RoundedCornerShape(30.dp))
+                .background(secondaryColor)
                 .clickable {
                     onAction()
                 }
@@ -158,7 +180,8 @@ private fun TotalBalanceActionButton(
                 contentDescription = text,
                 colorFilter = ColorFilter.tint(Color.White),
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(12.dp)
+                    .size(26.dp)
             )
         }
 

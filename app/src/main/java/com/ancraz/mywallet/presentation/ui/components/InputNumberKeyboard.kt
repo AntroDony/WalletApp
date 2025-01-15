@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
-import com.ancraz.mywallet.presentation.ui.theme.Pink40
+import com.ancraz.mywallet.presentation.ui.theme.outlineColor
 
 @Composable
 fun InputNumberKeyboard(
@@ -35,7 +35,7 @@ fun InputNumberKeyboard(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
-        modifier = modifier.padding(10.dp)
+        modifier = modifier
     ) {
         items(Keys){ key ->
             KeyboardButton(key, onClick = onAction)
@@ -51,11 +51,11 @@ private fun KeyboardButton(
 ){
     Box(
         modifier = modifier
-            .padding(2.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(Pink40)
+            .padding(4.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(outlineColor)
             .fillMaxWidth()
-            .height(40.dp)
+            .height(50.dp)
             .clickable {
                 onClick(keyboardKey.onAction)
             }
@@ -72,7 +72,7 @@ private fun KeyboardButton(
         } else {
             Text(
                 text = keyboardKey.symbol,
-                fontSize = 20.sp,
+                fontSize = 24.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Black,
                 modifier = Modifier

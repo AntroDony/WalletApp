@@ -45,7 +45,8 @@ private fun MainActivityScreen() {
     val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -83,6 +84,9 @@ private fun MainActivityScreen() {
                     modifier = Modifier.padding(innerPadding),
                     onUpdateBalanceValue = { value ->
                         homeViewModel.updateTotalBalance(value)
+                    },
+                    onNavigateBack = {
+                        navController.navigateUp()
                     }
                 )
             }

@@ -64,6 +64,7 @@ dependencies {
     //Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.ui.text.google.fonts)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     //Compose

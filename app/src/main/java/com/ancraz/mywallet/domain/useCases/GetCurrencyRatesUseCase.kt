@@ -1,11 +1,11 @@
 package com.ancraz.mywallet.domain.useCases
 
+import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.core.utils.onError
 import com.ancraz.mywallet.core.utils.onSuccess
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository
-import com.ancraz.mywallet.domain.models.CurrencyCode
 import com.ancraz.mywallet.domain.models.CurrencyRate
 import com.ancraz.mywallet.domain.repository.CurrencyRepository
 import com.ancraz.mywallet.domain.utils.desiredCurrencies

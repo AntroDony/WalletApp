@@ -1,7 +1,7 @@
 package com.ancraz.mywallet.data.mappers
 
+import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.utils.debugLog
-import com.ancraz.mywallet.domain.models.CurrencyCode
 import com.ancraz.mywallet.domain.models.CurrencyData
 import com.ancraz.mywallet.domain.models.CurrencyRate
 import kotlinx.serialization.json.Json
@@ -36,12 +36,11 @@ fun String.toCurrencyData(): CurrencyData{
 
 fun String.toCurrencyCode(): CurrencyCode {
     return when(this){
-        "USD" -> CurrencyCode.USD
         "EUR" -> CurrencyCode.EUR
         "RUB" -> CurrencyCode.RUB
         "GEL" -> CurrencyCode.GEL
         "KZT" -> CurrencyCode.KZT
-        else -> CurrencyCode.UNKNOWN
+        else -> CurrencyCode.USD
     }
 }
 

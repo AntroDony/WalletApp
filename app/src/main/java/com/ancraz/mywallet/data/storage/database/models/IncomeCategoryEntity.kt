@@ -16,4 +16,4 @@ data class IncomeCategoryEntity(
     @ColumnInfo(name = "category_name")
     override val name: String,
 
-): BaseCategory(id, name)
+): BaseCategoryEntity(id, name)

@@ -4,9 +4,12 @@ import android.content.Context
 import androidx.room.Room
 import com.ancraz.mywallet.BuildConfig
 import com.ancraz.mywallet.data.network.CurrencyRateDataSource
+import com.ancraz.mywallet.data.repository.BalanceRepositoryImpl
 import com.ancraz.mywallet.data.repository.CurrencyRepositoryImpl
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository
-import com.ancraz.mywallet.domain.network.NetworkDataSource
+import com.ancraz.mywallet.data.storage.database.WalletDatabase
+import com.ancraz.mywallet.domain.network.CurrencyDataSource
+import com.ancraz.mywallet.domain.repository.BalanceRepository
 import com.ancraz.mywallet.domain.repository.CurrencyRepository
 import dagger.Module
 import dagger.Provides
@@ -25,11 +28,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTaskDatabase(@ApplicationContext context: Context): TaskDatabase {
+    fun provideTaskDatabase(@ApplicationContext context: Context): WalletDatabase {
         val taskDatabase = Room.databaseBuilder(
             context,
-            TaskDatabase::class.java,
-            Constants.TASK_DATABASE_NAME
+            WalletDatabase::class.java,
+            "wallet_database"
         )
             .fallbackToDestructiveMigration()
             .build()
@@ -40,7 +43,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCurrencyRateDataSource(): NetworkDataSource{
+    fun provideCurrencyRateDataSource(): CurrencyDataSource{
         return CurrencyRateDataSource(
             HttpClient(CIO){
                 install(ContentNegotiation){
@@ -61,8 +64,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCurrencyRepository(dataSource: NetworkDataSource): CurrencyRepository{
+    fun provideCurrencyRepository(dataSource: CurrencyDataSource): CurrencyRepository{
         return CurrencyRepositoryImpl(dataSource)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideBalanceRepository(walletDatabase: WalletDatabase): BalanceRepository{
+        return BalanceRepositoryImpl(walletDatabase.transactionDao)
     }
 
 }

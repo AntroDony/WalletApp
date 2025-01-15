@@ -4,7 +4,7 @@ import com.ancraz.mywallet.core.utils.Result
 import com.ancraz.mywallet.core.utils.error.NetworkError
 import com.ancraz.mywallet.domain.models.CurrencyData
 
-interface NetworkDataSource {
+interface CurrencyDataSource {
 
     suspend fun getDesiredCurrenciesRate(
         desiredCurrenciesString: String,

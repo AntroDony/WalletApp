@@ -10,24 +10,24 @@ import com.ancraz.mywallet.core.models.TransactionType
 
 @Keep
 @Entity(
-    tableName = "transactions",
-    foreignKeys = [
-        ForeignKey(
-            entity = BalanceAccountEntity::class,
-            parentColumns = arrayOf("account_id"),
-            childColumns = arrayOf("account_id"),
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        )
-    ])
+    tableName = "transactions",)
+//    foreignKeys = [
+//        ForeignKey(
+//            entity = BalanceAccountEntity::class,
+//            parentColumns = arrayOf("account_id"),
+//            childColumns = arrayOf("account_id"),
+//            onUpdate = ForeignKey.CASCADE,
+//            onDelete = ForeignKey.CASCADE
+//        )
+//    ])
 data class TransactionEntity(
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "transaction_id")
     val id: Long = 0L,
 
-    @ColumnInfo(name = "account_id")
-    val accountId: Long,
+//    @ColumnInfo(name = "account_id")
+//    val accountId: Long,
 
     @ColumnInfo(name = "time")
     val time: Long,
@@ -42,8 +42,15 @@ data class TransactionEntity(
     val transactionType: TransactionType,
 
     @ColumnInfo(name = "description")
-    val description: String?,
+    val description: String? = null,
 
-    @ColumnInfo(name = "category")
-    val category: BaseCategory
+//    @ColumnInfo(name = "category")
+//    val category: BaseCategoryEntity? = null,
+
+//    @ColumnInfo(name = "to_account")
+//    val toAccount: BalanceAccountEntity? = null,
+//
+//    @ColumnInfo(name = "from_account")
+//    val fromAccount: BalanceAccountEntity? = null
+
 )

@@ -8,8 +8,7 @@ import com.ancraz.mywallet.core.utils.map
 import com.ancraz.mywallet.core.utils.safeCall
 import com.ancraz.mywallet.data.mappers.toCurrencyData
 import com.ancraz.mywallet.domain.models.CurrencyData
-import com.ancraz.mywallet.domain.models.CurrencyRate
-import com.ancraz.mywallet.domain.network.NetworkDataSource
+import com.ancraz.mywallet.domain.network.CurrencyDataSource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -18,7 +17,7 @@ import io.ktor.client.request.parameter
 class CurrencyRateDataSource(
     private val httpClient: HttpClient,
     private val apiKey: String
-): NetworkDataSource {
+): CurrencyDataSource {
 
     override suspend fun getDesiredCurrenciesRate(
         desiredCurrenciesString: String,

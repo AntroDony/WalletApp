@@ -3,11 +3,11 @@ package com.ancraz.mywallet.data.repository
 import com.ancraz.mywallet.core.utils.Result
 import com.ancraz.mywallet.core.utils.error.NetworkError
 import com.ancraz.mywallet.domain.models.CurrencyData
-import com.ancraz.mywallet.domain.network.NetworkDataSource
+import com.ancraz.mywallet.domain.network.CurrencyDataSource
 import com.ancraz.mywallet.domain.repository.CurrencyRepository
 
 class CurrencyRepositoryImpl(
-    private val networkDataSource: NetworkDataSource,
+    private val networkDataSource: CurrencyDataSource,
 ): CurrencyRepository {
 
     override suspend fun getCurrenciesRate(

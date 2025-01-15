@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.presentation.ui.screens.editBalanceScreen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,7 +33,8 @@ fun EditBalanceScreen(
     val valueState = remember { mutableStateOf(value.toFormattedString()) }
     Column(
         modifier = modifier.fillMaxSize()
-            .padding(14.dp)
+            .padding(14.dp),
+        verticalArrangement = Arrangement.Center
     ) {
         NavigationToolbar(title = "Edit Balance", onClickBack = onNavigateBack)
 

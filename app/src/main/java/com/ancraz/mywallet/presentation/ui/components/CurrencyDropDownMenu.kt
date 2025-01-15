@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -25,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
-import com.ancraz.mywallet.presentation.ui.theme.outlineColor
+import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
 
 @Composable
 fun CurrencyDropDownMenu(
@@ -50,7 +51,8 @@ fun CurrencyDropDownMenu(
             Text(
                 text = items[itemPosition.value].name,
                 color = onSurfaceColor,
-                fontSize = 26.sp
+                fontSize = 26.sp,
+                modifier = Modifier.padding(8.dp)
             )
 
             Image(
@@ -72,7 +74,7 @@ fun CurrencyDropDownMenu(
                 isDropDownExpanded.value = false
             },
             modifier = Modifier
-                .background(outlineColor)
+                .background(surfaceColor)
 
         ) {
             items.forEachIndexed { index, currency ->
@@ -81,7 +83,7 @@ fun CurrencyDropDownMenu(
                         Text(
                             text = currency.name,
                             color = onSurfaceColor,
-                            fontSize = 22.sp
+                            fontSize = 20.sp
                         )
                     },
                     onClick = {

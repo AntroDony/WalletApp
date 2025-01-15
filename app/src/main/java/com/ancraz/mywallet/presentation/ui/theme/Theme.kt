@@ -46,7 +46,7 @@ fun MyWalletTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.surface.toArgb()
+            (view.context as Activity).window.statusBarColor = colorScheme.background.toArgb()
         }
     }
 

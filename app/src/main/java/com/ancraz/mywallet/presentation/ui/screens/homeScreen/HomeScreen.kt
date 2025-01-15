@@ -40,7 +40,6 @@ import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
-import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable

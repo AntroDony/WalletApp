@@ -1,8 +1,10 @@
 package com.ancraz.mywallet.presentation.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,10 +29,12 @@ fun InputTextField(
     currencyCode: CurrencyCode,
     modifier: Modifier = Modifier
 ) {
-
     Column(
         modifier = modifier
-            .padding(12.dp)
+            .fillMaxSize()
+            .padding(12.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = title,
@@ -38,32 +42,29 @@ fun InputTextField(
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
         )
 
         HorizontalSpacer()
+
+        Text(
+            text = valueState.value,
+            color = onSurfaceColor,
+            fontSize = 60.sp,
+            modifier = Modifier
+        )
+
+        HorizontalSpacer()
+
+        CurrencyDropDownMenu(
+            currentCurrency = CurrencyCode.USD
+        )
 
         Row(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = valueState.value,
-                color = onSurfaceColor,
-                fontSize = 40.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-            )
 
-            VerticalSpacer()
-            VerticalSpacer()
-
-            CurrencyDropDownMenu(
-                currentCurrency = CurrencyCode.USD,
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-            )
         }
 
     }

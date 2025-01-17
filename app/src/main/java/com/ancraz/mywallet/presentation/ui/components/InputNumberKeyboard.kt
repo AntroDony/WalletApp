@@ -16,6 +16,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Backspace
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,18 +30,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.outlineColor
+import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
 fun InputNumberKeyboard(
-    modifier: Modifier = Modifier,
-    onAction: (KeyboardAction) -> Unit
+    inputValueState: MutableState<String>,
+    modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = modifier
     ) {
         items(Keys){ key ->
-            KeyboardButton(key, onClick = onAction)
+            KeyboardButton(key, onClick = { action ->
+                when (action) {
+                    is KeyboardAction.Number -> {
+                        if (inputValueState.value.isEmpty() || inputValueState.value.toFloat() == 0f) {
+                            inputValueState.value = action.number.toString()
+                        } else {
+                            inputValueState.value += action.number
+                        }
+                    }
+
+                    is KeyboardAction.Decimal -> {
+                        if (!inputValueState.value.contains(".") && inputValueState.value.isNotEmpty()) {
+                            inputValueState.value += "."
+                        }
+                    }
+
+                    is KeyboardAction.Delete -> {
+                        inputValueState.value = inputValueState.value.dropLast(1)
+                    }
+                }
+            })
         }
     }
 }
@@ -103,10 +127,9 @@ private val Keys = listOf(
 
 @Preview
 @Composable
-fun InputNumberKeyboardPreview(){
+private fun InputNumberKeyboardPreview(){
+    val inputValue = remember { mutableStateOf(8000f.toFormattedString()) }
     MyWalletTheme {
-        InputNumberKeyboard(){
-
-        }
+        InputNumberKeyboard(inputValue)
     }
 }

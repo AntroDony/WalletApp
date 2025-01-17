@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
-import com.ancraz.mywallet.domain.useCases.GetCurrencyRatesUseCase
+import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
 import com.ancraz.mywallet.domain.useCases.TotalBalanceUseCase
 import com.ancraz.mywallet.presentation.states.TotalBalanceState
 import dagger.hilt.android.lifecycle.HiltViewModel

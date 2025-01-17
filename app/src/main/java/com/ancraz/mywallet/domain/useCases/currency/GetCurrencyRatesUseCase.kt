@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.domain.useCases
+package com.ancraz.mywallet.domain.useCases.currency
 
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.result.DataResult
@@ -19,7 +19,7 @@ class GetCurrencyRatesUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) {
 
-    suspend operator fun invoke(): Flow<DataResult<List<CurrencyRate>>> {
+    operator fun invoke(): Flow<DataResult<List<CurrencyRate>>> {
         return flow {
             val currencyLastUpdateTime = dataStoreRepository.getCurrencyLastUpdateTime()
             if (currencyLastUpdateTime == null || needUpdateCurrencyRates(currencyLastUpdateTime)) {

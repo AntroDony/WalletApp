@@ -11,9 +11,12 @@ data class IncomeCategoryEntity(
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "category_id")
-    override val id: Long,
+    override val id: Long ,
 
     @ColumnInfo(name = "category_name")
     override val name: String,
 
-): BaseCategoryEntity(id, name)
+    @ColumnInfo(name = "category_icon")
+    override val iconName: String
+
+): BaseCategoryEntity(id, name, iconName)

@@ -46,7 +46,7 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 fun HomeScreen(
     totalBalanceState: TotalBalanceState,
     modifier: Modifier = Modifier,
-    onTransaction: (TransactionType) -> Unit,
+    onMadeTransaction: (TransactionType) -> Unit,
     onEditBalance: (Float) -> Unit
 ) {
     Column(
@@ -69,7 +69,7 @@ fun HomeScreen(
 
         TotalBalanceCard(
             totalBalanceState = totalBalanceState,
-            onTransaction = onTransaction,
+            onNewTransaction = onMadeTransaction,
             onEditBalance = onEditBalance
         )
     }
@@ -81,7 +81,7 @@ fun HomeScreen(
 private fun TotalBalanceCard(
     totalBalanceState: TotalBalanceState,
     modifier: Modifier = Modifier,
-    onTransaction: (TransactionType) -> Unit,
+    onNewTransaction: (TransactionType) -> Unit,
     onEditBalance: (Float) -> Unit
 ) {
     Card(
@@ -133,14 +133,14 @@ private fun TotalBalanceCard(
                     text = "Income",
                     icon = Icons.Filled.Add
                 ) {
-                    onTransaction(TransactionType.INCOME)
+                    onNewTransaction(TransactionType.INCOME)
                 }
 
                 TotalBalanceActionButton(
                     text = "Expense",
                     icon = Icons.Filled.Remove
                 ) {
-                    onTransaction(TransactionType.EXPENSE)
+                    onNewTransaction(TransactionType.EXPENSE)
                 }
 
                 TotalBalanceActionButton(
@@ -202,7 +202,7 @@ fun HomeScreenPreview() {
     MyWalletTheme {
         HomeScreen(
             totalBalanceState = TotalBalanceState(balance = 8000f),
-            onTransaction = {},
+            onMadeTransaction = {},
             onEditBalance = {}
         )
     }

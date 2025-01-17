@@ -6,7 +6,6 @@ import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class TotalBalanceUseCase @Inject constructor(

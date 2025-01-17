@@ -15,12 +15,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.navigation.NavigationRoute
 import com.ancraz.mywallet.presentation.ui.screens.editBalanceScreen.EditBalanceScreen
 import com.ancraz.mywallet.presentation.ui.screens.homeScreen.HomeScreen
+import com.ancraz.mywallet.presentation.ui.screens.inputScreen.TransactionInputScreen
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.viewModels.HomeViewModel
+import com.ancraz.mywallet.presentation.viewModels.TransactionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -43,6 +46,7 @@ private fun MainActivityScreen() {
     val navController = rememberNavController()
 
     val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
+    val transactionViewModel: TransactionViewModel = hiltViewModel<TransactionViewModel>()
 
     Scaffold(
         modifier = Modifier
@@ -58,8 +62,24 @@ private fun MainActivityScreen() {
                 HomeScreen(
                     homeViewModel.totalBalanceState.value,
                     modifier = Modifier.padding(innerPadding),
-                    onTransaction = {
-
+                    onMadeTransaction = { transactionType ->
+                        when(transactionType){
+                            TransactionType.INCOME -> {
+                                navigateToTransactionInputScreen(
+                                    navController,
+                                    homeViewModel.totalBalanceState.value.balance,
+                                    transactionType
+                                )
+                            }
+                            TransactionType.EXPENSE -> {
+                                navigateToTransactionInputScreen(
+                                    navController,
+                                    homeViewModel.totalBalanceState.value.balance,
+                                    transactionType
+                                )
+                            }
+                            TransactionType.TRANSFER -> {}
+                        }
                     },
                     onEditBalance = { currentBalance ->
                         navigateToEditBalanceScreen(navController, currentBalance)
@@ -90,13 +110,50 @@ private fun MainActivityScreen() {
                     }
                 )
             }
+
+            composable(
+                route = NavigationRoute.TransactionInputScreen.route + "/{balance}" + "/{transaction}"
+            ) { navBackStackEntry ->
+
+                val currentBalanceValue = try {
+                    (navBackStackEntry.arguments?.getString("balance") ?: "0").toFloat()
+                } catch (e: Exception) {
+                    debugLog("getCurrentBalance argument exception: ${e.message}")
+                    0f
+                }
+
+                val transactionType = try {
+                    val transactionString = (navBackStackEntry.arguments?.getString("transaction")) ?: ""
+                    when(transactionString){
+                        TransactionType.EXPENSE.name -> TransactionType.EXPENSE
+                        TransactionType.TRANSFER.name -> TransactionType.TRANSFER
+                        else -> TransactionType.INCOME
+                    }
+                } catch (e: Exception) {
+                    debugLog("getCurrentBalance argument exception: ${e.message}")
+                    TransactionType.INCOME
+                }
+
+                TransactionInputScreen(
+                    categoriesState = transactionViewModel.transactionCategoriesState.value,
+                    totalBalance = currentBalanceValue,
+                    transactionType = transactionType,
+                    modifier = Modifier.padding(innerPadding),
+                    onAddTransaction = {},
+                    onBack = {}
+                )
+            }
         }
     }
 }
 
 
-private fun navigateToEditBalanceScreen(navController: NavController, balance: Float){
+private fun navigateToEditBalanceScreen(navController: NavController, balance: Float) {
     navController.navigate(NavigationRoute.EditBalanceScreen.route + "/$balance")
+}
+
+private fun navigateToTransactionInputScreen(navController: NavController, balance: Float, transactionType: TransactionType){
+    navController.navigate(NavigationRoute.TransactionInputScreen.route + "/$balance" + "/${transactionType.name}")
 }
 
 

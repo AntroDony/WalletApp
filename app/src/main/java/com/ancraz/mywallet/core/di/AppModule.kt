@@ -4,12 +4,15 @@ import android.content.Context
 import androidx.room.Room
 import com.ancraz.mywallet.BuildConfig
 import com.ancraz.mywallet.data.network.CurrencyRateDataSource
-import com.ancraz.mywallet.data.repository.BalanceRepositoryImpl
+import com.ancraz.mywallet.data.repository.TransactionRepositoryImpl
 import com.ancraz.mywallet.data.repository.CurrencyRepositoryImpl
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository
+import com.ancraz.mywallet.data.storage.database.DatabaseInitializer
 import com.ancraz.mywallet.data.storage.database.WalletDatabase
+import com.ancraz.mywallet.data.storage.database.dao.CategoryDao
+import com.ancraz.mywallet.data.storage.database.dao.TransactionDao
 import com.ancraz.mywallet.domain.network.CurrencyDataSource
-import com.ancraz.mywallet.domain.repository.BalanceRepository
+import com.ancraz.mywallet.domain.repository.TransactionRepository
 import com.ancraz.mywallet.domain.repository.CurrencyRepository
 import dagger.Module
 import dagger.Provides
@@ -20,6 +23,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -28,25 +32,29 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTaskDatabase(@ApplicationContext context: Context): WalletDatabase {
-        val taskDatabase = Room.databaseBuilder(
+    fun provideWalletDatabase(
+        @ApplicationContext context: Context,
+        categoryProvider: Provider<CategoryDao>
+    ): WalletDatabase {
+        val walletDatabase = Room.databaseBuilder(
             context,
             WalletDatabase::class.java,
-            "wallet_database"
-        )
-            .fallbackToDestructiveMigration()
+            "wallet_database.db"
+        ).addCallback(
+            DatabaseInitializer(dataProvider = categoryProvider)
+        ).fallbackToDestructiveMigration()
             .build()
 
-        return taskDatabase
+        return walletDatabase
     }
 
 
     @Provides
     @Singleton
-    fun provideCurrencyRateDataSource(): CurrencyDataSource{
+    fun provideCurrencyRateDataSource(): CurrencyDataSource {
         return CurrencyRateDataSource(
-            HttpClient(CIO){
-                install(ContentNegotiation){
+            HttpClient(CIO) {
+                install(ContentNegotiation) {
                     json()
                 }
             },
@@ -64,15 +72,32 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCurrencyRepository(dataSource: CurrencyDataSource): CurrencyRepository{
+    fun provideCurrencyRepository(dataSource: CurrencyDataSource): CurrencyRepository {
         return CurrencyRepositoryImpl(dataSource)
     }
 
 
     @Provides
     @Singleton
-    fun provideBalanceRepository(walletDatabase: WalletDatabase): BalanceRepository{
-        return BalanceRepositoryImpl(walletDatabase.transactionDao)
+    fun provideTransactionRepository(walletDatabase: WalletDatabase): TransactionRepository {
+        return TransactionRepositoryImpl(
+            walletDatabase.transactionDao(),
+            walletDatabase.categoryDao()
+        )
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideTransactionDao(walletDatabase: WalletDatabase): TransactionDao {
+        return walletDatabase.transactionDao()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideCategoryDao(walletDatabase: WalletDatabase): CategoryDao{
+        return walletDatabase.categoryDao()
     }
 
 }

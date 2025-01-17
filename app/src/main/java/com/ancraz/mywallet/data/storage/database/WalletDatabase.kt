@@ -6,6 +6,7 @@ import androidx.room.TypeConverters
 import com.ancraz.mywallet.data.storage.database.converters.CurrencyConverter
 import com.ancraz.mywallet.data.storage.database.converters.TransactionTypeConverter
 import com.ancraz.mywallet.data.storage.database.dao.AccountDao
+import com.ancraz.mywallet.data.storage.database.dao.CategoryDao
 import com.ancraz.mywallet.data.storage.database.dao.TransactionDao
 import com.ancraz.mywallet.data.storage.database.models.BalanceAccountEntity
 import com.ancraz.mywallet.data.storage.database.models.ExpenseCategoryEntity
@@ -26,7 +27,9 @@ import com.ancraz.mywallet.data.storage.database.models.TransactionEntity
 @TypeConverters(CurrencyConverter::class, TransactionTypeConverter::class)
 abstract class WalletDatabase: RoomDatabase() {
 
-    abstract val transactionDao: TransactionDao
+    abstract fun transactionDao(): TransactionDao
 
-    abstract val accountDao: AccountDao
+    abstract fun accountDao(): AccountDao
+
+    abstract fun categoryDao(): CategoryDao
 }

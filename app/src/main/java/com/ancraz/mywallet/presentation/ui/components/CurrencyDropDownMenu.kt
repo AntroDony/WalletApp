@@ -15,6 +15,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,13 +31,13 @@ import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
 
 @Composable
 fun CurrencyDropDownMenu(
-    currentCurrency: CurrencyCode,
+    currentCurrencyState: MutableState<CurrencyCode>,
     modifier: Modifier = Modifier
 ) {
     val items = CurrencyCode.entries.toList()
 
     val isDropDownExpanded = remember { mutableStateOf(false) }
-    val itemPosition = remember { mutableStateOf(items.indexOf(currentCurrency)) }
+    val itemPosition = remember { mutableStateOf(items.indexOf(currentCurrencyState.value)) }
 
     Box(
         modifier = modifier
@@ -101,7 +102,8 @@ fun CurrencyDropDownMenu(
 @Preview
 @Composable
 private fun CurrencyDropDownMenuPreview() {
+    val currencyState = remember { mutableStateOf(CurrencyCode.USD) }
     MyWalletTheme {
-        CurrencyDropDownMenu(CurrencyCode.USD)
+        CurrencyDropDownMenu(currencyState)
     }
 }

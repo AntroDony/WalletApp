@@ -26,8 +26,8 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 @Composable
 fun InputTextField(
     valueState: MutableState<String>,
+    currencyState: MutableState<CurrencyCode>,
     title: String,
-    currencyCode: CurrencyCode,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -57,7 +57,7 @@ fun InputTextField(
         HorizontalSpacer()
 
         CurrencyDropDownMenu(
-            currentCurrency = currencyCode
+            currentCurrencyState = currencyState
         )
 
         Row(
@@ -77,11 +77,12 @@ fun InputTextField(
 @Composable
 fun InputTextFieldPreview(){
     val valueState = remember { mutableStateOf(8000f.toFormattedString()) }
+    val currencyState = remember { mutableStateOf(CurrencyCode.EUR) }
     MyWalletTheme {
         InputTextField(
             valueState = valueState,
-            title = "Balance",
-            currencyCode = CurrencyCode.USD
+            currencyState = currencyState,
+            title = "Balance"
         )
     }
 }

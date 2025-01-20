@@ -21,8 +21,11 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,18 +36,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.presentation.states.TotalBalanceState
+import com.ancraz.mywallet.core.utils.debugLog
+import com.ancraz.mywallet.presentation.models.TransactionUi
+import com.ancraz.mywallet.presentation.states.HomeScreenData
+import com.ancraz.mywallet.presentation.states.HomeScreenState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
+import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
+import java.util.Calendar
 
 @Composable
 fun HomeScreen(
-    totalBalanceState: TotalBalanceState,
+    homeScreenState: HomeScreenState,
     modifier: Modifier = Modifier,
     onMadeTransaction: (TransactionType) -> Unit,
     onEditBalance: (Float) -> Unit
@@ -68,7 +77,7 @@ fun HomeScreen(
         HorizontalSpacer()
 
         TotalBalanceCard(
-            totalBalanceState = totalBalanceState,
+            homeScreenState = homeScreenState,
             onNewTransaction = onMadeTransaction,
             onEditBalance = onEditBalance
         )
@@ -79,7 +88,7 @@ fun HomeScreen(
 
 @Composable
 private fun TotalBalanceCard(
-    totalBalanceState: TotalBalanceState,
+    homeScreenState: HomeScreenState,
     modifier: Modifier = Modifier,
     onNewTransaction: (TransactionType) -> Unit,
     onEditBalance: (Float) -> Unit
@@ -107,14 +116,15 @@ private fun TotalBalanceCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            if (totalBalanceState.isLoading) {
+            if (homeScreenState.isLoading) {
                 CircularProgressIndicator(
+                    trackColor = onPrimaryColor,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                 )
             } else {
                 Text(
-                    text = "\$ ${totalBalanceState.balance.toFormattedString()}",
+                    text = "\$ ${homeScreenState.data.balance.toFormattedString()}",
                     color = Color.Black,
                     fontSize = 40.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -147,7 +157,7 @@ private fun TotalBalanceCard(
                     text = "Edit",
                     icon = Icons.Filled.Edit
                 ) {
-                    onEditBalance(totalBalanceState.balance)
+                    onEditBalance(homeScreenState.data.balance)
                 }
             }
 
@@ -201,7 +211,20 @@ private fun TotalBalanceActionButton(
 fun HomeScreenPreview() {
     MyWalletTheme {
         HomeScreen(
-            totalBalanceState = TotalBalanceState(balance = 8000f),
+            homeScreenState = HomeScreenState(
+                isLoading = true,
+                data = HomeScreenData(
+                    balance = 8000f,
+                    transactions = listOf(
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.INCOME, currency = CurrencyCode.USD),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
+                    )
+                )
+            ),
             onMadeTransaction = {},
             onEditBalance = {}
         )

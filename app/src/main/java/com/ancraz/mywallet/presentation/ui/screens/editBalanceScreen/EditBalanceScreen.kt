@@ -30,6 +30,8 @@ fun EditBalanceScreen(
     onNavigateBack: () -> Unit
 ) {
     val valueState = remember { mutableStateOf(value.toFormattedString()) }
+    val currencyState = remember { mutableStateOf(currencyCode) }
+
     Column(
         modifier = modifier.fillMaxSize()
             .padding(14.dp),
@@ -41,8 +43,8 @@ fun EditBalanceScreen(
 
         InputTextField(
             valueState = valueState,
+            currencyState = currencyState,
             title = "Total Balance",
-            currencyCode = currencyCode,
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.CenterHorizontally)

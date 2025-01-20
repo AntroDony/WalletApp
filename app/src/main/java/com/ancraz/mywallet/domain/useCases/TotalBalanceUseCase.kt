@@ -16,13 +16,12 @@ class TotalBalanceUseCase @Inject constructor(
         return flow {
             emit(DataResult.Loading())
             dataStoreRepository.totalBalanceInUsdFlow().collect{ balance->
-                debugLog("getTotalBalanceFlow : $balance")
                 emit(DataResult.Success(balance))
             }
         }
     }
 
-    suspend fun updateTotalBalance(value: Float, currency: CurrencyCode){
+    suspend fun editTotalBalance(value: Float, currency: CurrencyCode){
         when(currency){
             CurrencyCode.USD -> {
                 updateBalance(value)

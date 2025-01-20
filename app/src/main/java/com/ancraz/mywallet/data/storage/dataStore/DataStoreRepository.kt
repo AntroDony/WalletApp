@@ -44,13 +44,17 @@ class DataStoreRepository(
 
     suspend fun incomeTotalBalance(value: Float){
         context.dataStore.edit { preferences ->
-            preferences[TOTAL_BALANCE_USD] = preferences[TOTAL_BALANCE_USD] ?: (0f + value)
+            preferences[TOTAL_BALANCE_USD] = preferences[TOTAL_BALANCE_USD]?.let {
+                it + value
+            } ?: (0f + value)
         }
     }
 
     suspend fun expenseTotalBalance(value: Float){
         context.dataStore.edit { preferences ->
-            preferences[TOTAL_BALANCE_USD] = preferences[TOTAL_BALANCE_USD] ?: (0f - value)
+            preferences[TOTAL_BALANCE_USD] = preferences[TOTAL_BALANCE_USD]?.let {
+                it - value
+            } ?: (0f - value)
         }
     }
 

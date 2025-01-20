@@ -60,21 +60,21 @@ private fun MainActivityScreen() {
                 route = NavigationRoute.HomeScreen.route
             ) {
                 HomeScreen(
-                    homeViewModel.totalBalanceState.value,
+                    homeViewModel.homeScreenState.value,
                     modifier = Modifier.padding(innerPadding),
                     onMadeTransaction = { transactionType ->
                         when(transactionType){
                             TransactionType.INCOME -> {
                                 navigateToTransactionInputScreen(
                                     navController,
-                                    homeViewModel.totalBalanceState.value.balance,
+                                    homeViewModel.homeScreenState.value.data.balance,
                                     transactionType
                                 )
                             }
                             TransactionType.EXPENSE -> {
                                 navigateToTransactionInputScreen(
                                     navController,
-                                    homeViewModel.totalBalanceState.value.balance,
+                                    homeViewModel.homeScreenState.value.data.balance,
                                     transactionType
                                 )
                             }
@@ -103,7 +103,7 @@ private fun MainActivityScreen() {
                     value = currentBalanceValue,
                     modifier = Modifier.padding(innerPadding),
                     onUpdateBalanceValue = { value ->
-                        homeViewModel.updateTotalBalance(value)
+                        homeViewModel.editTotalBalance(value)
                     },
                     onNavigateBack = {
                         navController.navigateUp()
@@ -139,8 +139,12 @@ private fun MainActivityScreen() {
                     totalBalance = currentBalanceValue,
                     transactionType = transactionType,
                     modifier = Modifier.padding(innerPadding),
-                    onAddTransaction = {},
-                    onBack = {}
+                    onAddTransaction = { transaction ->
+                        transactionViewModel.addNewTransaction(transaction)
+                    },
+                    onBack = {
+                        navController.navigateUp()
+                    }
                 )
             }
         }

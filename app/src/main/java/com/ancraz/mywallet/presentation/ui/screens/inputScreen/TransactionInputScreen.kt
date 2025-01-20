@@ -1,9 +1,7 @@
 package com.ancraz.mywallet.presentation.ui.screens.inputScreen
 
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -30,9 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,8 +39,8 @@ import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
+import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.states.TransactionCategoriesState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
@@ -53,9 +49,9 @@ import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
-import com.ancraz.mywallet.presentation.ui.theme.errorColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryContainerColor
+import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
 import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
@@ -66,20 +62,25 @@ fun TransactionInputScreen(
     totalBalance: Float = 0f,
     transactionType: TransactionType,
     modifier: Modifier = Modifier,
-    onAddTransaction: (TransactionCategoryUi) -> Unit,
+    onAddTransaction: (TransactionUi) -> Unit,
     onBack: () -> Unit
 ) {
-    val inputValueState = remember { mutableStateOf(0f.toFormattedString())}
-    val descriptionState = remember { mutableStateOf("") }
-    val bottomSheetState = rememberModalBottomSheetState()
+    val inputValueState = remember { mutableStateOf(0f.toFormattedString()) }
+    val currencyState = remember { mutableStateOf(CurrencyCode.USD) }
+
+    val descriptionState = remember { mutableStateOf<String?>(null) }
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     val isBottomSheetExpanded = rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .padding(14.dp)
     ) {
         NavigationToolbar(
-            title = transactionType.name.uppercase(),
+            title = transactionType.name.lowercase().replaceFirstChar { it.uppercase() },
             onClickBack = onBack
         )
 
@@ -87,8 +88,8 @@ fun TransactionInputScreen(
 
         InputTextField(
             valueState = inputValueState,
-            title = "Total Balance: ${totalBalance.toFormattedString()}",
-            currencyCode = CurrencyCode.USD,
+            currencyState = currencyState,
+            title = "Balance: ${totalBalance.toFormattedString()}",
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.CenterHorizontally)
@@ -118,38 +119,45 @@ fun TransactionInputScreen(
                 onDismissRequest = {
                     isBottomSheetExpanded.value = false
                 },
-                modifier = Modifier
-                    .background(backgroundColor)
+                containerColor = backgroundColor
             ) {
                 val categoryList = if (transactionType == TransactionType.INCOME) {
                     categoriesState.incomeCategories
-                }
-                 else {
-                     categoriesState.expenseCategories
+                } else {
+                    categoriesState.expenseCategories
                 }
 
                 CategoryListMenu(
                     categoryList,
                     onSelected = { category ->
+                        isBottomSheetExpanded.value = false
 
+                        val transactionObject = buildTransactionObject(
+                            value = inputValueState.value.toFloatValue(),
+                            currency = currencyState.value,
+                            type = transactionType,
+                            description = descriptionState.value ?: category.name
+                        )
+
+                        onAddTransaction(transactionObject)
+                        onBack()
                     }
                 )
             }
         }
-
     }
 }
 
 
 @Composable
 private fun TransactionDescriptionTextField(
-    textState: MutableState<String>,
+    textState: MutableState<String?>,
     modifier: Modifier = Modifier
-){
+) {
     val textStyle = TextStyle(fontSize = 16.sp)
 
     OutlinedTextField(
-        value = textState.value,
+        value = textState.value ?: "",
         onValueChange = {
             textState.value = it
         },
@@ -189,23 +197,18 @@ private fun TransactionDescriptionTextField(
 @Composable
 private fun CategoryListMenu(
     categories: List<TransactionCategoryUi>,
-    modifier: Modifier = Modifier,
     onSelected: (TransactionCategoryUi) -> Unit
-){
-    val selectedCategory = remember { mutableStateOf<TransactionCategoryUi?>(null) }
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-        HorizontalSpacer()
-
-        LazyVerticalGrid(GridCells.Fixed(3)) {
-            items(categories){ category ->
-                CategoryItem(category)
-            }
+) {
+    LazyVerticalGrid(GridCells.Fixed(3)) {
+        items(categories) { category ->
+            CategoryItem(
+                category,
+                modifier = Modifier
+                    .clickable {
+                        onSelected(category)
+                    }
+            )
         }
-
-        HorizontalSpacer()
     }
 }
 
@@ -229,7 +232,7 @@ private fun CategoryItem(
         modifier = modifier
             .padding(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = backgroundColor
+            containerColor = surfaceColor
         ),
         border = BorderStroke(width = 1.dp, color = primaryColor)
     ) {
@@ -243,16 +246,16 @@ private fun CategoryItem(
                 contentDescription = category.name,
                 imageLoader = imageLoader,
                 colorFilter = ColorFilter.tint(
-                    primaryColor
+                    Color.White
                 ),
                 modifier = Modifier
                     .padding(6.dp)
-                    .size(42.dp)
+                    .size(40.dp)
             )
 
             Text(
                 text = category.name,
-                color = primaryColor,
+                color = Color.White,
                 fontSize = 12.sp,
                 maxLines = 1
             )
@@ -266,20 +269,80 @@ private fun CategoryItem(
 
 @Preview
 @Composable
-private fun TransactionInputScreenPreview(){
+private fun TransactionInputScreenPreview() {
     MyWalletTheme {
         TransactionInputScreen(
             categoriesState = TransactionCategoriesState(
                 expenseCategories = listOf(
-                    TransactionCategoryUi(name = "Category 1", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
-                    TransactionCategoryUi(name = "Category 2", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
-                    TransactionCategoryUi(name = "Category 3", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
-                    TransactionCategoryUi(name = "Category 4", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
-                    TransactionCategoryUi(name = "Category 5", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE)
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 2",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 3",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 4",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 2",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 3",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 4",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 2",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 3",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 4",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 5",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    )
                 )
             ),
             totalBalance = 8000f,
-            TransactionType.INCOME,
+            TransactionType.EXPENSE,
             onAddTransaction = {},
             onBack = {}
         )
@@ -289,18 +352,58 @@ private fun TransactionInputScreenPreview(){
 
 @Preview
 @Composable
-private fun CategoryItemPreview(){
+private fun CategoryItemPreview() {
     MyWalletTheme {
         CategoryListMenu(
             categories = listOf(
-                TransactionCategoryUi(name = "Category 1", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
-                TransactionCategoryUi(name = "Category 1", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
-                TransactionCategoryUi(name = "Category 1", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
-                TransactionCategoryUi(name = "Category 1", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
-                TransactionCategoryUi(name = "Category 1", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
-                TransactionCategoryUi(name = "Category 1", iconAssetPath = "categories_icon/house_category.svg", transactionType = TransactionType.EXPENSE),
+                TransactionCategoryUi(
+                    name = "Category 1",
+                    iconAssetPath = "categories_icon/house_category.svg",
+                    transactionType = TransactionType.EXPENSE
+                ),
+                TransactionCategoryUi(
+                    name = "Category 1",
+                    iconAssetPath = "categories_icon/house_category.svg",
+                    transactionType = TransactionType.EXPENSE
+                ),
+                TransactionCategoryUi(
+                    name = "Category 1",
+                    iconAssetPath = "categories_icon/house_category.svg",
+                    transactionType = TransactionType.EXPENSE
+                ),
+                TransactionCategoryUi(
+                    name = "Category 1",
+                    iconAssetPath = "categories_icon/house_category.svg",
+                    transactionType = TransactionType.EXPENSE
+                ),
+                TransactionCategoryUi(
+                    name = "Category 1",
+                    iconAssetPath = "categories_icon/house_category.svg",
+                    transactionType = TransactionType.EXPENSE
+                ),
+                TransactionCategoryUi(
+                    name = "Category 1",
+                    iconAssetPath = "categories_icon/house_category.svg",
+                    transactionType = TransactionType.EXPENSE
+                ),
             ),
             onSelected = {}
         )
     }
+}
+
+
+
+private fun buildTransactionObject(
+    value: Float,
+    currency: CurrencyCode,
+    type: TransactionType,
+    description: String?,
+): TransactionUi{
+    return TransactionUi(
+        value = value,
+        currency = currency,
+        type = type,
+        description = description
+    )
 }

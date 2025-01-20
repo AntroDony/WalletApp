@@ -4,13 +4,17 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionCategoryUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.DeleteTransactionCategoryUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionCategoriesUseCase
+import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionsUseCase
 import com.ancraz.mywallet.presentation.mapper.toCategoryUi
+import com.ancraz.mywallet.presentation.mapper.toTransaction
+import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.states.TransactionCategoriesState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +38,13 @@ class TransactionViewModel @Inject constructor(
 
     init {
         getAllTransactionCategories()
+    }
+
+
+    fun addNewTransaction(transactionUi: TransactionUi){
+        viewModelScope.launch(ioDispatcher) {
+            addTransactionUseCase.addTransaction(transactionUi.toTransaction())
+        }
     }
 
 

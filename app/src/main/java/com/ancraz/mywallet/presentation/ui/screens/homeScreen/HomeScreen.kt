@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.presentation.ui.screens.homeScreen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,11 +14,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,11 +50,16 @@ import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.states.HomeScreenData
 import com.ancraz.mywallet.presentation.states.HomeScreenState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
+import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
+import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
+import com.ancraz.mywallet.presentation.ui.theme.errorColor
+import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
+import com.ancraz.mywallet.presentation.ui.utils.timeToString
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 import java.util.Calendar
 
@@ -61,7 +73,7 @@ fun HomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(14.dp)
+            .padding(horizontal = 14.dp)
     ) {
         HorizontalSpacer()
 
@@ -80,6 +92,12 @@ fun HomeScreen(
             homeScreenState = homeScreenState,
             onNewTransaction = onMadeTransaction,
             onEditBalance = onEditBalance
+        )
+
+        HorizontalSpacer()
+
+        TransactionListContainer(
+            homeScreenState = homeScreenState
         )
     }
 
@@ -107,7 +125,7 @@ private fun TotalBalanceCard(
         ) {
             Text(
                 text = "Total balance",
-                fontSize = 14.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.Black,
                 modifier = Modifier
@@ -202,7 +220,146 @@ private fun TotalBalanceActionButton(
                 .align(Alignment.CenterHorizontally)
         )
     }
+}
 
+
+@Composable
+private fun TransactionListContainer(
+    homeScreenState: HomeScreenState,
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Transactions",
+                fontSize = 16.sp,
+                color = onBackgroundColor
+            )
+
+            Row(
+                modifier = Modifier,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "All",
+                    fontSize = 16.sp,
+                    color = onBackgroundColor
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Image(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                    contentDescription = "All Transactions",
+                    colorFilter = ColorFilter.tint(onBackgroundColor),
+                    modifier = Modifier
+                        .size(16.dp)
+                )
+            }
+        }
+        VerticalSpacer()
+
+        LazyColumn(
+            modifier = Modifier
+        ){
+            items(homeScreenState.data.transactions){ transaction ->
+                TransactionCard(
+                    transaction = transaction,
+                    onClick = {}
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun TransactionCard(
+    transaction: TransactionUi,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+){
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 6.dp, vertical = 8.dp)
+            .clickable {
+                onClick()
+            },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor
+        ),
+        border = BorderStroke(width = 1.dp, color = primaryColor)
+
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            //todo add category icon
+            Image(
+                imageVector = Icons.Outlined.Circle,
+                contentDescription = "",
+                colorFilter = ColorFilter.tint(primaryColor),
+                modifier = Modifier
+                    .size(50.dp)
+            )
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 6.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = transaction.description ?: "",
+                    fontSize = 16.sp,
+                    color = onBackgroundColor
+                )
+
+                HorizontalSpacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = transaction.time.timeToString(),
+                    fontSize = 14.sp,
+                    color = onBackgroundColor
+                )
+            }
+            TransactionValueText(transaction)
+
+        }
+    }
+}
+
+
+@Composable
+private fun TransactionValueText(transaction: TransactionUi){
+    val textColor = if (transaction.type == TransactionType.EXPENSE) primaryColor else errorColor
+    val valuePrefix = if (transaction.type == TransactionType.EXPENSE){
+        "+"
+    } else if (transaction.type == TransactionType.INCOME) {
+        "-"
+    } else {
+        ""
+    }
+
+    val valueSuffix = transaction.currency.name
+
+    Text(
+        text = "$valuePrefix${transaction.value.toFormattedString()} $valueSuffix",
+        fontSize = 16.sp,
+        color = textColor
+    )
 }
 
 
@@ -216,12 +373,12 @@ fun HomeScreenPreview() {
                 data = HomeScreenData(
                     balance = 8000f,
                     transactions = listOf(
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.INCOME, currency = CurrencyCode.USD),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 1"),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.INCOME, currency = CurrencyCode.USD, description = "Transaction 2"),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 3"),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 4"),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 5"),
+                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 6"),
                     )
                 )
             ),

@@ -1,12 +1,22 @@
 package com.ancraz.mywallet.presentation.ui.utils
 
 import com.ancraz.mywallet.core.utils.debugLog
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 
 fun Float.toFormattedString(): String{
     return String.format(Locale.US, "%.2f", this)
 }
+
+
+fun Long.timeToString(): String {
+    val dateFormat = SimpleDateFormat("dd MMM, HH:mm", Locale.US)
+    val date = Date(this)
+    return dateFormat.format(date)
+}
+
 
 fun String.toFloatValue(): Float {
     return try {

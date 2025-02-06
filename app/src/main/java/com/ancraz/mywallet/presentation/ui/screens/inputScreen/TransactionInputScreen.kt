@@ -2,8 +2,12 @@ package com.ancraz.mywallet.presentation.ui.screens.inputScreen
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,21 +17,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -50,13 +54,13 @@ import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
+import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryContainerColor
 import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
 import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionInputScreen(
     categoriesState: TransactionCategoriesState,
@@ -72,17 +76,15 @@ fun TransactionInputScreen(
     val currencyState = remember { mutableStateOf(CurrencyCode.USD) }
 
     val descriptionState = remember { mutableStateOf<String?>(null) }
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
-    //val isBottomSheetExpanded = rememberSaveable { mutableStateOf(false) }
     val isCategoryListOpen = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(14.dp)
+            .padding(horizontal = 14.dp)
     ) {
+        HorizontalSpacer()
+
         NavigationToolbar(
             title = transactionType.name.lowercase().replaceFirstChar { it.uppercase() },
             onClickBack = onBack
@@ -95,16 +97,20 @@ fun TransactionInputScreen(
             currencyState = currencyState,
             title = "Balance: ${totalBalance.toFormattedString()}",
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                //.weight(1f)
                 .align(Alignment.CenterHorizontally)
-                .weight(1f)
+
         )
 
         HorizontalSpacer()
 
         if (!isCategoryListOpen.value) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.Bottom
             ) {
                 TransactionDescriptionTextField(descriptionState)
 
@@ -120,6 +126,8 @@ fun TransactionInputScreen(
                         isCategoryListOpen.value = true
                     }
                 )
+
+                HorizontalSpacer()
             }
         } else {
             val categoryList = if (transactionType == TransactionType.INCOME) {
@@ -130,6 +138,8 @@ fun TransactionInputScreen(
 
             CategoryListMenu(
                 categoryList,
+                openState = isCategoryListOpen,
+                modifier = Modifier.weight(1f),
                 onSelected = { category ->
                     isCategoryListOpen.value = false
 
@@ -141,8 +151,9 @@ fun TransactionInputScreen(
                         category = category
                     )
 
-                    if (transactionObject == null){
-                        Toast.makeText(context, "Transaction value cannot be 0", Toast.LENGTH_LONG).show()
+                    if (transactionObject == null) {
+                        Toast.makeText(context, "Transaction value cannot be 0", Toast.LENGTH_LONG)
+                            .show()
                     } else {
                         onAddTransaction(transactionObject)
                         onBack()
@@ -188,7 +199,7 @@ private fun TransactionDescriptionTextField(
             focusedIndicatorColor = primaryColor,
             unfocusedIndicatorColor = primaryContainerColor,
 
-        ),
+            ),
         modifier = modifier
             .fillMaxWidth()
     )
@@ -198,17 +209,47 @@ private fun TransactionDescriptionTextField(
 @Composable
 private fun CategoryListMenu(
     categories: List<TransactionCategoryUi>,
+    openState: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
     onSelected: (TransactionCategoryUi) -> Unit
 ) {
-    LazyVerticalGrid(GridCells.Fixed(3)) {
-        items(categories) { category ->
-            CategoryItem(
-                category,
+    Column(
+        modifier = modifier
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
+                .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
+                .background(surfaceColor)
+
+        ){
+            Image(
+                imageVector = Icons.Filled.ArrowDropDown,
+                contentDescription = "Close",
+                colorFilter = ColorFilter.tint(onSecondaryColor),
                 modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(40.dp)
                     .clickable {
-                        onSelected(category)
+                        openState.value = false
                     }
             )
+        }
+
+        LazyVerticalGrid(
+            modifier = Modifier
+                .background(surfaceColor),
+            columns = GridCells.Fixed(3)) {
+            items(categories) { category ->
+                CategoryItem(
+                    category,
+                    modifier = Modifier
+                        .clickable {
+                            onSelected(category)
+                        }
+                )
+            }
         }
     }
 }
@@ -339,7 +380,52 @@ private fun TransactionInputScreenPreview() {
                         name = "Category 5",
                         iconAssetPath = "categories_icon/house_category.svg",
                         transactionType = TransactionType.EXPENSE
-                    )
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
+                    TransactionCategoryUi(
+                        name = "Category 1",
+                        iconAssetPath = "categories_icon/house_category.svg",
+                        transactionType = TransactionType.EXPENSE
+                    ),
                 )
             ),
             totalBalance = 8000f,
@@ -350,50 +436,6 @@ private fun TransactionInputScreenPreview() {
     }
 }
 
-
-@Preview
-@Composable
-private fun CategoryItemPreview() {
-    MyWalletTheme {
-        CategoryListMenu(
-            categories = listOf(
-                TransactionCategoryUi(
-                    name = "Category 1",
-                    iconAssetPath = "categories_icon/house_category.svg",
-                    transactionType = TransactionType.EXPENSE
-                ),
-                TransactionCategoryUi(
-                    name = "Category 1",
-                    iconAssetPath = "categories_icon/house_category.svg",
-                    transactionType = TransactionType.EXPENSE
-                ),
-                TransactionCategoryUi(
-                    name = "Category 1",
-                    iconAssetPath = "categories_icon/house_category.svg",
-                    transactionType = TransactionType.EXPENSE
-                ),
-                TransactionCategoryUi(
-                    name = "Category 1",
-                    iconAssetPath = "categories_icon/house_category.svg",
-                    transactionType = TransactionType.EXPENSE
-                ),
-                TransactionCategoryUi(
-                    name = "Category 1",
-                    iconAssetPath = "categories_icon/house_category.svg",
-                    transactionType = TransactionType.EXPENSE
-                ),
-                TransactionCategoryUi(
-                    name = "Category 1",
-                    iconAssetPath = "categories_icon/house_category.svg",
-                    transactionType = TransactionType.EXPENSE
-                ),
-            ),
-            onSelected = {}
-        )
-    }
-}
-
-
 private fun buildTransactionObject(
     value: Float,
     currency: CurrencyCode,
@@ -401,7 +443,7 @@ private fun buildTransactionObject(
     description: String?,
     category: TransactionCategoryUi
 ): TransactionUi? {
-    if (value == 0f){
+    if (value == 0f) {
         return null
     }
     return TransactionUi(

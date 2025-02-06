@@ -31,7 +31,7 @@ class CurrencyRateDataSource(
             parameter("symbols", desiredCurrenciesString)
         }
 
-        debugLog("RESPONSE: ${response.body<String>()} | $response")
+        debugLog("CurrencyApiResponse: ${response.body<String>()} | $response")
 
         return safeCall<String> {
             response

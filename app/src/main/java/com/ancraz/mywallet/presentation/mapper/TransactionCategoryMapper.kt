@@ -1,43 +1,33 @@
 package com.ancraz.mywallet.presentation.mapper
 
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.domain.models.ExpenseTransactionCategory
-import com.ancraz.mywallet.domain.models.IncomeTransactionCategory
+import com.ancraz.mywallet.domain.models.Transaction
+import com.ancraz.mywallet.domain.models.TransactionCategory
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 
 
-fun IncomeTransactionCategory.toCategoryUi(): TransactionCategoryUi{
+fun TransactionCategory.toCategoryUi(): TransactionCategoryUi{
     return TransactionCategoryUi(
         id = this.id,
         name = this.name,
         iconAssetPath = "categories_icon/${this.iconName}.svg",
-        transactionType = TransactionType.INCOME
+        transactionType = when(this.categoryType){
+            TransactionType.INCOME -> TransactionType.INCOME
+            TransactionType.EXPENSE -> TransactionType.EXPENSE
+            TransactionType.TRANSFER -> TransactionType.TRANSFER
+        }
     )
 }
 
-fun ExpenseTransactionCategory.toCategoryUi(): TransactionCategoryUi{
-    return TransactionCategoryUi(
+fun TransactionCategoryUi.toTransactionCategory(): TransactionCategory{
+    return TransactionCategory(
         id = this.id,
         name = this.name,
-        iconAssetPath = "categories_icon/${this.iconName}.svg",
-        transactionType = TransactionType.EXPENSE
-    )
-}
-
-
-fun TransactionCategoryUi.toIncomeCategory(): IncomeTransactionCategory{
-    return IncomeTransactionCategory(
-        id = this.id,
-        name = this.name,
-        iconName = iconAssetPath.substringBefore(".svg").substringAfterLast("/")
-    )
-}
-
-
-fun TransactionCategoryUi.toExpenseCategory(): ExpenseTransactionCategory{
-    return ExpenseTransactionCategory(
-        id = this.id,
-        name = this.name,
-        iconName = iconAssetPath.substringBefore(".svg").substringAfterLast("/")
+        iconName = iconAssetPath.substringBefore(".svg").substringAfterLast("/"),
+        categoryType = when(this.transactionType){
+            TransactionType.INCOME -> TransactionType.INCOME
+            TransactionType.EXPENSE -> TransactionType.EXPENSE
+            TransactionType.TRANSFER -> TransactionType.TRANSFER
+        }
     )
 }

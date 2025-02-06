@@ -6,17 +6,19 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Keep
-@Entity(tableName = "income_categories")
-data class IncomeCategoryEntity(
+@Entity(tableName = "categories")
+data class CategoryEntity(
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "category_id")
-    override val id: Long ,
+    val id: Long = 0L,
 
     @ColumnInfo(name = "category_name")
-    override val name: String,
+    val name: String,
 
     @ColumnInfo(name = "category_icon")
-    override val iconName: String
+    val iconName: String,
 
-): BaseCategoryEntity(id, name, iconName)
+    @ColumnInfo(name = "category_type")
+    val categoryType: TransactionCategoryEntityType
+)

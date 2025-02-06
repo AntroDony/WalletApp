@@ -1,7 +1,6 @@
 package com.ancraz.mywallet.domain.repository
 
-import com.ancraz.mywallet.domain.models.ExpenseTransactionCategory
-import com.ancraz.mywallet.domain.models.IncomeTransactionCategory
+import com.ancraz.mywallet.domain.models.TransactionCategory
 import com.ancraz.mywallet.domain.models.Transaction
 import kotlinx.coroutines.flow.Flow
 
@@ -20,16 +19,14 @@ interface TransactionRepository {
     suspend fun deleteTransactionById(id: Long)
 
 
-    fun getIncomeCategoryList(): Flow<List<IncomeTransactionCategory>>
+    fun getIncomeCategoryList(): Flow<List<TransactionCategory>>
 
-    fun getExpenseCategoryList(): Flow<List<ExpenseTransactionCategory>>
+    fun getExpenseCategoryList(): Flow<List<TransactionCategory>>
 
-    suspend fun addNewIncomeCategory(category: IncomeTransactionCategory)
+    suspend fun addNewIncomeCategory(category: TransactionCategory)
 
-    suspend fun addNewExpenseCategory(category: ExpenseTransactionCategory)
+    suspend fun addNewExpenseCategory(category: TransactionCategory)
 
-    suspend fun deleteIncomeCategoryById(id: Long)
-
-    suspend fun deleteExpenseCategoryById(id: Long)
+    suspend fun deleteCategoryById(id: Long)
 
 }

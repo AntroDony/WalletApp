@@ -2,8 +2,7 @@ package com.ancraz.mywallet.domain.useCases.transactions
 
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
-import com.ancraz.mywallet.domain.models.ExpenseTransactionCategory
-import com.ancraz.mywallet.domain.models.IncomeTransactionCategory
+import com.ancraz.mywallet.domain.models.TransactionCategory
 import com.ancraz.mywallet.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -13,7 +12,7 @@ class GetTransactionCategoriesUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository
 ) {
 
-    fun getIncomeCategories(): Flow<DataResult<List<IncomeTransactionCategory>>>{
+    fun getIncomeCategories(): Flow<DataResult<List<TransactionCategory>>>{
         return flow {
            try {
                emit(DataResult.Loading())
@@ -30,7 +29,7 @@ class GetTransactionCategoriesUseCase @Inject constructor(
     }
 
 
-    fun getExpenseCategories(): Flow<DataResult<List<ExpenseTransactionCategory>>>{
+    fun getExpenseCategories(): Flow<DataResult<List<TransactionCategory>>>{
         return flow {
             try {
                 emit(DataResult.Loading())

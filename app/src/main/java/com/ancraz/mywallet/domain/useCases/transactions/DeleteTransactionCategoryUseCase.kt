@@ -7,11 +7,7 @@ class DeleteTransactionCategoryUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository
 ) {
 
-    suspend fun deleteIncomeCategory(id: Long){
-        transactionRepository.deleteIncomeCategoryById(id)
-    }
-
-    suspend fun deleteExpenseCategory(id: Long){
-        transactionRepository.deleteExpenseCategoryById(id)
+    suspend fun execute(id: Long){
+        transactionRepository.deleteCategoryById(id)
     }
 }

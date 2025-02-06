@@ -1,41 +1,33 @@
 package com.ancraz.mywallet.data.mappers
 
-import com.ancraz.mywallet.data.storage.database.models.ExpenseCategoryEntity
-import com.ancraz.mywallet.data.storage.database.models.IncomeCategoryEntity
-import com.ancraz.mywallet.domain.models.ExpenseTransactionCategory
-import com.ancraz.mywallet.domain.models.IncomeTransactionCategory
+import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.data.storage.database.models.CategoryEntity
+import com.ancraz.mywallet.data.storage.database.models.TransactionCategoryEntityType
+import com.ancraz.mywallet.domain.models.TransactionCategory
 
-fun IncomeCategoryEntity.toTransactionCategory(): IncomeTransactionCategory{
-    return IncomeTransactionCategory(
+fun CategoryEntity.toTransactionCategory(): TransactionCategory{
+    return TransactionCategory(
         id = this.id,
         name = this.name,
-        iconName = this.iconName
+        iconName = this.iconName,
+        categoryType = when(this.categoryType){
+            TransactionCategoryEntityType.INCOME -> TransactionType.INCOME
+            TransactionCategoryEntityType.EXPENSE -> TransactionType.EXPENSE
+            TransactionCategoryEntityType.TRANSFER -> TransactionType.TRANSFER
+        }
     )
 }
 
 
-fun ExpenseCategoryEntity.toTransactionCategory(): ExpenseTransactionCategory{
-    return ExpenseTransactionCategory(
+fun TransactionCategory.toCategoryEntity(): CategoryEntity{
+    return CategoryEntity(
         id = this.id,
         name = this.name,
-        iconName = this.iconName
-    )
-}
-
-
-fun IncomeTransactionCategory.toCategoryEntity(): IncomeCategoryEntity{
-    return IncomeCategoryEntity(
-        id = this.id,
-        name = this.name,
-        iconName = this.iconName
-    )
-}
-
-
-fun ExpenseTransactionCategory.toCategoryEntity(): ExpenseCategoryEntity{
-    return ExpenseCategoryEntity(
-        id = this.id,
-        name = this.name,
-        iconName = this.iconName
+        iconName = this.iconName,
+        categoryType = when (this.categoryType){
+            TransactionType.INCOME -> TransactionCategoryEntityType.INCOME
+            TransactionType.EXPENSE -> TransactionCategoryEntityType.EXPENSE
+            TransactionType.TRANSFER -> TransactionCategoryEntityType.TRANSFER
+        }
     )
 }

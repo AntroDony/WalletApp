@@ -58,6 +58,7 @@ class TransactionViewModel @Inject constructor(
                                 category.toCategoryUi()
                             } ?: emptyList()
                         )
+                        debugLog("expenseCategories: ${_transactionCategoriesState.value.expenseCategories}")
                     }
                     is  DataResult.Loading -> {
                         _transactionCategoriesState.value = TransactionCategoriesState(isLoading = true)
@@ -77,6 +78,8 @@ class TransactionViewModel @Inject constructor(
                                 category.toCategoryUi()
                             } ?: emptyList()
                         )
+
+                        debugLog("incomeCategories: ${_transactionCategoriesState.value.incomeCategories}")
                     }
                     is  DataResult.Loading -> {
                         _transactionCategoriesState.value = TransactionCategoriesState(isLoading = true)
@@ -89,6 +92,4 @@ class TransactionViewModel @Inject constructor(
             }.launchIn(viewModelScope)
         }
     }
-
-
 }

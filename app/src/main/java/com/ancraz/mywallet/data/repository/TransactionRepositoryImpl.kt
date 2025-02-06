@@ -1,20 +1,17 @@
 package com.ancraz.mywallet.data.repository
 
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.data.mappers.toCategoryEntity
 import com.ancraz.mywallet.data.mappers.toTransaction
 import com.ancraz.mywallet.data.mappers.toTransactionCategory
 import com.ancraz.mywallet.data.mappers.toTransactionEntity
 import com.ancraz.mywallet.data.storage.database.dao.CategoryDao
 import com.ancraz.mywallet.data.storage.database.dao.TransactionDao
-import com.ancraz.mywallet.domain.models.ExpenseTransactionCategory
-import com.ancraz.mywallet.domain.models.IncomeTransactionCategory
+import com.ancraz.mywallet.domain.models.TransactionCategory
 import com.ancraz.mywallet.domain.models.Transaction
 import com.ancraz.mywallet.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class TransactionRepositoryImpl @Inject constructor(
     private val transactionDao: TransactionDao,
@@ -50,7 +47,7 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getExpenseCategoryList(): Flow<List<ExpenseTransactionCategory>> {
+    override fun getExpenseCategoryList(): Flow<List<TransactionCategory>> {
         return categoryDao.getAllExpenseCategories().map { list ->
             list.map { category ->
                 category.toTransactionCategory()
@@ -59,7 +56,7 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getIncomeCategoryList(): Flow<List<IncomeTransactionCategory>> {
+    override fun getIncomeCategoryList(): Flow<List<TransactionCategory>> {
         return categoryDao.getAllIncomeCategories().map { list ->
             list.map { category ->
                 category.toTransactionCategory()
@@ -68,22 +65,18 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun addNewExpenseCategory(category: ExpenseTransactionCategory) {
-        categoryDao.insertExpenseCategory(category.toCategoryEntity())
+    override suspend fun addNewExpenseCategory(category: TransactionCategory) {
+        categoryDao.insertCategory(category.toCategoryEntity())
     }
 
 
-    override suspend fun addNewIncomeCategory(category: IncomeTransactionCategory) {
-        categoryDao.insertIncomeCategory(category.toCategoryEntity())
+    override suspend fun addNewIncomeCategory(category: TransactionCategory) {
+        categoryDao.insertCategory(category.toCategoryEntity())
     }
 
 
-    override suspend fun deleteExpenseCategoryById(id: Long) {
-        categoryDao.deleteExpenseCategoryById(id)
+    override suspend fun deleteCategoryById(id: Long) {
+        categoryDao.deleteCategoryById(id)
     }
 
-
-    override suspend fun deleteIncomeCategoryById(id: Long) {
-        categoryDao.deleteIncomeCategoryById(id)
-    }
 }

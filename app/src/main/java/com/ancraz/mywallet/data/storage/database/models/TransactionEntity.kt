@@ -44,8 +44,8 @@ data class TransactionEntity(
     @ColumnInfo(name = "description")
     val description: String? = null,
 
-//    @ColumnInfo(name = "category")
-//    val category: BaseCategoryEntity? = null,
+    @ColumnInfo(name = "category")
+    val category: CategoryEntity? = null,
 
 //    @ColumnInfo(name = "to_account")
 //    val toAccount: BalanceAccountEntity? = null,

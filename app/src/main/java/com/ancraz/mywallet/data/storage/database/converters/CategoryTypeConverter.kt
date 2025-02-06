@@ -1,21 +1,21 @@
 package com.ancraz.mywallet.data.storage.database.converters
 
 import androidx.room.TypeConverter
-import com.ancraz.mywallet.data.storage.database.models.TransactionCategoryEntityType
+import com.ancraz.mywallet.data.storage.database.models.CategoryTransactionType
 
 class CategoryTypeConverter {
 
     @TypeConverter
-    fun categoryTypeToString(type: TransactionCategoryEntityType): String{
+    fun categoryTypeToString(type: CategoryTransactionType): String{
         return type.name
     }
 
 
     @TypeConverter
-    fun stringToCategoryType(typeName: String): TransactionCategoryEntityType {
+    fun stringToCategoryType(typeName: String): CategoryTransactionType {
         return when(typeName){
-            TransactionCategoryEntityType.INCOME.name -> TransactionCategoryEntityType.INCOME
-            else -> TransactionCategoryEntityType.EXPENSE
+            CategoryTransactionType.INCOME.name -> CategoryTransactionType.INCOME
+            else -> CategoryTransactionType.EXPENSE
         }
     }
 

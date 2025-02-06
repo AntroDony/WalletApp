@@ -20,5 +20,5 @@ data class CategoryEntity(
     val iconName: String,
 
     @ColumnInfo(name = "category_type")
-    val categoryType: TransactionCategoryEntityType
+    val categoryType: CategoryTransactionType
 )

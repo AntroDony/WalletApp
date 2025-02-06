@@ -39,10 +39,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.ImageLoader
+import coil3.compose.AsyncImage
+import coil3.svg.SvgDecoder
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.utils.debugLog
@@ -229,7 +233,8 @@ private fun TransactionListContainer(
     modifier: Modifier = Modifier
 ){
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .padding(horizontal = 10.dp),
     ) {
         Row(
             modifier = Modifier
@@ -263,7 +268,6 @@ private fun TransactionListContainer(
                 )
             }
         }
-        VerticalSpacer()
 
         LazyColumn(
             modifier = Modifier
@@ -285,10 +289,18 @@ private fun TransactionCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ){
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(SvgDecoder.Factory())
+        }
+        .build()
+    val assetUri = "file:///android_asset/${transaction.category?.iconAssetPath}"
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 6.dp, vertical = 8.dp)
+            .padding(vertical = 10.dp)
             .clickable {
                 onClick()
             },
@@ -302,23 +314,25 @@ private fun TransactionCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(6.dp),
+                .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            //todo add category icon
-            Image(
-                imageVector = Icons.Outlined.Circle,
-                contentDescription = "",
+            AsyncImage(
+                model = assetUri,
+                contentDescription = transaction.category?.name,
+                imageLoader = imageLoader,
                 colorFilter = ColorFilter.tint(primaryColor),
                 modifier = Modifier
-                    .size(50.dp)
+                    .size(40.dp)
             )
+
+
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 6.dp),
+                    .padding(horizontal = 8.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
@@ -344,10 +358,10 @@ private fun TransactionCard(
 
 @Composable
 private fun TransactionValueText(transaction: TransactionUi){
-    val textColor = if (transaction.type == TransactionType.EXPENSE) primaryColor else errorColor
-    val valuePrefix = if (transaction.type == TransactionType.EXPENSE){
+    val textColor = if (transaction.type == TransactionType.INCOME) primaryColor else errorColor
+    val valuePrefix = if (transaction.type == TransactionType.INCOME){
         "+"
-    } else if (transaction.type == TransactionType.INCOME) {
+    } else if (transaction.type == TransactionType.EXPENSE) {
         "-"
     } else {
         ""

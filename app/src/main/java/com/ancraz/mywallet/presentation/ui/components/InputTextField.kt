@@ -45,7 +45,7 @@ fun InputTextField(
             modifier = Modifier
         )
 
-        HorizontalSpacer(Modifier.height(20.dp))
+        HorizontalSpacer(height = 20.dp)
 
         Text(
             text = valueState.value,

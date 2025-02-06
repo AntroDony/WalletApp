@@ -11,7 +11,8 @@ fun TransactionEntity.toTransaction(): Transaction{
         value = this.value,
         currencyCode = this.currency,
         transactionType = this.transactionType,
-        description = this.description
+        description = this.description,
+        category = this.category?.toTransactionCategory()
     )
 }
 
@@ -23,6 +24,7 @@ fun Transaction.toTransactionEntity(): TransactionEntity{
         value = this.value,
         currency = this.currencyCode,
         transactionType = this.transactionType,
-        description = this.description
+        description = this.description,
+        category = this.category?.toCategoryEntity()
     )
 }

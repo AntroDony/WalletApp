@@ -10,12 +10,12 @@ class CategoryConverter {
     private val gson = Gson()
 
     @TypeConverter
-    fun categoryEntityToString(categoryEntity: CategoryEntity): String{
+    fun categoryEntityToString(categoryEntity: CategoryEntity?): String{
         return gson.toJson(categoryEntity)
     }
 
     @TypeConverter
-    fun stringToCategoryEntity(categoryString: String): CategoryEntity{
+    fun stringToCategoryEntity(categoryString: String): CategoryEntity?{
         val groupType = object : TypeToken<CategoryEntity>(){}.type
         return gson.fromJson(categoryString, groupType)
     }

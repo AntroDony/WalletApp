@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.presentation.ui.screens.inputScreen
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -65,6 +66,8 @@ fun TransactionInputScreen(
     onAddTransaction: (TransactionUi) -> Unit,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
+
     val inputValueState = remember { mutableStateOf(0f.toFormattedString()) }
     val currencyState = remember { mutableStateOf(CurrencyCode.USD) }
 
@@ -72,7 +75,8 @@ fun TransactionInputScreen(
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    val isBottomSheetExpanded = rememberSaveable { mutableStateOf(false) }
+    //val isBottomSheetExpanded = rememberSaveable { mutableStateOf(false) }
+    val isCategoryListOpen = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -98,52 +102,53 @@ fun TransactionInputScreen(
 
         HorizontalSpacer()
 
-        TransactionDescriptionTextField(descriptionState)
-
-        HorizontalSpacer()
-
-        InputNumberKeyboard(inputValueState)
-
-        HorizontalSpacer()
-
-        SubmitButton(
-            title = "Select category",
-            onClick = {
-                isBottomSheetExpanded.value = true
-            }
-        )
-
-        if (isBottomSheetExpanded.value) {
-            ModalBottomSheet(
-                sheetState = bottomSheetState,
-                onDismissRequest = {
-                    isBottomSheetExpanded.value = false
-                },
-                containerColor = backgroundColor
+        if (!isCategoryListOpen.value) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                val categoryList = if (transactionType == TransactionType.INCOME) {
-                    categoriesState.incomeCategories
-                } else {
-                    categoriesState.expenseCategories
-                }
+                TransactionDescriptionTextField(descriptionState)
 
-                CategoryListMenu(
-                    categoryList,
-                    onSelected = { category ->
-                        isBottomSheetExpanded.value = false
+                HorizontalSpacer()
 
-                        val transactionObject = buildTransactionObject(
-                            value = inputValueState.value.toFloatValue(),
-                            currency = currencyState.value,
-                            type = transactionType,
-                            description = descriptionState.value ?: category.name
-                        )
+                InputNumberKeyboard(inputValueState)
 
-                        onAddTransaction(transactionObject)
-                        onBack()
+                HorizontalSpacer()
+
+                SubmitButton(
+                    title = "Select category",
+                    onClick = {
+                        isCategoryListOpen.value = true
                     }
                 )
             }
+        } else {
+            val categoryList = if (transactionType == TransactionType.INCOME) {
+                categoriesState.incomeCategories
+            } else {
+                categoriesState.expenseCategories
+            }
+
+            CategoryListMenu(
+                categoryList,
+                onSelected = { category ->
+                    isCategoryListOpen.value = false
+
+                    val transactionObject = buildTransactionObject(
+                        value = inputValueState.value.toFloatValue(),
+                        currency = currencyState.value,
+                        type = transactionType,
+                        description = descriptionState.value ?: category.name,
+                        category = category
+                    )
+
+                    if (transactionObject == null){
+                        Toast.makeText(context, "Transaction value cannot be 0", Toast.LENGTH_LONG).show()
+                    } else {
+                        onAddTransaction(transactionObject)
+                        onBack()
+                    }
+                }
+            )
         }
     }
 }
@@ -182,10 +187,6 @@ private fun TransactionDescriptionTextField(
 
             focusedIndicatorColor = primaryColor,
             unfocusedIndicatorColor = primaryContainerColor,
-
-//            selectionColors = TextSelectionColors(
-//                handleColor =
-//            )
 
         ),
         modifier = modifier
@@ -393,17 +394,21 @@ private fun CategoryItemPreview() {
 }
 
 
-
 private fun buildTransactionObject(
     value: Float,
     currency: CurrencyCode,
     type: TransactionType,
     description: String?,
-): TransactionUi{
+    category: TransactionCategoryUi
+): TransactionUi? {
+    if (value == 0f){
+        return null
+    }
     return TransactionUi(
         value = value,
         currency = currency,
         type = type,
-        description = description
+        description = description,
+        category = category
     )
 }

@@ -2,6 +2,7 @@ package com.ancraz.mywallet.presentation.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -25,6 +26,7 @@ fun SubmitButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = primaryColor
         ),
+        shape = RoundedCornerShape(12.dp),
         onClick = {
             onClick()
         }
@@ -32,7 +34,7 @@ fun SubmitButton(
         Text(
             text = title.uppercase(),
             color = onPrimaryColor,
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(vertical = 4.dp)

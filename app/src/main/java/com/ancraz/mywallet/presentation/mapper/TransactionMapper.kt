@@ -10,7 +10,8 @@ fun TransactionUi.toTransaction(): Transaction{
         value = this.value,
         currencyCode = this.currency,
         transactionType = this.type,
-        description = this.description
+        description = this.description,
+        category = this.category?.toTransactionCategory()
     )
 }
 
@@ -22,6 +23,7 @@ fun Transaction.toTransactionUi(): TransactionUi{
         value = this.value,
         currency = this.currencyCode,
         type = this.transactionType,
-        description = this.description
+        description = this.description,
+        category = this.category?.toCategoryUi()
     )
 }

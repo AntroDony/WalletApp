@@ -15,5 +15,7 @@ data class TransactionUi(
 
     val type: TransactionType,
 
-    val description: String? = null
+    val description: String? = null,
+
+    val category: TransactionCategoryUi? = null
 )

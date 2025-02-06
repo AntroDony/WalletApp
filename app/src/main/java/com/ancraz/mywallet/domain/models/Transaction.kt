@@ -17,4 +17,6 @@ data class Transaction(
 
     val description: String?,
 
+    val category: TransactionCategory?
+
 )

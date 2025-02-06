@@ -1,5 +1,5 @@
 package com.ancraz.mywallet.data.storage.database.models
 
-enum class TransactionCategoryEntityType {
+enum class CategoryTransactionType {
     INCOME, EXPENSE, TRANSFER
 }

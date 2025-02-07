@@ -62,26 +62,26 @@ class DataStoreRepository(
         return context.dataStore.data.first()[CURRENCY_UPDATE_TIME]
     }
 
-    suspend fun getCurrencyRateToUsd(currencyCode: CurrencyCode): Float?{
+    suspend fun getCurrencyRateToUsd(currencyCode: CurrencyCode): Float{
         when (currencyCode) {
             CurrencyCode.EUR -> {
-                return context.dataStore.data.first()[EURO_RATE_TO_USD]
+                return context.dataStore.data.first()[EURO_RATE_TO_USD] ?: 0f
             }
 
             CurrencyCode.RUB -> {
-                return context.dataStore.data.first()[RUB_RATE_TO_USD]
+                return context.dataStore.data.first()[RUB_RATE_TO_USD] ?: 0f
             }
 
             CurrencyCode.GEL -> {
-                return context.dataStore.data.first()[GEL_RATE_TO_USD]
+                return context.dataStore.data.first()[GEL_RATE_TO_USD] ?: 0f
             }
 
             CurrencyCode.KZT -> {
-                return context.dataStore.data.first()[KZT_RATE_TO_USD]
+                return context.dataStore.data.first()[KZT_RATE_TO_USD] ?: 0f
             }
 
             CurrencyCode.USD -> {
-                return null
+                return 1f
             }
         }
     }

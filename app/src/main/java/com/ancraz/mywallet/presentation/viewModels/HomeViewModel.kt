@@ -75,7 +75,7 @@ class HomeViewModel @Inject constructor(
                             isLoading = false,
                             data = _homeScreenState.value.data.copy(transactions = result.data?.map {
                                 it.toTransactionUi()
-                            } ?: emptyList())
+                            }?.reversed() ?: emptyList())
                         )
                     }
                     is DataResult.Loading -> {

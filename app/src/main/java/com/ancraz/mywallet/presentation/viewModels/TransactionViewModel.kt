@@ -43,6 +43,7 @@ class TransactionViewModel @Inject constructor(
 
     fun addNewTransaction(transactionUi: TransactionUi){
         viewModelScope.launch(ioDispatcher) {
+            debugLog("newTransaction: $transactionUi")
             addTransactionUseCase.addTransaction(transactionUi.toTransaction())
         }
     }

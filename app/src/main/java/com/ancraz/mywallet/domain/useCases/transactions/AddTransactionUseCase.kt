@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.domain.useCases.transactions
 
+import com.ancraz.mywallet.core.converter.CurrencyConverter
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository
 import com.ancraz.mywallet.domain.models.Transaction
@@ -10,6 +11,8 @@ class AddTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val dataStoreRepository: DataStoreRepository
 ) {
+
+    private val currencyConverter = CurrencyConverter(dataStoreRepository)
 
     suspend fun addTransaction(transaction: Transaction){
         when(transaction.transactionType){
@@ -30,13 +33,24 @@ class AddTransactionUseCase @Inject constructor(
     private suspend fun addIncomeTransaction(transaction: Transaction){
         transactionRepository.addNewTransaction(transaction)
 
-        dataStoreRepository.incomeTotalBalance(transaction.value)
+        dataStoreRepository.incomeTotalBalance(
+            currencyConverter.convertToUsd(
+                value = transaction.value,
+                currencyCode = transaction.currencyCode
+            )
+
+        )
     }
 
 
     private suspend fun addExpenseTransaction(transaction: Transaction){
         transactionRepository.addNewTransaction(transaction)
 
-        dataStoreRepository.expenseTotalBalance(transaction.value)
+        dataStoreRepository.expenseTotalBalance(
+            currencyConverter.convertToUsd(
+                value = transaction.value,
+                currencyCode = transaction.currencyCode
+            )
+        )
     }
 }

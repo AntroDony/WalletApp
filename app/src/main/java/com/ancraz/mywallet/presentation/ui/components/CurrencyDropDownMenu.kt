@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.core.models.CurrencyCode
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
@@ -90,6 +91,7 @@ fun CurrencyDropDownMenu(
                     onClick = {
                         isDropDownExpanded.value = false
                         itemPosition.value = index
+                        currentCurrencyState.value = items[index]
                     }
                 )
 

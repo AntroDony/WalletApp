@@ -12,7 +12,7 @@ class GetTransactionsUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository
 ){
 
-    fun execute(): Flow<DataResult<List<Transaction>>> {
+    operator fun invoke(): Flow<DataResult<List<Transaction>>> {
         return flow {
             try {
                 emit(DataResult.Loading())

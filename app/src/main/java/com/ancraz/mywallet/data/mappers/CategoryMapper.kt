@@ -2,7 +2,7 @@ package com.ancraz.mywallet.data.mappers
 
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.data.storage.database.models.CategoryEntity
-import com.ancraz.mywallet.data.storage.database.models.CategoryTransactionType
+import com.ancraz.mywallet.data.storage.database.models.subModels.CategoryTransactionType
 import com.ancraz.mywallet.domain.models.TransactionCategory
 
 fun CategoryEntity.toTransactionCategory(): TransactionCategory{

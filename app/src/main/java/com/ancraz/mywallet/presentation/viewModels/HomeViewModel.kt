@@ -10,6 +10,7 @@ import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
 import com.ancraz.mywallet.domain.useCases.TotalBalanceUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionsUseCase
+import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
 import com.ancraz.mywallet.presentation.states.HomeScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
-    private val totalBalanceUseCase: TotalBalanceUseCase
+    private val totalBalanceUseCase: TotalBalanceUseCase,
+    private val getWalletsUseCase: GetAllWalletsUseCase
 ): ViewModel(){
 
     private val ioDispatcher = Dispatchers.IO
@@ -33,7 +35,7 @@ class HomeViewModel @Inject constructor(
 
 
     init {
-        updateData()
+        fetchData()
     }
 
 
@@ -44,7 +46,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun updateData(){
+    private fun fetchData(){
         viewModelScope.launch(ioDispatcher) {
             getCurrencyRatesUseCase().onEach{ result ->
                 debugLog("GetCurrencyRateResult: ${result.data} | ${result.errorMessage}")
@@ -59,16 +61,18 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                     is DataResult.Loading -> {
-                        _homeScreenState.value = HomeScreenState(isLoading = true)
+                        _homeScreenState.value = _homeScreenState.value.copy(isLoading = true)
                     }
                     is DataResult.Error -> {
                         debugLog("getTotalBalance error: ${result.errorMessage}")
-                        _homeScreenState.value = HomeScreenState(error = result.errorMessage)
+                        _homeScreenState.value = _homeScreenState.value.copy(
+                            error = result.errorMessage
+                        )
                     }
                 }
             }.launchIn(viewModelScope)
 
-            getTransactionsUseCase.execute().onEach { result ->
+            getTransactionsUseCase().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
                         _homeScreenState.value = homeScreenState.value.copy(
@@ -79,14 +83,38 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                     is DataResult.Loading -> {
-                        _homeScreenState.value = HomeScreenState(isLoading = true)
+                        _homeScreenState.value = _homeScreenState.value.copy(isLoading = true)
                     }
                     is DataResult.Error -> {
-                        debugLog("getTransactionsUseCase error: ${result.errorMessage}")
-                        _homeScreenState.value = HomeScreenState(error = result.errorMessage)
+                        debugLog("getTransactions Error: ${result.errorMessage}")
+                        _homeScreenState.value = _homeScreenState.value.copy(
+                            error = result.errorMessage
+                        )
                     }
                 }
             }.launchIn(viewModelScope)
+
+
+            getWalletsUseCase().onEach { result ->
+                when(result){
+                    is DataResult.Success -> {
+                        _homeScreenState.value = homeScreenState.value.copy(
+                            data = _homeScreenState.value.data.copy(
+
+                            )
+                        )
+                    }
+                    is DataResult.Loading -> {
+                        debugLog("getWallet Loading")
+                    }
+                    is DataResult.Error -> {
+                        debugLog("getWallet Error: ${result.errorMessage}")
+                        _homeScreenState.value = _homeScreenState.value.copy(
+                            error = result.errorMessage
+                        )
+                    }
+                }
+            }
         }
     }
 }

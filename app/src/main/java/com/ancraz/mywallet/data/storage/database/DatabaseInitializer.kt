@@ -4,7 +4,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ancraz.mywallet.data.storage.database.dao.CategoryDao
 import com.ancraz.mywallet.data.storage.database.models.CategoryEntity
-import com.ancraz.mywallet.data.storage.database.models.CategoryTransactionType
+import com.ancraz.mywallet.data.storage.database.models.subModels.CategoryTransactionType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

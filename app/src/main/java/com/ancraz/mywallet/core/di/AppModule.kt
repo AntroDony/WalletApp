@@ -11,6 +11,7 @@ import com.ancraz.mywallet.data.storage.database.DatabaseInitializer
 import com.ancraz.mywallet.data.storage.database.WalletDatabase
 import com.ancraz.mywallet.data.storage.database.dao.CategoryDao
 import com.ancraz.mywallet.data.storage.database.dao.TransactionDao
+import com.ancraz.mywallet.data.storage.database.dao.WalletDao
 import com.ancraz.mywallet.domain.network.CurrencyDataSource
 import com.ancraz.mywallet.domain.repository.TransactionRepository
 import com.ancraz.mywallet.domain.repository.CurrencyRepository
@@ -98,6 +99,13 @@ object AppModule {
     @Singleton
     fun provideCategoryDao(walletDatabase: WalletDatabase): CategoryDao{
         return walletDatabase.categoryDao()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideWalletDao(walletDatabase: WalletDatabase): WalletDao{
+        return walletDatabase.walletDao()
     }
 
 }

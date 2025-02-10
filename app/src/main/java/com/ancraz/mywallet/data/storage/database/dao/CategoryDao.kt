@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.ancraz.mywallet.data.storage.database.models.CategoryEntity
-import com.ancraz.mywallet.data.storage.database.models.CategoryTransactionType
+import com.ancraz.mywallet.data.storage.database.models.subModels.CategoryTransactionType
 import kotlinx.coroutines.flow.Flow
 
 @Dao

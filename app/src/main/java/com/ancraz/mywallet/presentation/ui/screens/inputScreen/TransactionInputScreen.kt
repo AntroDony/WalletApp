@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,17 +45,19 @@ import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.presentation.models.CurrencyRateUi
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
-import com.ancraz.mywallet.presentation.states.TransactionCategoriesState
+import com.ancraz.mywallet.presentation.states.TransactionUiState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
-import com.ancraz.mywallet.presentation.ui.components.InputTextField
+import com.ancraz.mywallet.presentation.ui.components.TransactionConfigContainer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
+import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryContainerColor
 import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
@@ -63,7 +66,7 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
 fun TransactionInputScreen(
-    categoriesState: TransactionCategoriesState,
+    uiState: TransactionUiState,
     totalBalance: Float = 0f,
     transactionType: TransactionType,
     modifier: Modifier = Modifier,
@@ -92,18 +95,24 @@ fun TransactionInputScreen(
 
         HorizontalSpacer()
 
-        InputTextField(
+        TransactionConfigContainer(
             valueState = inputValueState,
             currencyState = currencyState,
             title = "Balance: ${totalBalance.toFormattedString()}",
             modifier = Modifier
                 .fillMaxWidth()
-                //.weight(1f)
                 .align(Alignment.CenterHorizontally)
-
         )
 
         HorizontalSpacer()
+
+        if (currencyState.value != CurrencyCode.USD) {
+            RateInfoText(
+                currentCurrencyState = currencyState.value,
+                rates = uiState.data.currencyRates
+            )
+            HorizontalSpacer()
+        }
 
         if (!isCategoryListOpen.value) {
             Column(
@@ -131,9 +140,9 @@ fun TransactionInputScreen(
             }
         } else {
             val categoryList = if (transactionType == TransactionType.INCOME) {
-                categoriesState.incomeCategories
+                uiState.data.incomeCategories
             } else {
-                categoriesState.expenseCategories
+                uiState.data.expenseCategories
             }
 
             CategoryListMenu(
@@ -161,6 +170,32 @@ fun TransactionInputScreen(
                 }
             )
         }
+    }
+}
+
+
+@Composable
+private fun RateInfoText(
+    currentCurrencyState: CurrencyCode,
+    rates: List<CurrencyRateUi>,
+    modifier: Modifier = Modifier
+){
+    val baseText = "1 USD = "
+    val currentRateIndex = rates.map { rate -> rate.currencyCode }.indexOf(currentCurrencyState)
+    val rateText = "${rates[currentRateIndex].rate} ${currentCurrencyState.name}"
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = baseText + rateText,
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp,
+            color = onSurfaceColor,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
@@ -223,7 +258,7 @@ private fun CategoryListMenu(
                 .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
                 .background(surfaceColor)
 
-        ){
+        ) {
             Image(
                 imageVector = Icons.Filled.ArrowDropDown,
                 contentDescription = "Close",
@@ -240,7 +275,8 @@ private fun CategoryListMenu(
         LazyVerticalGrid(
             modifier = Modifier
                 .background(surfaceColor),
-            columns = GridCells.Fixed(3)) {
+            columns = GridCells.Fixed(3)
+        ) {
             items(categories) { category ->
                 CategoryItem(
                     category,
@@ -314,118 +350,126 @@ private fun CategoryItem(
 private fun TransactionInputScreenPreview() {
     MyWalletTheme {
         TransactionInputScreen(
-            categoriesState = TransactionCategoriesState(
-                expenseCategories = listOf(
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
+            uiState = TransactionUiState(
+                data = TransactionUiState.TransactionScreenData(
+                    currencyRates = listOf(
+                        CurrencyRateUi(CurrencyCode.EUR, 1.2f),
+                        CurrencyRateUi(CurrencyCode.KZT, 0.11f),
+                        CurrencyRateUi(CurrencyCode.RUB, 99f),
+                        CurrencyRateUi(CurrencyCode.GEL, 0.4f),
                     ),
-                    TransactionCategoryUi(
-                        name = "Category 2",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 3",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 4",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 2",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 3",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 4",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 2",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 3",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 4",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 5",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
-                    TransactionCategoryUi(
-                        name = "Category 1",
-                        iconAssetPath = "categories_icon/house_category.svg",
-                        transactionType = TransactionType.EXPENSE
-                    ),
+                    expenseCategories = listOf(
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 2",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 3",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 4",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 2",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 3",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 4",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 2",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 3",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 4",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 5",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                        TransactionCategoryUi(
+                            name = "Category 1",
+                            iconAssetPath = "categories_icon/house_category.svg",
+                            transactionType = TransactionType.EXPENSE
+                        ),
+                    )
                 )
             ),
             totalBalance = 8000f,

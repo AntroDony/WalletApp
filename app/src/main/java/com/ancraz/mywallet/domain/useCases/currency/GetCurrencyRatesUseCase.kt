@@ -23,7 +23,7 @@ class GetCurrencyRatesUseCase @Inject constructor(
         return flow {
             val currencyLastUpdateTime = dataStoreRepository.getCurrencyLastUpdateTime()
             if (currencyLastUpdateTime == null || needUpdateCurrencyRates(currencyLastUpdateTime)) {
-                getCurrencyRatesFromApi{ onError ->
+                getCurrencyRatesFromApi { onError ->
                     emit(onError)
                 }
             }
@@ -34,14 +34,13 @@ class GetCurrencyRatesUseCase @Inject constructor(
                 val resultList = mutableListOf<CurrencyRate>()
                 CurrencyCode.entries.forEach { code ->
                     val rate = dataStoreRepository.getCurrencyRateToUsd(code)
-                    rate?.let {
-                        resultList.add(
-                            CurrencyRate(
-                                currencyCode = code,
-                                rateValue = it
-                            )
+                    resultList.add(
+                        CurrencyRate(
+                            currencyCode = code,
+                            rateValue = rate
                         )
-                    }
+                    )
+
                 }
 
                 emit(DataResult.Success(resultList))
@@ -56,7 +55,9 @@ class GetCurrencyRatesUseCase @Inject constructor(
         remoteRepository.getCurrenciesRate(desiredCurrencies)
             .onSuccess { currencyData ->
                 debugLog("update data in dataStore")
-                dataStoreRepository.updateLastCurrencyUpdatedTime(currencyData.updateTime ?: Calendar.getInstance().timeInMillis)
+                dataStoreRepository.updateLastCurrencyUpdatedTime(
+                    currencyData.updateTime ?: Calendar.getInstance().timeInMillis
+                )
                 currencyData.rates.forEach { rate ->
                     dataStoreRepository.updateCurrencyRate(rate)
                 }

@@ -46,7 +46,7 @@ class HomeViewModel @Inject constructor(
 
     private fun updateData(){
         viewModelScope.launch(ioDispatcher) {
-            getCurrencyRatesUseCase.invoke().onEach{ result ->
+            getCurrencyRatesUseCase().onEach{ result ->
                 debugLog("GetCurrencyRateResult: ${result.data} | ${result.errorMessage}")
             }.launchIn(viewModelScope)
 

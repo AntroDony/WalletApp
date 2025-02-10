@@ -1,12 +1,9 @@
 package com.ancraz.mywallet.presentation.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +22,7 @@ import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
-fun InputTextField(
+fun TransactionConfigContainer(
     valueState: MutableState<String>,
     currencyState: MutableState<CurrencyCode>,
     title: String,
@@ -80,7 +77,7 @@ fun InputTextFieldPreview(){
     val valueState = remember { mutableStateOf(8000f.toFormattedString()) }
     val currencyState = remember { mutableStateOf(CurrencyCode.EUR) }
     MyWalletTheme {
-        InputTextField(
+        TransactionConfigContainer(
             valueState = valueState,
             currencyState = currencyState,
             title = "Balance"

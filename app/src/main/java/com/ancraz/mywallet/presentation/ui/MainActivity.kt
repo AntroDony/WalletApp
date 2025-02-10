@@ -135,7 +135,7 @@ private fun MainActivityScreen() {
                 }
 
                 TransactionInputScreen(
-                    categoriesState = transactionViewModel.transactionCategoriesState.value,
+                    uiState = transactionViewModel.transactionUiState.value,
                     totalBalance = currentBalanceValue,
                     transactionType = transactionType,
                     modifier = Modifier.padding(innerPadding),

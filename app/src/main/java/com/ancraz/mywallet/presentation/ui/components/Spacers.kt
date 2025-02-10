@@ -17,7 +17,7 @@ fun HorizontalSpacer(
 }
 
 @Composable
-fun VerticalSpacer(
+fun VerticalSpacerr(
     width: Dp,
     modifier: Modifier = Modifier
 ){

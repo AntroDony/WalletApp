@@ -11,5 +11,6 @@ data class HomeScreenState(
 
 data class HomeScreenData(
     val balance: Float = 0f,
+    //val wallets: List<>
     val transactions: List<TransactionUi> = emptyList()
 )

@@ -21,18 +21,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,12 +44,10 @@ import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.states.HomeScreenData
 import com.ancraz.mywallet.presentation.states.HomeScreenState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
-import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.errorColor
@@ -93,15 +86,21 @@ fun HomeScreen(
         HorizontalSpacer()
 
         TotalBalanceCard(
-            homeScreenState = homeScreenState,
+            state = homeScreenState,
             onNewTransaction = onMadeTransaction,
             onEditBalance = onEditBalance
         )
 
         HorizontalSpacer()
 
+        WalletListContainer(
+            state = homeScreenState
+        )
+
+        HorizontalSpacer()
+
         TransactionListContainer(
-            homeScreenState = homeScreenState
+            state = homeScreenState
         )
     }
 
@@ -110,7 +109,7 @@ fun HomeScreen(
 
 @Composable
 private fun TotalBalanceCard(
-    homeScreenState: HomeScreenState,
+    state: HomeScreenState,
     modifier: Modifier = Modifier,
     onNewTransaction: (TransactionType) -> Unit,
     onEditBalance: (Float) -> Unit
@@ -138,7 +137,7 @@ private fun TotalBalanceCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            if (homeScreenState.isLoading) {
+            if (state.isLoading) {
                 CircularProgressIndicator(
                     trackColor = onPrimaryColor,
                     modifier = Modifier
@@ -146,7 +145,7 @@ private fun TotalBalanceCard(
                 )
             } else {
                 Text(
-                    text = "\$ ${homeScreenState.data.balance.toFormattedString()}",
+                    text = "\$ ${state.data.balance.toFormattedString()}",
                     color = Color.Black,
                     fontSize = 40.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -179,7 +178,7 @@ private fun TotalBalanceCard(
                     text = "Edit",
                     icon = Icons.Filled.Edit
                 ) {
-                    onEditBalance(homeScreenState.data.balance)
+                    onEditBalance(state.data.balance)
                 }
             }
 
@@ -228,8 +227,17 @@ private fun TotalBalanceActionButton(
 
 
 @Composable
+private fun WalletListContainer(
+    state: HomeScreenState,
+    modifier: Modifier = Modifier
+){
+
+}
+
+
+@Composable
 private fun TransactionListContainer(
-    homeScreenState: HomeScreenState,
+    state: HomeScreenState,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -272,7 +280,7 @@ private fun TransactionListContainer(
         LazyColumn(
             modifier = Modifier
         ){
-            items(homeScreenState.data.transactions){ transaction ->
+            items(state.data.transactions){ transaction ->
                 TransactionCard(
                     transaction = transaction,
                     onClick = {}

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
-import com.ancraz.mywallet.presentation.ui.components.InputTextField
+import com.ancraz.mywallet.presentation.ui.components.TransactionConfigContainer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
@@ -41,7 +41,7 @@ fun EditBalanceScreen(
 
         HorizontalSpacer()
 
-        InputTextField(
+        TransactionConfigContainer(
             valueState = valueState,
             currencyState = currencyState,
             title = "Total Balance",

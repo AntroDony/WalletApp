@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
@@ -18,6 +17,7 @@ import com.ancraz.mywallet.presentation.ui.components.TransactionConfigContainer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
+import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
@@ -25,19 +25,22 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 fun EditBalanceScreen(
     value: Float,
     currencyCode: CurrencyCode = CurrencyCode.USD,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     onUpdateBalanceValue: (Float) -> Unit,
-    onNavigateBack: () -> Unit
+    onBack: () -> Unit
 ) {
     val valueState = remember { mutableStateOf(value.toFormattedString()) }
     val currencyState = remember { mutableStateOf(currencyCode) }
 
     Column(
-        modifier = modifier.fillMaxSize()
-            .padding(14.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = screenHorizontalPadding),
         verticalArrangement = Arrangement.Center
     ) {
-        NavigationToolbar(title = "Edit Balance", onClickBack = onNavigateBack)
+        HorizontalSpacer()
+
+        NavigationToolbar(title = "Edit Balance", onClickBack = onBack)
 
         HorizontalSpacer()
 
@@ -64,7 +67,7 @@ fun EditBalanceScreen(
             onClick = {
                 val newBalanceValue = valueState.value.toFloatValue()
                 onUpdateBalanceValue(newBalanceValue)
-                onNavigateBack()
+                onBack()
             }
         )
     }
@@ -78,7 +81,8 @@ fun EditBalancePreview() {
     MyWalletTheme {
         EditBalanceScreen(
             value = 8000f,
+            modifier = Modifier,
             onUpdateBalanceValue = {},
-            onNavigateBack = {})
+            onBack = {})
     }
 }

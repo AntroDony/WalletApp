@@ -17,13 +17,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.utils.debugLog
-import com.ancraz.mywallet.presentation.navigation.NavigationRoute
+import com.ancraz.mywallet.presentation.navigation.NavigationScreen
+import com.ancraz.mywallet.presentation.ui.screens.createWalletScreen.CreateWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalanceScreen.EditBalanceScreen
 import com.ancraz.mywallet.presentation.ui.screens.homeScreen.HomeScreen
 import com.ancraz.mywallet.presentation.ui.screens.inputScreen.TransactionInputScreen
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.viewModels.HomeViewModel
 import com.ancraz.mywallet.presentation.viewModels.TransactionViewModel
+import com.ancraz.mywallet.presentation.viewModels.WalletViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -54,10 +56,10 @@ private fun MainActivityScreen() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = NavigationRoute.HomeScreen.route
+            startDestination = NavigationScreen.HomeScreen.route
         ) {
             composable(
-                route = NavigationRoute.HomeScreen.route
+                route = NavigationScreen.HomeScreen.route
             ) {
                 HomeScreen(
                     homeViewModel.homeScreenState.value,
@@ -83,12 +85,20 @@ private fun MainActivityScreen() {
                     },
                     onEditBalance = { currentBalance ->
                         navigateToEditBalanceScreen(navController, currentBalance)
+                    },
+                    onCreateWallet = {
+                        navController.navigate(
+                            NavigationScreen.CreateWalletScreen.route
+                        )
+                    },
+                    onEditWallet = {
+
                     }
                 )
             }
 
             composable(
-                route = NavigationRoute.EditBalanceScreen.route + "/{balance}"
+                route = NavigationScreen.EditBalanceScreen.route + "/{balance}"
             ) { navBackStackEntry ->
 
                 val currentBalanceValue = try {
@@ -105,14 +115,31 @@ private fun MainActivityScreen() {
                     onUpdateBalanceValue = { value ->
                         homeViewModel.editTotalBalance(value)
                     },
-                    onNavigateBack = {
+                    onBack = {
                         navController.navigateUp()
                     }
                 )
             }
 
             composable(
-                route = NavigationRoute.TransactionInputScreen.route + "/{balance}" + "/{transaction}"
+                route = NavigationScreen.CreateWalletScreen.route
+            ){ navBackStackEntry ->
+                val walletViewModel = hiltViewModel<WalletViewModel>()
+
+                CreateWalletScreen(
+                    modifier = Modifier
+                        .padding(innerPadding),
+                    onAddWallet = {
+                        //todo implement
+                    },
+                    onBack = {
+                        navController.navigateUp()
+                    }
+                )
+            }
+
+            composable(
+                route = NavigationScreen.TransactionInputScreen.route + "/{balance}" + "/{transaction}"
             ) { navBackStackEntry ->
 
                 val currentBalanceValue = try {
@@ -153,11 +180,11 @@ private fun MainActivityScreen() {
 
 
 private fun navigateToEditBalanceScreen(navController: NavController, balance: Float) {
-    navController.navigate(NavigationRoute.EditBalanceScreen.route + "/$balance")
+    navController.navigate(NavigationScreen.EditBalanceScreen.route + "/$balance")
 }
 
 private fun navigateToTransactionInputScreen(navController: NavController, balance: Float, transactionType: TransactionType){
-    navController.navigate(NavigationRoute.TransactionInputScreen.route + "/$balance" + "/${transactionType.name}")
+    navController.navigate(NavigationScreen.TransactionInputScreen.route + "/$balance" + "/${transactionType.name}")
 }
 
 

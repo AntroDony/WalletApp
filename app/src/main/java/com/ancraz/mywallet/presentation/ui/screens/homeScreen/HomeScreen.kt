@@ -1,6 +1,7 @@
 package com.ancraz.mywallet.presentation.ui.screens.homeScreen
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,8 +32,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -45,16 +49,20 @@ import coil3.svg.SvgDecoder
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.presentation.models.TransactionUi
+import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.states.HomeScreenData
 import com.ancraz.mywallet.presentation.states.HomeScreenState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
+import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.errorColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
+import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
+import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
 import com.ancraz.mywallet.presentation.ui.utils.timeToString
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
@@ -63,14 +71,16 @@ import java.util.Calendar
 @Composable
 fun HomeScreen(
     homeScreenState: HomeScreenState,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     onMadeTransaction: (TransactionType) -> Unit,
-    onEditBalance: (Float) -> Unit
+    onEditBalance: (Float) -> Unit,
+    onCreateWallet: () -> Unit,
+    onEditWallet: (WalletUi) -> Unit
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 14.dp)
+            .padding(horizontal = screenHorizontalPadding)
     ) {
         HorizontalSpacer()
 
@@ -94,13 +104,16 @@ fun HomeScreen(
         HorizontalSpacer()
 
         WalletListContainer(
-            state = homeScreenState
+            wallets = homeScreenState.data.wallets,
+            onCreateWallet = {
+                onCreateWallet()
+            }
         )
 
         HorizontalSpacer()
 
         TransactionListContainer(
-            state = homeScreenState
+            transactions = homeScreenState.data.transactions
         )
     }
 
@@ -228,16 +241,115 @@ private fun TotalBalanceActionButton(
 
 @Composable
 private fun WalletListContainer(
-    state: HomeScreenState,
-    modifier: Modifier = Modifier
+    wallets: List<WalletUi>,
+    modifier: Modifier = Modifier,
+    onCreateWallet: () -> Unit
 ){
+    Column(
+        modifier = modifier
+            .padding(horizontal = 10.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Wallets",
+                fontSize = 16.sp,
+                color = onBackgroundColor
+            )
 
+            Row(
+                modifier = Modifier,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "All",
+                    fontSize = 16.sp,
+                    color = onBackgroundColor
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Image(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                    contentDescription = "All Wallets",
+                    colorFilter = ColorFilter.tint(onBackgroundColor),
+                    modifier = Modifier
+                        .size(16.dp)
+                )
+            }
+        }
+
+        if (wallets.isEmpty()){
+            AddNewWalletButton(
+                onClick = {
+                    onCreateWallet()
+                }
+            )
+        } else {
+
+        }
+    }
+}
+
+
+@Composable
+private fun AddNewWalletButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+){
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp)
+            .clickable {
+                onClick()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        val stroke = Stroke(width = 2f,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 15f), 0f)
+        )
+        Canvas(Modifier.fillMaxWidth().height(70.dp)){
+            drawRoundRect(
+                color = primaryColor,
+                style = stroke,
+                cornerRadius = CornerRadius(x = 40f, y = 40f)
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Image(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "Add Wallet",
+                colorFilter = ColorFilter.tint(onSecondaryColor),
+                modifier = Modifier
+                    .size(34.dp)
+            )
+
+            VerticalSpacer()
+
+            Text(
+                text = "Add Wallet",
+                color = onSecondaryColor,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
 }
 
 
 @Composable
 private fun TransactionListContainer(
-    state: HomeScreenState,
+    transactions: List<TransactionUi>,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -280,7 +392,7 @@ private fun TransactionListContainer(
         LazyColumn(
             modifier = Modifier
         ){
-            items(state.data.transactions){ transaction ->
+            items(transactions){ transaction ->
                 TransactionCard(
                     transaction = transaction,
                     onClick = {}
@@ -334,8 +446,6 @@ private fun TransactionCard(
                 modifier = Modifier
                     .size(40.dp)
             )
-
-
 
             Column(
                 modifier = Modifier
@@ -404,8 +514,11 @@ fun HomeScreenPreview() {
                     )
                 )
             ),
+            modifier = Modifier,
             onMadeTransaction = {},
-            onEditBalance = {}
+            onEditBalance = {},
+            onEditWallet = {},
+            onCreateWallet = {}
         )
     }
 }

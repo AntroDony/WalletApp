@@ -2,7 +2,6 @@ package com.ancraz.mywallet.core.converter
 
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository
-import javax.inject.Inject
 
 class CurrencyConverter(
     private val dataStore: DataStoreRepository

@@ -11,13 +11,13 @@ class WalletConverter {
     private val gson = Gson()
 
     @TypeConverter
-    fun currencyAccountToString(account: CurrencyAccount): String {
+    fun currencyAccountListToString(account: List<CurrencyAccount>): String {
         return gson.toJson(account)
     }
 
 
     @TypeConverter
-    fun stringToCurrencyAccount(accountString: String): CurrencyAccount{
+    fun stringToCurrencyAccountList(accountString: String): List<CurrencyAccount>{
         val groupType = object : TypeToken<CurrencyAccount>(){}.type
         return gson.fromJson(accountString, groupType)
     }

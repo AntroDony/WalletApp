@@ -15,4 +15,6 @@ class WalletViewModel @Inject constructor(
     private val updateWalletUseCase: UpdateWalletUseCase,
     private val deleteWalletUseCase: DeleteWalletUseCase
 ): ViewModel()  {
+
+
 }

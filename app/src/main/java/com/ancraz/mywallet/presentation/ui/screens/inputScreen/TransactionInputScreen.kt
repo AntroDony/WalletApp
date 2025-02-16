@@ -60,6 +60,7 @@ import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryContainerColor
+import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
 import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
@@ -69,7 +70,7 @@ fun TransactionInputScreen(
     uiState: TransactionUiState,
     totalBalance: Float = 0f,
     transactionType: TransactionType,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     onAddTransaction: (TransactionUi) -> Unit,
     onBack: () -> Unit
 ) {
@@ -84,7 +85,7 @@ fun TransactionInputScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 14.dp)
+            .padding(horizontal = screenHorizontalPadding)
     ) {
         HorizontalSpacer()
 
@@ -101,6 +102,7 @@ fun TransactionInputScreen(
             title = "Balance: ${totalBalance.toFormattedString()}",
             modifier = Modifier
                 .fillMaxWidth()
+                //.weight(1f)
                 .align(Alignment.CenterHorizontally)
         )
 
@@ -114,61 +116,70 @@ fun TransactionInputScreen(
             HorizontalSpacer()
         }
 
-        if (!isCategoryListOpen.value) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                TransactionDescriptionTextField(descriptionState)
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            if (!isCategoryListOpen.value) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    TransactionDescriptionTextField(descriptionState)
 
-                HorizontalSpacer()
+                    HorizontalSpacer()
 
-                InputNumberKeyboard(inputValueState)
+                    InputNumberKeyboard(inputValueState)
 
-                HorizontalSpacer()
+                    HorizontalSpacer()
 
-                SubmitButton(
-                    title = "Select category",
-                    onClick = {
-                        isCategoryListOpen.value = true
-                    }
-                )
-
-                HorizontalSpacer()
-            }
-        } else {
-            val categoryList = if (transactionType == TransactionType.INCOME) {
-                uiState.data.incomeCategories
-            } else {
-                uiState.data.expenseCategories
-            }
-
-            CategoryListMenu(
-                categoryList,
-                openState = isCategoryListOpen,
-                modifier = Modifier.weight(1f),
-                onSelected = { category ->
-                    isCategoryListOpen.value = false
-
-                    val transactionObject = buildTransactionObject(
-                        value = inputValueState.value.toFloatValue(),
-                        currency = currencyState.value,
-                        type = transactionType,
-                        description = descriptionState.value ?: category.name,
-                        category = category
+                    SubmitButton(
+                        title = "Select category",
+                        onClick = {
+                            isCategoryListOpen.value = true
+                        }
                     )
 
-                    if (transactionObject == null) {
-                        Toast.makeText(context, "Transaction value cannot be 0", Toast.LENGTH_LONG)
-                            .show()
-                    } else {
-                        onAddTransaction(transactionObject)
-                        onBack()
-                    }
+                    HorizontalSpacer()
                 }
-            )
+            } else {
+                val categoryList = if (transactionType == TransactionType.INCOME) {
+                    uiState.data.incomeCategories
+                } else {
+                    uiState.data.expenseCategories
+                }
+
+                CategoryListMenu(
+                    categoryList,
+                    openState = isCategoryListOpen,
+                    //modifier = Modifier.weight(1f),
+                    onSelected = { category ->
+                        isCategoryListOpen.value = false
+
+                        val transactionObject = buildTransactionObject(
+                            value = inputValueState.value.toFloatValue(),
+                            currency = currencyState.value,
+                            type = transactionType,
+                            description = descriptionState.value ?: category.name,
+                            category = category
+                        )
+
+                        if (transactionObject == null) {
+                            Toast.makeText(
+                                context,
+                                "Transaction value cannot be 0",
+                                Toast.LENGTH_LONG
+                            )
+                                .show()
+                        } else {
+                            onAddTransaction(transactionObject)
+                            onBack()
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -427,53 +438,54 @@ private fun TransactionInputScreenPreview() {
                         TransactionCategoryUi(
                             name = "Category 1",
                             iconAssetPath = "categories_icon/house_category.svg",
-                            transactionType = TransactionType.EXPENSE
+                            transactionType = TransactionType.INCOME
                         ),
                         TransactionCategoryUi(
                             name = "Category 1",
                             iconAssetPath = "categories_icon/house_category.svg",
-                            transactionType = TransactionType.EXPENSE
+                            transactionType = TransactionType.INCOME
                         ),
                         TransactionCategoryUi(
                             name = "Category 1",
                             iconAssetPath = "categories_icon/house_category.svg",
-                            transactionType = TransactionType.EXPENSE
+                            transactionType = TransactionType.INCOME
                         ),
                         TransactionCategoryUi(
                             name = "Category 1",
                             iconAssetPath = "categories_icon/house_category.svg",
-                            transactionType = TransactionType.EXPENSE
+                            transactionType = TransactionType.INCOME
                         ),
                         TransactionCategoryUi(
                             name = "Category 1",
                             iconAssetPath = "categories_icon/house_category.svg",
-                            transactionType = TransactionType.EXPENSE
+                            transactionType = TransactionType.INCOME
                         ),
                         TransactionCategoryUi(
                             name = "Category 1",
                             iconAssetPath = "categories_icon/house_category.svg",
-                            transactionType = TransactionType.EXPENSE
+                            transactionType = TransactionType.INCOME
                         ),
                         TransactionCategoryUi(
                             name = "Category 1",
                             iconAssetPath = "categories_icon/house_category.svg",
-                            transactionType = TransactionType.EXPENSE
+                            transactionType = TransactionType.INCOME
                         ),
                         TransactionCategoryUi(
                             name = "Category 1",
                             iconAssetPath = "categories_icon/house_category.svg",
-                            transactionType = TransactionType.EXPENSE
+                            transactionType = TransactionType.INCOME
                         ),
                         TransactionCategoryUi(
                             name = "Category 1",
                             iconAssetPath = "categories_icon/house_category.svg",
-                            transactionType = TransactionType.EXPENSE
+                            transactionType = TransactionType.INCOME
                         ),
                     )
                 )
             ),
             totalBalance = 8000f,
-            TransactionType.EXPENSE,
+            TransactionType.INCOME,
+            modifier = Modifier,
             onAddTransaction = {},
             onBack = {}
         )

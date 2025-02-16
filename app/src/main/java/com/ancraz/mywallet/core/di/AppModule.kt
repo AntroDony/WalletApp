@@ -6,6 +6,7 @@ import com.ancraz.mywallet.BuildConfig
 import com.ancraz.mywallet.data.network.CurrencyRateDataSource
 import com.ancraz.mywallet.data.repository.TransactionRepositoryImpl
 import com.ancraz.mywallet.data.repository.CurrencyRepositoryImpl
+import com.ancraz.mywallet.data.repository.WalletRepositoryImpl
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository
 import com.ancraz.mywallet.data.storage.database.DatabaseInitializer
 import com.ancraz.mywallet.data.storage.database.WalletDatabase
@@ -15,6 +16,7 @@ import com.ancraz.mywallet.data.storage.database.dao.WalletDao
 import com.ancraz.mywallet.domain.network.CurrencyDataSource
 import com.ancraz.mywallet.domain.repository.TransactionRepository
 import com.ancraz.mywallet.domain.repository.CurrencyRepository
+import com.ancraz.mywallet.domain.repository.WalletRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -84,6 +86,15 @@ object AppModule {
         return TransactionRepositoryImpl(
             walletDatabase.transactionDao(),
             walletDatabase.categoryDao()
+        )
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideWalletRepository(walletDatabase: WalletDatabase): WalletRepository {
+        return WalletRepositoryImpl(
+            walletDatabase.walletDao()
         )
     }
 

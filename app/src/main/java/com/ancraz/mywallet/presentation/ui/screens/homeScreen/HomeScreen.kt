@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -48,12 +49,15 @@ import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.states.HomeScreenData
 import com.ancraz.mywallet.presentation.states.HomeScreenState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
+import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
+import com.ancraz.mywallet.presentation.ui.components.WalletCard
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.errorColor
@@ -105,6 +109,9 @@ fun HomeScreen(
 
         WalletListContainer(
             wallets = homeScreenState.data.wallets,
+            onEditWallet = { wallet ->
+                onEditWallet(wallet)
+            },
             onCreateWallet = {
                 onCreateWallet()
             }
@@ -243,6 +250,7 @@ private fun TotalBalanceActionButton(
 private fun WalletListContainer(
     wallets: List<WalletUi>,
     modifier: Modifier = Modifier,
+    onEditWallet: (WalletUi) -> Unit,
     onCreateWallet: () -> Unit
 ){
     Column(
@@ -289,7 +297,22 @@ private fun WalletListContainer(
                 }
             )
         } else {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
 
+            ) {
+                items(wallets){ wallet ->
+                    WalletCard(
+                        wallet = wallet,
+                        onClick = {
+                            onEditWallet(wallet)
+                        }
+                    )
+
+                    VerticalSpacer()
+                }
+            }
         }
     }
 }
@@ -403,98 +426,6 @@ private fun TransactionListContainer(
 }
 
 
-@Composable
-private fun TransactionCard(
-    transaction: TransactionUi,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-){
-    val context = LocalContext.current
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            add(SvgDecoder.Factory())
-        }
-        .build()
-    val assetUri = "file:///android_asset/${transaction.category?.iconAssetPath}"
-
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp)
-            .clickable {
-                onClick()
-            },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = backgroundColor
-        ),
-        border = BorderStroke(width = 1.dp, color = primaryColor)
-
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            AsyncImage(
-                model = assetUri,
-                contentDescription = transaction.category?.name,
-                imageLoader = imageLoader,
-                colorFilter = ColorFilter.tint(primaryColor),
-                modifier = Modifier
-                    .size(40.dp)
-            )
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = transaction.description ?: "",
-                    fontSize = 16.sp,
-                    color = onBackgroundColor
-                )
-
-                HorizontalSpacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = transaction.time.timeToString(),
-                    fontSize = 14.sp,
-                    color = onBackgroundColor
-                )
-            }
-            TransactionValueText(transaction)
-
-        }
-    }
-}
-
-
-@Composable
-private fun TransactionValueText(transaction: TransactionUi){
-    val textColor = if (transaction.type == TransactionType.INCOME) primaryColor else errorColor
-    val valuePrefix = if (transaction.type == TransactionType.INCOME){
-        "+"
-    } else if (transaction.type == TransactionType.EXPENSE) {
-        "-"
-    } else {
-        ""
-    }
-
-    val valueSuffix = transaction.currency.name
-
-    Text(
-        text = "$valuePrefix${transaction.value.toFormattedString()} $valueSuffix",
-        fontSize = 16.sp,
-        color = textColor
-    )
-}
-
-
 @Preview
 @Composable
 fun HomeScreenPreview() {
@@ -511,6 +442,40 @@ fun HomeScreenPreview() {
                         TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 4"),
                         TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 5"),
                         TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 6"),
+                    ),
+                    wallets = listOf(
+                        WalletUi(
+                            name = "TBC Card",
+                            description = "TBC Bank physic account",
+                            walletType = WalletType.CARD,
+                            accounts = listOf(
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+                            ),
+                            totalBalance = 2400f
+                        ),
+                        WalletUi(
+                            name = "Cash",
+                            description = "TBC Bank physic account",
+                            walletType = WalletType.CASH,
+                            accounts = listOf(
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+                            ),
+                            totalBalance = 2400f
+                        ),
+                        WalletUi(
+                            name = "Trust Wallet 1",
+                            walletType = WalletType.CRYPTO_WALLET,
+                            accounts = listOf(
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+                            ),
+                            totalBalance = 2400f
+                        )
                     )
                 )
             ),

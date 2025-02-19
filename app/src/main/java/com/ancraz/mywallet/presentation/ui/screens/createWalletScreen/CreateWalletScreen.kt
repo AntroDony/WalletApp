@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.presentation.ui.screens.createWalletScreen
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -24,10 +25,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -43,6 +46,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -70,7 +74,6 @@ import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
-import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
@@ -79,8 +82,10 @@ fun CreateWalletScreen(
     onAddWallet: (WalletUi) -> Unit,
     onBack: () -> Unit
 ) {
-    val nameState = remember { mutableStateOf("") }
-    val descriptionState = remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    val nameState = remember { mutableStateOf<String?>(null) }
+    val descriptionState = remember { mutableStateOf<String?>(null) }
     val selectedType = remember { mutableStateOf<WalletType?>(null) }
     val currencyList = remember {
         mutableStateOf(
@@ -163,7 +168,20 @@ fun CreateWalletScreen(
         SubmitButton(
             title = "Add Wallet",
             onClick = {
-                tryAddWallet()
+                val wallet = buildWalletObject(
+                    name = nameState.value,
+                    description = descriptionState.value,
+                    type = selectedType.value,
+                    accounts = currencyList.value,
+                    onError = { message ->
+                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    }
+                )
+
+                wallet?.let {
+                    onAddWallet(it)
+                    onBack()
+                }
             }
         )
 
@@ -188,14 +206,14 @@ private fun TitleText(
 
 @Composable
 private fun InputTextField(
-    textState: MutableState<String>,
+    textState: MutableState<String?>,
     placeholderText: String,
     maxLines: Int,
     fontSize: TextUnit = 16.sp,
     modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
-        value = textState.value,
+        value = textState.value ?: "",
         onValueChange = { text ->
             textState.value = text
         },
@@ -295,19 +313,46 @@ private fun CurrencyAccountList(
     accountList: MutableState<List<WalletUi.CurrencyAccountUi>>,
     modifier: Modifier = Modifier,
 ) {
+    val isSelectAccountCurrencyDialogOpen = remember { mutableStateOf(false) }
+
+    if (isSelectAccountCurrencyDialogOpen.value){
+        SelectNewAccountCurrencyDialog(
+            currencies = CurrencyCode.entries,
+            onResult = { currency ->
+                accountList.value = accountList.value.apply {
+                    this.toMutableList()
+                        .add(
+                            WalletUi.CurrencyAccountUi(
+                                currency = currency
+                            )
+                        )
+                }
+            },
+            onCancel = {
+                isSelectAccountCurrencyDialogOpen.value = false
+            }
+        )
+    }
+
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
     ) {
         items(accountList.value) { account ->
             CurrencyAccountItem(
-                account = account
+                account = account,
+                onDelete = { account ->
+                    accountList.value = accountList.value.apply {
+                        this.toMutableList()
+                            .remove(account)
+                    }
+                }
             )
         }
         item {
             AddAccountButton(
                 onClick = {
-
+                    isSelectAccountCurrencyDialogOpen.value = true
                 }
             )
         }
@@ -318,9 +363,10 @@ private fun CurrencyAccountList(
 @Composable
 private fun CurrencyAccountItem(
     account: WalletUi.CurrencyAccountUi,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDelete: (WalletUi.CurrencyAccountUi) -> Unit
 ) {
-    val isEditValueDialogOpen = remember { mutableStateOf(true) }
+    val isEditValueDialogOpen = remember { mutableStateOf(false) }
     val accountValue = remember { mutableStateOf(account.value) }
 
     if (isEditValueDialogOpen.value) {
@@ -332,8 +378,6 @@ private fun CurrencyAccountItem(
             onCancel = {
                 isEditValueDialogOpen.value = false
             }
-
-
         )
     }
 
@@ -363,25 +407,42 @@ private fun CurrencyAccountItem(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
-            VerticalSpacer()
+            VerticalSpacer(width = 20.dp)
 
             Text(
                 text = account.value.toFormattedString(),
                 color = onBackgroundColor,
                 fontSize = 16.sp,
                 maxLines = 1,
-                fontWeight = FontWeight.Bold
-            )
-
-            VerticalSpacer()
-
-            Image(
-                imageVector = Icons.Filled.Edit,
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(onBackgroundColor),
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .size(24.dp)
+                    .weight(1f)
             )
+
+            VerticalSpacer(width = 20.dp)
+
+            Row {
+                Image(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(onBackgroundColor),
+                    modifier = Modifier
+                        .size(24.dp)
+                )
+
+                VerticalSpacer(width = 20.dp)
+
+                Image(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(onBackgroundColor),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable {
+                            onDelete(account)
+                        }
+                )
+            }
         }
     }
 }
@@ -432,7 +493,7 @@ private fun AddAccountButton(
             VerticalSpacer()
 
             Text(
-                text = "Add Wallet",
+                text = "Add Account",
                 color = onSecondaryColor,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
@@ -547,6 +608,105 @@ private fun EditAccountValueDialog(
 }
 
 
+@Composable
+private fun SelectNewAccountCurrencyDialog(
+    currencies: List<CurrencyCode>,
+    modifier: Modifier = Modifier,
+    onResult: (CurrencyCode) -> Unit,
+    onCancel: () -> Unit
+){
+    val selectedCurrency = remember { mutableStateOf(CurrencyCode.USD) }
+
+    Dialog(
+        onDismissRequest = {
+            onCancel()
+        }
+    ) {
+        Card(
+            modifier = modifier,
+            colors = CardDefaults.cardColors(
+                containerColor = backgroundColor
+            ),
+            border = BorderStroke(width = 1.dp, color = primaryColor)
+        ) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Edit value",
+                    color = onBackgroundColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                HorizontalSpacer(height = 20.dp)
+
+                currencies.forEach { currency ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ){
+                        RadioButton(
+                            selected = currency == selectedCurrency.value,
+                            onClick = {
+                                selectedCurrency.value = currency
+                            }
+                        )
+
+                        VerticalSpacer()
+
+                        Text(
+                            text = currency.name,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = onBackgroundColor
+                        )
+                    }
+                }
+
+                HorizontalSpacer(height = 20.dp)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextButton(
+                        onClick = { onCancel() },
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            color = onBackgroundColor,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    TextButton(
+                        onClick = {
+                            onResult(selectedCurrency.value)
+                        }
+                    ) {
+                        Text(
+                            text = "Save",
+                            color = onBackgroundColor,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 @Preview
 @Composable
 private fun CreateWalletScreenPreview() {
@@ -561,6 +721,26 @@ private fun CreateWalletScreenPreview() {
 }
 
 
-private fun tryAddWallet() {
-
+private fun buildWalletObject(
+    name: String?,
+    description: String?,
+    type: WalletType?,
+    accounts: List<WalletUi.CurrencyAccountUi>,
+    onError: (String) -> Unit
+): WalletUi? {
+    if (name.isNullOrEmpty()){
+        onError("Wallet name cannot be empty")
+        return null
+    }
+    if (type == null){
+        onError("Select wallet type")
+        return null
+    }
+    return WalletUi(
+        name = name,
+        description = description,
+        walletType = type,
+        accounts = accounts,
+        totalBalance = 0f
+    )
 }

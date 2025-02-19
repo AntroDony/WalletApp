@@ -129,8 +129,8 @@ private fun MainActivityScreen() {
                 CreateWalletScreen(
                     modifier = Modifier
                         .padding(innerPadding),
-                    onAddWallet = {
-                        //todo implement
+                    onAddWallet = { wallet ->
+                        walletViewModel.addWallet(wallet)
                     },
                     onBack = {
                         navController.navigateUp()

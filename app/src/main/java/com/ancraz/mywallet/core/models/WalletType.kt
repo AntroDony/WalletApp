@@ -5,5 +5,6 @@ enum class WalletType(val walletName: String) {
     CARD("Card"),
     BANK_ACCOUNT("Bank Account"),
     CRYPTO_WALLET("Crypto Wallet"),
-    INVESTMENTS("Investments")
+    INVESTMENTS("Investments"),
+    OTHER("Other")
 }

@@ -1,7 +1,6 @@
 package com.ancraz.mywallet.presentation.mapper
 
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.domain.models.Transaction
 import com.ancraz.mywallet.domain.models.TransactionCategory
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 

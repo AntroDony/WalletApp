@@ -28,7 +28,7 @@ fun WalletUi.toWallet(): Wallet{
 private fun Wallet.WalletCurrencyAccount.toAccountUi(): WalletUi.CurrencyAccountUi {
     return WalletUi.CurrencyAccountUi(
         currency = this.currencyCode,
-        value = this.value
+        moneyValue = this.value
     )
 }
 
@@ -36,6 +36,6 @@ private fun Wallet.WalletCurrencyAccount.toAccountUi(): WalletUi.CurrencyAccount
 private fun WalletUi.CurrencyAccountUi.toCurrencyAccount(): Wallet.WalletCurrencyAccount {
     return Wallet.WalletCurrencyAccount(
         currencyCode = this.currency,
-        value = this.value
+        value = this.moneyValue
     )
 }

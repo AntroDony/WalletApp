@@ -13,6 +13,6 @@ data class WalletUi(
 ) {
     data class CurrencyAccountUi(
         val currency: CurrencyCode = CurrencyCode.USD,
-        val value: Float = 0f
+        val moneyValue: Float = 0f
     )
 }

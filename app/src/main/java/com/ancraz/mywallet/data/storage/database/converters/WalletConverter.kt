@@ -18,7 +18,7 @@ class WalletConverter {
 
     @TypeConverter
     fun stringToCurrencyAccountList(accountString: String): List<CurrencyAccount>{
-        val groupType = object : TypeToken<CurrencyAccount>(){}.type
+        val groupType = object : TypeToken<List<CurrencyAccount>>(){}.type
         return gson.fromJson(accountString, groupType)
     }
 

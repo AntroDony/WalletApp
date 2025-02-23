@@ -12,6 +12,7 @@ import com.ancraz.mywallet.domain.useCases.TotalBalanceUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionsUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
+import com.ancraz.mywallet.presentation.mapper.toWalletUi
 import com.ancraz.mywallet.presentation.states.HomeScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,11 +34,9 @@ class HomeViewModel @Inject constructor(
     private var _homeScreenState = mutableStateOf(HomeScreenState())
     val homeScreenState: State<HomeScreenState> = _homeScreenState
 
-
     init {
         fetchData()
     }
-
 
     fun editTotalBalance(value: Float, code: CurrencyCode = CurrencyCode.USD){
         viewModelScope.launch(ioDispatcher) {
@@ -48,6 +47,7 @@ class HomeViewModel @Inject constructor(
 
     private fun fetchData(){
         viewModelScope.launch(ioDispatcher) {
+
             getCurrencyRatesUseCase().onEach{ result ->
                 debugLog("GetCurrencyRateResult: ${result.data} | ${result.errorMessage}")
             }.launchIn(viewModelScope)
@@ -100,7 +100,9 @@ class HomeViewModel @Inject constructor(
                     is DataResult.Success -> {
                         _homeScreenState.value = homeScreenState.value.copy(
                             data = _homeScreenState.value.data.copy(
-
+                                wallets = result.data?.map { wallet ->
+                                    wallet.toWalletUi()
+                                } ?: emptyList()
                             )
                         )
                     }
@@ -114,7 +116,7 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
-            }
+            }.launchIn(viewModelScope)
         }
     }
 }

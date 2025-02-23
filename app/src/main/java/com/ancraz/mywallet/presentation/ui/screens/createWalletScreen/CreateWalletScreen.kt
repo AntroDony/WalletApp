@@ -17,10 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -41,7 +42,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
@@ -74,6 +77,7 @@ import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
+import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
@@ -87,16 +91,17 @@ fun CreateWalletScreen(
     val nameState = remember { mutableStateOf<String?>(null) }
     val descriptionState = remember { mutableStateOf<String?>(null) }
     val selectedType = remember { mutableStateOf<WalletType?>(null) }
-    val currencyList = remember {
-        mutableStateOf(
-            listOf(
-                WalletUi.CurrencyAccountUi(
-                    currency = CurrencyCode.USD,
-                    value = 0f
+    val currencyList =
+        remember {
+            mutableStateOf(
+                listOf(
+                    WalletUi.CurrencyAccountUi(
+                        currency = CurrencyCode.USD,
+                        moneyValue = 0f
+                    )
                 )
             )
-        )
-    }
+        }
 
     Column(
         modifier = modifier
@@ -278,14 +283,11 @@ private fun WalletTypeItem(
     selectedType: MutableState<WalletType?>,
     modifier: Modifier = Modifier
 ) {
-    val isSelected = remember {
-        mutableStateOf(
-            if (selectedType.value == type) true else false
-        )
-    }
+    val isSelected = selectedType.value == type
+
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected.value) primaryColor else backgroundColor
+            containerColor = if (isSelected) primaryColor else backgroundColor
         ),
         shape = RoundedCornerShape(6.dp),
         border = BorderStroke(width = 1.dp, color = primaryColor),
@@ -298,7 +300,7 @@ private fun WalletTypeItem(
             text = type.walletName,
             fontSize = 14.sp,
             maxLines = 1,
-            color = if (isSelected.value) backgroundColor else onSurfaceColor,
+            color = if (isSelected) backgroundColor else onSurfaceColor,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
@@ -315,18 +317,20 @@ private fun CurrencyAccountList(
 ) {
     val isSelectAccountCurrencyDialogOpen = remember { mutableStateOf(false) }
 
-    if (isSelectAccountCurrencyDialogOpen.value){
+    if (isSelectAccountCurrencyDialogOpen.value) {
         SelectNewAccountCurrencyDialog(
             currencies = CurrencyCode.entries,
             onResult = { currency ->
-                accountList.value = accountList.value.apply {
-                    this.toMutableList()
-                        .add(
+                accountList.value = accountList.value
+                    .toMutableList()
+                    .apply {
+                        add(
                             WalletUi.CurrencyAccountUi(
                                 currency = currency
                             )
                         )
-                }
+                    }
+                isSelectAccountCurrencyDialogOpen.value = false
             },
             onCancel = {
                 isSelectAccountCurrencyDialogOpen.value = false
@@ -338,14 +342,22 @@ private fun CurrencyAccountList(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        items(accountList.value) { account ->
+        itemsIndexed(accountList.value) { index, account ->
             CurrencyAccountItem(
                 account = account,
+                onEditAccount = { editedAccount ->
+                    accountList.value = accountList.value
+                        .toMutableList()
+                        .apply {
+                            set(index, editedAccount)
+                        }
+                },
                 onDelete = { account ->
-                    accountList.value = accountList.value.apply {
-                        this.toMutableList()
-                            .remove(account)
-                    }
+                    accountList.value = accountList.value
+                        .toMutableList()
+                        .apply {
+                            remove(account)
+                        }
                 }
             )
         }
@@ -364,16 +376,21 @@ private fun CurrencyAccountList(
 private fun CurrencyAccountItem(
     account: WalletUi.CurrencyAccountUi,
     modifier: Modifier = Modifier,
+    onEditAccount: (WalletUi.CurrencyAccountUi) -> Unit,
     onDelete: (WalletUi.CurrencyAccountUi) -> Unit
 ) {
     val isEditValueDialogOpen = remember { mutableStateOf(false) }
-    val accountValue = remember { mutableStateOf(account.value) }
 
     if (isEditValueDialogOpen.value) {
         EditAccountValueDialog(
-            value = accountValue.value.toFormattedString(),
-            onResult = {
-
+            value = account.moneyValue.toFormattedString(),
+            onResult = { newValueString ->
+                onEditAccount(
+                    account.copy(
+                        moneyValue = newValueString.toFloatValue()
+                    )
+                )
+                isEditValueDialogOpen.value = false
             },
             onCancel = {
                 isEditValueDialogOpen.value = false
@@ -391,7 +408,7 @@ private fun CurrencyAccountItem(
         ),
         border = BorderStroke(width = 1.dp, color = primaryColor),
         onClick = {
-
+            isEditValueDialogOpen.value = true
         }
     ) {
         Row(
@@ -410,7 +427,7 @@ private fun CurrencyAccountItem(
             VerticalSpacer(width = 20.dp)
 
             Text(
-                text = account.value.toFormattedString(),
+                text = account.moneyValue.toFormattedString(),
                 color = onBackgroundColor,
                 fontSize = 16.sp,
                 maxLines = 1,
@@ -438,6 +455,7 @@ private fun CurrencyAccountItem(
                     colorFilter = ColorFilter.tint(onBackgroundColor),
                     modifier = Modifier
                         .size(24.dp)
+                        .clip(CircleShape)
                         .clickable {
                             onDelete(account)
                         }
@@ -466,9 +484,11 @@ private fun AddAccountButton(
             width = 2f,
             pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 15f), 0f)
         )
-        Canvas(Modifier
-            .fillMaxWidth()
-            .height(45.dp)) {
+        Canvas(
+            Modifier
+                .fillMaxWidth()
+                .height(45.dp)
+        ) {
             drawRoundRect(
                 color = primaryColor,
                 style = stroke,
@@ -568,6 +588,7 @@ private fun EditAccountValueDialog(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
 
                 HorizontalSpacer(height = 20.dp)
@@ -614,7 +635,7 @@ private fun SelectNewAccountCurrencyDialog(
     modifier: Modifier = Modifier,
     onResult: (CurrencyCode) -> Unit,
     onCancel: () -> Unit
-){
+) {
     val selectedCurrency = remember { mutableStateOf(CurrencyCode.USD) }
 
     Dialog(
@@ -650,7 +671,7 @@ private fun SelectNewAccountCurrencyDialog(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start
-                    ){
+                    ) {
                         RadioButton(
                             selected = currency == selectedCurrency.value,
                             onClick = {
@@ -728,11 +749,11 @@ private fun buildWalletObject(
     accounts: List<WalletUi.CurrencyAccountUi>,
     onError: (String) -> Unit
 ): WalletUi? {
-    if (name.isNullOrEmpty()){
+    if (name.isNullOrEmpty()) {
         onError("Wallet name cannot be empty")
         return null
     }
-    if (type == null){
+    if (type == null) {
         onError("Select wallet type")
         return null
     }

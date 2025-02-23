@@ -1,6 +1,5 @@
 package com.ancraz.mywallet.presentation.ui.screens.homeScreen
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,17 +38,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.ImageLoader
-import coil3.compose.AsyncImage
-import coil3.svg.SvgDecoder
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.models.WalletType
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.states.HomeScreenData
@@ -59,8 +55,6 @@ import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.components.WalletCard
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
-import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
-import com.ancraz.mywallet.presentation.ui.theme.errorColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
 import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
@@ -68,7 +62,6 @@ import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
-import com.ancraz.mywallet.presentation.ui.utils.timeToString
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 import java.util.Calendar
 
@@ -81,6 +74,9 @@ fun HomeScreen(
     onCreateWallet: () -> Unit,
     onEditWallet: (WalletUi) -> Unit
 ) {
+    debugLog("HomeScreen state: $homeScreenState")
+
+    
     Column(
         modifier = modifier
             .fillMaxSize()

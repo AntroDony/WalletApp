@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
@@ -45,6 +46,7 @@ fun WalletCard(
     Card(
         modifier = modifier
             .wrapContentWidth()
+            .widthIn(max = 300.dp)
             .padding(vertical = 10.dp),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor
@@ -56,14 +58,14 @@ fun WalletCard(
     ) {
         Column(
             modifier = Modifier
-                //.fillMaxWidth()
+                .wrapContentWidth()
                 .padding(14.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .wrapContentWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
@@ -80,28 +82,30 @@ fun WalletCard(
                 Text(
                     text = wallet.name,
                     color = onBackgroundColor,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
+                    maxLines = 2,
                     modifier = Modifier
-                        .weight(1f)
+                        //.weight(1f)
                 )
+
+                VerticalSpacer()
             }
 
-            HorizontalSpacer()
+            HorizontalSpacer(height = 8.dp)
 
             Text(
                 text = "Balance",
                 color = onBackgroundColor.copy(alpha = 0.7f),
-                fontSize = 16.sp
+                fontSize = 14.sp
             )
 
-            HorizontalSpacer()
+            HorizontalSpacer(height = 8.dp)
 
             Text(
                 text = "${wallet.totalBalance.toFormattedString()} USD",
                 color = onBackgroundColor,
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
         }

@@ -18,12 +18,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +56,7 @@ import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.components.WalletCard
+import com.ancraz.mywallet.presentation.ui.events.HomeScreenUiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
@@ -68,10 +72,7 @@ import java.util.Calendar
 fun HomeScreen(
     uiState: HomeScreenState,
     modifier: Modifier,
-    onMadeTransaction: (TransactionType) -> Unit,
-    onEditBalance: (Float) -> Unit,
-    onCreateWallet: () -> Unit,
-    onEditWallet: (WalletUi) -> Unit
+    onEvent: (HomeScreenUiEvent) -> Unit
 ) {
     debugLog("HomeScreen state: $uiState")
 
@@ -83,21 +84,48 @@ fun HomeScreen(
     ) {
         HorizontalSpacer()
 
-        Text(
-            text = "My Wallet",
-            color = onSurfaceColor,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.SemiBold,
+        Box(
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-        )
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp)
+        ) {
+            Text(
+                text = "My Wallet",
+                color = onSurfaceColor,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+
+            Image(
+                imageVector = Icons.Outlined.Sync,
+                contentDescription = "Sync data",
+                colorFilter = ColorFilter.tint(onSurfaceColor),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(30.dp)
+                    .clip(CircleShape)
+                    .clickable {
+                        onEvent(HomeScreenUiEvent.SyncData)
+                    }
+            )
+        }
 
         HorizontalSpacer()
 
         TotalBalanceCard(
             state = uiState,
-            onNewTransaction = onMadeTransaction,
-            onEditBalance = onEditBalance
+            onNewTransaction = { transactionType ->
+                onEvent(
+                    HomeScreenUiEvent.CreateTransaction(transactionType)
+                )
+                               },
+            onEditBalance = { currentBalance ->
+                onEvent(
+                    HomeScreenUiEvent.EditTotalBalance(currentBalance)
+                )
+            }
         )
 
         HorizontalSpacer()
@@ -105,10 +133,12 @@ fun HomeScreen(
         WalletListContainer(
             wallets = uiState.data.wallets,
             onEditWallet = { wallet ->
-                onEditWallet(wallet)
+                onEvent(
+                    HomeScreenUiEvent.EditWallet(wallet)
+                )
             },
             onCreateWallet = {
-                onCreateWallet()
+                onEvent(HomeScreenUiEvent.CreateWallet)
             }
         )
 
@@ -407,14 +437,46 @@ private fun TransactionListContainer(
             }
         }
 
-        LazyColumn(
-            modifier = Modifier
-        ){
-            items(transactions){ transaction ->
-                TransactionCard(
-                    transaction = transaction,
-                    onClick = {}
-                )
+        if (transactions.isEmpty()){
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        imageVector = Icons.AutoMirrored.Rounded.List,
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(onSurfaceColor),
+                        modifier = Modifier
+                            .size(100.dp)
+                    )
+                    Text(
+                        text = "No transactions",
+                        color = onSurfaceColor,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .padding(16.dp)
+                    )
+                }
+
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+            ){
+                items(transactions){ transaction ->
+                    TransactionCard(
+                        transaction = transaction,
+                        onClick = {}
+                    )
+                }
             }
         }
     }
@@ -511,10 +573,7 @@ fun HomeScreenPreview() {
                 )
             ),
             modifier = Modifier,
-            onMadeTransaction = {},
-            onEditBalance = {},
-            onEditWallet = {},
-            onCreateWallet = {}
+            onEvent = {}
         )
     }
 }

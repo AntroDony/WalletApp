@@ -54,6 +54,8 @@ import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
 import com.ancraz.mywallet.presentation.ui.components.TransactionConfigContainer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
+import com.ancraz.mywallet.presentation.ui.events.TransactionInputScreenUiEvent
+import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
@@ -71,8 +73,7 @@ fun TransactionInputScreen(
     totalBalance: Float = 0f,
     transactionType: TransactionType,
     modifier: Modifier,
-    onAddTransaction: (TransactionUi) -> Unit,
-    onBack: () -> Unit
+    onEvent: (UiEvent) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -91,7 +92,9 @@ fun TransactionInputScreen(
 
         NavigationToolbar(
             title = transactionType.name.lowercase().replaceFirstChar { it.uppercase() },
-            onClickBack = onBack
+            onClickBack = {
+                onEvent(UiEvent.GoBack)
+            }
         )
 
         HorizontalSpacer()
@@ -174,8 +177,10 @@ fun TransactionInputScreen(
                             )
                                 .show()
                         } else {
-                            onAddTransaction(transactionObject)
-                            onBack()
+                            onEvent(
+                                TransactionInputScreenUiEvent.AddTransaction(transactionObject)
+                            )
+                            onEvent(UiEvent.GoBack)
                         }
                     }
                 )
@@ -486,8 +491,7 @@ private fun TransactionInputScreenPreview() {
             totalBalance = 8000f,
             TransactionType.INCOME,
             modifier = Modifier,
-            onAddTransaction = {},
-            onBack = {}
+            onEvent = {}
         )
     }
 }

@@ -69,6 +69,8 @@ import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
+import com.ancraz.mywallet.presentation.ui.events.CreateWalletScreenUiEvent
+import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
@@ -83,8 +85,7 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 @Composable
 fun CreateWalletScreen(
     modifier: Modifier,
-    onAddWallet: (WalletUi) -> Unit,
-    onBack: () -> Unit
+    onEvent: (UiEvent) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -112,7 +113,9 @@ fun CreateWalletScreen(
 
         NavigationToolbar(
             title = "New Wallet",
-            onClickBack = onBack
+            onClickBack = {
+                onEvent(UiEvent.GoBack)
+            }
         )
 
         HorizontalSpacer(height = 20.dp)
@@ -184,8 +187,8 @@ fun CreateWalletScreen(
                 )
 
                 wallet?.let {
-                    onAddWallet(it)
-                    onBack()
+                    onEvent(CreateWalletScreenUiEvent.AddWallet(it))
+                    onEvent(UiEvent.GoBack)
                 }
             }
         )
@@ -735,8 +738,7 @@ private fun CreateWalletScreenPreview() {
         CreateWalletScreen(
             modifier = Modifier
                 .background(backgroundColor),
-            onAddWallet = {},
-            onBack = {}
+            onEvent = {}
         )
     }
 }

@@ -45,6 +45,32 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun syncData(){
+        viewModelScope.launch(ioDispatcher) {
+            getWalletsUseCase().onEach { result ->
+                when(result){
+                    is DataResult.Success -> {
+                        val walletSumInUsd = result.data?.map { wallet ->
+                            wallet.totalBalance
+                        }?.sum()
+
+                        walletSumInUsd?.let { value ->
+                            totalBalanceUseCase.editTotalBalance(value, CurrencyCode.USD)
+                        } ?: run {
+                            debugLog("walletSum is null")
+                        }
+                    }
+                    is DataResult.Loading -> {
+                        debugLog("syncData loading")
+                    }
+                    is DataResult.Error -> {
+                        debugLog("syncData error: ${result.errorMessage}")
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
     private fun fetchData(){
         viewModelScope.launch(ioDispatcher) {
 

@@ -29,8 +29,6 @@ class GetCurrencyRatesUseCase @Inject constructor(
             }
 
             try {
-                emit(DataResult.Loading())
-
                 val resultList = mutableListOf<CurrencyRate>()
                 CurrencyCode.entries.forEach { code ->
                     val rate = dataStoreRepository.getCurrencyRateToUsd(code)

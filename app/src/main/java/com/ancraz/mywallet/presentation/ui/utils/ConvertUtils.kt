@@ -1,6 +1,8 @@
 package com.ancraz.mywallet.presentation.ui.utils
 
 import com.ancraz.mywallet.core.utils.debugLog
+import com.ancraz.mywallet.presentation.models.CurrencyRateUi
+import com.ancraz.mywallet.presentation.models.WalletUi
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

@@ -122,7 +122,7 @@ class TransactionViewModel @Inject constructor(
                     }
                     is DataResult.Error -> {
                         debugLog("fetchCurrencyRates error: ${result.errorMessage}")
-                        _transactionUiState.value = TransactionUiState(error = result.errorMessage)
+                        _transactionUiState.value = _transactionUiState.value.copy(error = result.errorMessage)
                     }
                 }
             }.launchIn(viewModelScope)

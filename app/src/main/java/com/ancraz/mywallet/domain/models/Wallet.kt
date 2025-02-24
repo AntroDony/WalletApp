@@ -8,6 +8,7 @@ data class Wallet(
     val name: String,
     val description: String?,
     val currencyAccountList: List<WalletCurrencyAccount>,
+    val totalBalance: Float = 0f,
     val walletType: WalletType
 ){
 

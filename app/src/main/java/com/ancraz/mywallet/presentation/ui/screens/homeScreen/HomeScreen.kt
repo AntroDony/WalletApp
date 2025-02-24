@@ -48,7 +48,6 @@ import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
-import com.ancraz.mywallet.presentation.states.HomeScreenData
 import com.ancraz.mywallet.presentation.states.HomeScreenState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.TransactionCard
@@ -67,14 +66,14 @@ import java.util.Calendar
 
 @Composable
 fun HomeScreen(
-    homeScreenState: HomeScreenState,
+    uiState: HomeScreenState,
     modifier: Modifier,
     onMadeTransaction: (TransactionType) -> Unit,
     onEditBalance: (Float) -> Unit,
     onCreateWallet: () -> Unit,
     onEditWallet: (WalletUi) -> Unit
 ) {
-    debugLog("HomeScreen state: $homeScreenState")
+    debugLog("HomeScreen state: $uiState")
 
     
     Column(
@@ -96,7 +95,7 @@ fun HomeScreen(
         HorizontalSpacer()
 
         TotalBalanceCard(
-            state = homeScreenState,
+            state = uiState,
             onNewTransaction = onMadeTransaction,
             onEditBalance = onEditBalance
         )
@@ -104,7 +103,7 @@ fun HomeScreen(
         HorizontalSpacer()
 
         WalletListContainer(
-            wallets = homeScreenState.data.wallets,
+            wallets = uiState.data.wallets,
             onEditWallet = { wallet ->
                 onEditWallet(wallet)
             },
@@ -116,7 +115,7 @@ fun HomeScreen(
         HorizontalSpacer()
 
         TransactionListContainer(
-            transactions = homeScreenState.data.transactions
+            transactions = uiState.data.transactions
         )
     }
 
@@ -427,17 +426,53 @@ private fun TransactionListContainer(
 fun HomeScreenPreview() {
     MyWalletTheme {
         HomeScreen(
-            homeScreenState = HomeScreenState(
+            uiState = HomeScreenState(
                 isLoading = true,
-                data = HomeScreenData(
+                data = HomeScreenState.HomeScreenData(
                     balance = 8000f,
                     transactions = listOf(
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 1"),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.INCOME, currency = CurrencyCode.USD, description = "Transaction 2"),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 3"),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 4"),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 5"),
-                        TransactionUi(time = Calendar.getInstance().timeInMillis, value = 200f, type = TransactionType.EXPENSE, currency = CurrencyCode.USD, description = "Transaction 6"),
+                        TransactionUi(
+                            time = Calendar.getInstance().timeInMillis,
+                            value = 200f,
+                            type = TransactionType.EXPENSE,
+                            currency = CurrencyCode.USD,
+                            description = "Transaction 1"
+                        ),
+                        TransactionUi(
+                            time = Calendar.getInstance().timeInMillis,
+                            value = 200f,
+                            type = TransactionType.INCOME,
+                            currency = CurrencyCode.USD,
+                            description = "Transaction 2"
+                        ),
+                        TransactionUi(
+                            time = Calendar.getInstance().timeInMillis,
+                            value = 200f,
+                            type = TransactionType.EXPENSE,
+                            currency = CurrencyCode.USD,
+                            description = "Transaction 3"
+                        ),
+                        TransactionUi(
+                            time = Calendar.getInstance().timeInMillis,
+                            value = 200f,
+                            type = TransactionType.EXPENSE,
+                            currency = CurrencyCode.USD,
+                            description = "Transaction 4"
+                        ),
+                        TransactionUi(
+                            time = Calendar.getInstance().timeInMillis,
+                            value = 200f,
+                            type = TransactionType.EXPENSE,
+                            currency = CurrencyCode.USD,
+                            description = "Transaction 5"
+                        ),
+                        TransactionUi(
+                            time = Calendar.getInstance().timeInMillis,
+                            value = 200f,
+                            type = TransactionType.EXPENSE,
+                            currency = CurrencyCode.USD,
+                            description = "Transaction 6"
+                        ),
                     ),
                     wallets = listOf(
                         WalletUi(

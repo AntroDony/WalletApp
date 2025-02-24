@@ -10,7 +10,7 @@ fun Wallet.toWalletUi(): WalletUi {
         description = this.description,
         accounts = this.currencyAccountList.map { account -> account.toAccountUi()},
         walletType = this.walletType,
-        totalBalance = this.currencyAccountList.map { account -> account.value }.sum()
+        totalBalance = this.totalBalance
     )
 }
 
@@ -20,7 +20,8 @@ fun WalletUi.toWallet(): Wallet{
         name = this.name,
         description = this.description,
         currencyAccountList = this.accounts.map { account -> account.toCurrencyAccount() },
-        walletType = this.walletType
+        walletType = this.walletType,
+        totalBalance = this.totalBalance
     )
 }
 

@@ -6,16 +6,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
+import com.ancraz.mywallet.domain.models.Transaction
 import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionCategoryUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.DeleteTransactionCategoryUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionCategoriesUseCase
+import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionsUseCase
 import com.ancraz.mywallet.presentation.mapper.toCategoryUi
 import com.ancraz.mywallet.presentation.mapper.toCurrencyRateUi
 import com.ancraz.mywallet.presentation.mapper.toTransaction
+import com.ancraz.mywallet.presentation.mapper.toTransactionUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
-import com.ancraz.mywallet.presentation.states.TransactionUiState
+import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionUiState
+import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.TransactionListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -27,6 +31,7 @@ import javax.inject.Inject
 class TransactionViewModel @Inject constructor(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val getTransactionCategoriesUseCase: GetTransactionCategoriesUseCase,
+    private val getTransactionsUseCase: GetTransactionsUseCase,
     private val addTransactionCategoryUseCase: AddTransactionCategoryUseCase,
     private val deleteTransactionCategoryUseCase: DeleteTransactionCategoryUseCase,
     private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase
@@ -34,12 +39,15 @@ class TransactionViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private var _transactionUiState = mutableStateOf(TransactionUiState())
-    val transactionUiState: State<TransactionUiState> = _transactionUiState
+    private var _createTransactionUiState = mutableStateOf(CreateTransactionUiState())
+    val createTransactionUiState: State<CreateTransactionUiState> = _createTransactionUiState
+
+    private var _transactionListUiState = mutableStateOf(TransactionListUiState())
+    val transactionListUiState: State<TransactionListUiState> = _transactionListUiState
+
 
     init {
-        getAllTransactionCategories()
-        fetchCurrencyRates()
+        fetchData()
     }
 
 
@@ -51,14 +59,23 @@ class TransactionViewModel @Inject constructor(
     }
 
 
-    private fun getAllTransactionCategories() {
+    private fun fetchData(){
+        viewModelScope.launch {
+            fetchTransactionCategories()
+            fetchTransactionList()
+            fetchCurrencyRates()
+        }
+    }
+
+
+    private fun fetchTransactionCategories() {
         viewModelScope.launch(ioDispatcher) {
             getTransactionCategoriesUseCase.getExpenseCategories().onEach { result ->
                 when (result) {
                     is DataResult.Success -> {
-                        _transactionUiState.value = _transactionUiState.value.copy(
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
                             isLoading = false,
-                            data = _transactionUiState.value.data.copy(
+                            data = _createTransactionUiState.value.data.copy(
                                 expenseCategories = result.data?.map { category ->
                                     category.toCategoryUi()
                                 } ?: emptyList()
@@ -67,12 +84,12 @@ class TransactionViewModel @Inject constructor(
                     }
 
                     is DataResult.Loading -> {
-                        _transactionUiState.value = TransactionUiState(isLoading = true)
+                        _createTransactionUiState.value = CreateTransactionUiState(isLoading = true)
                     }
 
                     is DataResult.Error -> {
                         debugLog("getExpenseCategories error: ${result.errorMessage}")
-                        _transactionUiState.value = TransactionUiState(error = result.errorMessage)
+                        _createTransactionUiState.value = CreateTransactionUiState(error = result.errorMessage)
                     }
                 }
             }.launchIn(viewModelScope)
@@ -80,9 +97,9 @@ class TransactionViewModel @Inject constructor(
             getTransactionCategoriesUseCase.getIncomeCategories().onEach { result ->
                 when (result) {
                     is DataResult.Success -> {
-                        _transactionUiState.value = _transactionUiState.value.copy(
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
                             isLoading = false,
-                            data = _transactionUiState.value.data.copy(
+                            data = _createTransactionUiState.value.data.copy(
                                 incomeCategories = result.data?.map { category ->
                                     category.toCategoryUi()
                                 } ?: emptyList()
@@ -91,12 +108,40 @@ class TransactionViewModel @Inject constructor(
                     }
 
                     is DataResult.Loading -> {
-                        _transactionUiState.value = TransactionUiState(isLoading = true)
+                        _createTransactionUiState.value = CreateTransactionUiState(isLoading = true)
                     }
 
                     is DataResult.Error -> {
                         debugLog("getExpenseCategories error: ${result.errorMessage}")
-                        _transactionUiState.value = TransactionUiState(error = result.errorMessage)
+                        _createTransactionUiState.value = CreateTransactionUiState(error = result.errorMessage)
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
+
+    private fun fetchTransactionList(){
+        viewModelScope.launch {
+            getTransactionsUseCase().onEach { result ->
+                when(result){
+                    is DataResult.Success -> {
+                        _transactionListUiState.value = _transactionListUiState.value.copy(
+                            isLoading = false,
+                            transactionList = result.data?.map { transaction: Transaction ->
+                                transaction.toTransactionUi()
+                            } ?: emptyList()
+                        )
+                    }
+                    is DataResult.Loading -> {
+                        _transactionListUiState.value = _transactionListUiState.value.copy(
+                            isLoading = true
+                        )
+                    }
+                    is DataResult.Error -> {
+                        _transactionListUiState.value = _transactionListUiState.value.copy(
+                            error = result.errorMessage
+                        )
                     }
                 }
             }.launchIn(viewModelScope)
@@ -109,8 +154,8 @@ class TransactionViewModel @Inject constructor(
             getCurrencyRatesUseCase().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
-                        _transactionUiState.value = _transactionUiState.value.copy(
-                            data = _transactionUiState.value.data.copy(
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                            data = _createTransactionUiState.value.data.copy(
                                 currencyRates = result.data?.map { rate ->
                                     rate.toCurrencyRateUi()
                                 } ?: emptyList()
@@ -122,7 +167,7 @@ class TransactionViewModel @Inject constructor(
                     }
                     is DataResult.Error -> {
                         debugLog("fetchCurrencyRates error: ${result.errorMessage}")
-                        _transactionUiState.value = _transactionUiState.value.copy(error = result.errorMessage)
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(error = result.errorMessage)
                     }
                 }
             }.launchIn(viewModelScope)

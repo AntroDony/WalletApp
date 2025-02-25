@@ -8,23 +8,39 @@ sealed interface UiEvent {
     data object GoBack: UiEvent
 }
 
-sealed class HomeScreenUiEvent: UiEvent{
-    data class CreateTransaction(val transactionType: TransactionType): HomeScreenUiEvent()
-    data class EditTotalBalance(val currentBalance: Float): HomeScreenUiEvent()
-    data class EditWallet(val wallet: WalletUi): HomeScreenUiEvent()
-    data object CreateWallet: HomeScreenUiEvent()
-    data object SyncData: HomeScreenUiEvent()
+sealed class HomeUiEvent: UiEvent{
+    data class CreateTransaction(val transactionType: TransactionType): HomeUiEvent()
+    data class EditTotalBalance(val currentBalance: Float): HomeUiEvent()
+
+    data class ShowWalletInfo(val wallet: WalletUi): HomeUiEvent()
+    data class ShowTransactionInfo(val transaction: TransactionUi): HomeUiEvent()
+
+    data object CreateWallet: HomeUiEvent()
+    data object SyncData: HomeUiEvent()
+
+    data object ShowAllWallets: HomeUiEvent()
+    data object ShowAllTransactions: HomeUiEvent()
+
+
 }
 
-sealed class EditBalanceScreenUiEvent: UiEvent{
-    data class UpdateBalanceValue(val newBalance: Float): EditBalanceScreenUiEvent()
+sealed class EditBalanceUiEvent: UiEvent{
+    data class UpdateBalanceValue(val newBalance: Float): EditBalanceUiEvent()
 }
 
-sealed class CreateWalletScreenUiEvent: UiEvent{
-    data class AddWallet(val wallet: WalletUi): CreateWalletScreenUiEvent()
+sealed class CreateWalletUiEvent: UiEvent{
+    data class AddWallet(val wallet: WalletUi): CreateWalletUiEvent()
 }
 
-sealed class TransactionInputScreenUiEvent: UiEvent{
-    data class AddTransaction(val transaction: TransactionUi): TransactionInputScreenUiEvent()
+sealed class CreateTransactionUiEvent: UiEvent{
+    data class AddTransaction(val transaction: TransactionUi): CreateTransactionUiEvent()
+}
+
+sealed class TransactionListUiEvent: UiEvent {
+    data class ShowTransactionInfo(val transaction: TransactionUi): TransactionListUiEvent()
+}
+
+sealed class WalletListUiEvent: UiEvent{
+    data class ShowWalletInfo(val wallet: WalletUi): WalletListUiEvent()
 }
 

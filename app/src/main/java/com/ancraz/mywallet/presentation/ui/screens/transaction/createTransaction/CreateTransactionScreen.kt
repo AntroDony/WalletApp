@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.ui.screens.inputScreen
+package com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -48,13 +48,12 @@ import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.presentation.models.CurrencyRateUi
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
-import com.ancraz.mywallet.presentation.states.TransactionUiState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
 import com.ancraz.mywallet.presentation.ui.components.TransactionConfigContainer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
-import com.ancraz.mywallet.presentation.ui.events.TransactionInputScreenUiEvent
+import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
@@ -68,8 +67,8 @@ import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
-fun TransactionInputScreen(
-    uiState: TransactionUiState,
+fun CreateTransactionScreen(
+    uiState: CreateTransactionUiState,
     totalBalance: Float = 0f,
     transactionType: TransactionType,
     modifier: Modifier,
@@ -105,7 +104,6 @@ fun TransactionInputScreen(
             title = "Balance: ${totalBalance.toFormattedString()}",
             modifier = Modifier
                 .fillMaxWidth()
-                //.weight(1f)
                 .align(Alignment.CenterHorizontally)
         )
 
@@ -157,7 +155,6 @@ fun TransactionInputScreen(
                 CategoryListMenu(
                     categoryList,
                     openState = isCategoryListOpen,
-                    //modifier = Modifier.weight(1f),
                     onSelected = { category ->
                         isCategoryListOpen.value = false
 
@@ -178,7 +175,7 @@ fun TransactionInputScreen(
                                 .show()
                         } else {
                             onEvent(
-                                TransactionInputScreenUiEvent.AddTransaction(transactionObject)
+                                CreateTransactionUiEvent.AddTransaction(transactionObject)
                             )
                             onEvent(UiEvent.GoBack)
                         }
@@ -365,9 +362,9 @@ private fun CategoryItem(
 @Composable
 private fun TransactionInputScreenPreview() {
     MyWalletTheme {
-        TransactionInputScreen(
-            uiState = TransactionUiState(
-                data = TransactionUiState.TransactionScreenData(
+        CreateTransactionScreen(
+            uiState = CreateTransactionUiState(
+                data = CreateTransactionUiState.TransactionScreenData(
                     currencyRates = listOf(
                         CurrencyRateUi(CurrencyCode.EUR, 1.2f),
                         CurrencyRateUi(CurrencyCode.KZT, 0.11f),

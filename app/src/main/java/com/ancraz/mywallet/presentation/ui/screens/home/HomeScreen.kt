@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.ui.screens.homeScreen
+package com.ancraz.mywallet.presentation.ui.screens.home
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -51,12 +51,11 @@ import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
-import com.ancraz.mywallet.presentation.states.HomeScreenState
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.components.WalletCard
-import com.ancraz.mywallet.presentation.ui.events.HomeScreenUiEvent
+import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
@@ -70,9 +69,9 @@ import java.util.Calendar
 
 @Composable
 fun HomeScreen(
-    uiState: HomeScreenState,
+    uiState: HomeUiState,
     modifier: Modifier,
-    onEvent: (HomeScreenUiEvent) -> Unit
+    onEvent: (HomeUiEvent) -> Unit
 ) {
     debugLog("HomeScreen state: $uiState")
 
@@ -107,7 +106,7 @@ fun HomeScreen(
                     .size(30.dp)
                     .clip(CircleShape)
                     .clickable {
-                        onEvent(HomeScreenUiEvent.SyncData)
+                        onEvent(HomeUiEvent.SyncData)
                     }
             )
         }
@@ -118,12 +117,12 @@ fun HomeScreen(
             state = uiState,
             onNewTransaction = { transactionType ->
                 onEvent(
-                    HomeScreenUiEvent.CreateTransaction(transactionType)
+                    HomeUiEvent.CreateTransaction(transactionType)
                 )
                                },
             onEditBalance = { currentBalance ->
                 onEvent(
-                    HomeScreenUiEvent.EditTotalBalance(currentBalance)
+                    HomeUiEvent.EditTotalBalance(currentBalance)
                 )
             }
         )
@@ -134,11 +133,11 @@ fun HomeScreen(
             wallets = uiState.data.wallets,
             onEditWallet = { wallet ->
                 onEvent(
-                    HomeScreenUiEvent.EditWallet(wallet)
+                    HomeUiEvent.ShowWalletInfo(wallet)
                 )
             },
             onCreateWallet = {
-                onEvent(HomeScreenUiEvent.CreateWallet)
+                onEvent(HomeUiEvent.CreateWallet)
             }
         )
 
@@ -154,7 +153,7 @@ fun HomeScreen(
 
 @Composable
 private fun TotalBalanceCard(
-    state: HomeScreenState,
+    state: HomeUiState,
     modifier: Modifier = Modifier,
     onNewTransaction: (TransactionType) -> Unit,
     onEditBalance: (Float) -> Unit
@@ -488,9 +487,9 @@ private fun TransactionListContainer(
 fun HomeScreenPreview() {
     MyWalletTheme {
         HomeScreen(
-            uiState = HomeScreenState(
+            uiState = HomeUiState(
                 isLoading = true,
-                data = HomeScreenState.HomeScreenData(
+                data = HomeUiState.HomeScreenData(
                     balance = 8000f,
                     transactions = listOf(
                         TransactionUi(

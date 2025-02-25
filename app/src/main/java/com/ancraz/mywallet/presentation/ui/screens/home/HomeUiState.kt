@@ -1,9 +1,9 @@
-package com.ancraz.mywallet.presentation.states
+package com.ancraz.mywallet.presentation.ui.screens.home
 
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 
-data class HomeScreenState(
+data class HomeUiState(
     val isLoading: Boolean = false,
     val data: HomeScreenData = HomeScreenData(),
     val error: String? = null

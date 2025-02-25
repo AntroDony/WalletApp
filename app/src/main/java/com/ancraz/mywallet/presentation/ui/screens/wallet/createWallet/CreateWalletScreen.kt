@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.ui.screens.createWalletScreen
+package com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -69,7 +69,7 @@ import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
-import com.ancraz.mywallet.presentation.ui.events.CreateWalletScreenUiEvent
+import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
@@ -187,7 +187,7 @@ fun CreateWalletScreen(
                 )
 
                 wallet?.let {
-                    onEvent(CreateWalletScreenUiEvent.AddWallet(it))
+                    onEvent(CreateWalletUiEvent.AddWallet(it))
                     onEvent(UiEvent.GoBack)
                 }
             }

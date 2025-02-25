@@ -1,9 +1,9 @@
-package com.ancraz.mywallet.presentation.states
+package com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction
 
 import com.ancraz.mywallet.presentation.models.CurrencyRateUi
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 
-data class TransactionUiState(
+data class CreateTransactionUiState(
     val isLoading: Boolean = false,
     val data: TransactionScreenData = TransactionScreenData(),
     val error: String? = null

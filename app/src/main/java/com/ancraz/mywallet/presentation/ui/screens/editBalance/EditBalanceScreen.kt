@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.ui.screens.editBalanceScreen
+package com.ancraz.mywallet.presentation.ui.screens.editBalance
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,13 +10,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
 import com.ancraz.mywallet.presentation.ui.components.TransactionConfigContainer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
-import com.ancraz.mywallet.presentation.ui.events.EditBalanceScreenUiEvent
+import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
@@ -25,13 +24,12 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
 fun EditBalanceScreen(
-    value: Float,
-    currencyCode: CurrencyCode = CurrencyCode.USD,
+    uiState: EditBalanceUiState,
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
-    val valueState = remember { mutableStateOf(value.toFormattedString()) }
-    val currencyState = remember { mutableStateOf(currencyCode) }
+    val valueState = remember { mutableStateOf(uiState.data.currentTotalBalance.toFormattedString()) }
+    val currencyState = remember { mutableStateOf(uiState.data.currency) }
 
     Column(
         modifier = modifier
@@ -72,7 +70,7 @@ fun EditBalanceScreen(
             title = "Update",
             onClick = {
                 val newBalanceValue = valueState.value.toFloatValue()
-                onEvent(EditBalanceScreenUiEvent.UpdateBalanceValue(newBalanceValue))
+                onEvent(EditBalanceUiEvent.UpdateBalanceValue(newBalanceValue))
                 onEvent(UiEvent.GoBack)
             }
         )
@@ -86,7 +84,11 @@ fun EditBalanceScreen(
 fun EditBalancePreview() {
     MyWalletTheme {
         EditBalanceScreen(
-            value = 8000f,
+            uiState = EditBalanceUiState(
+                data = EditBalanceUiState.EditBalanceScreenData(
+                    currentTotalBalance = 8000f
+                )
+            ),
             modifier = Modifier,
             onEvent = {}
         )

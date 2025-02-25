@@ -13,7 +13,7 @@ import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionsUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
 import com.ancraz.mywallet.presentation.mapper.toWalletUi
-import com.ancraz.mywallet.presentation.states.HomeScreenState
+import com.ancraz.mywallet.presentation.ui.screens.home.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -31,8 +31,8 @@ class HomeViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private var _homeScreenState = mutableStateOf(HomeScreenState())
-    val homeScreenState: State<HomeScreenState> = _homeScreenState
+    private var _homeUiState = mutableStateOf(HomeUiState())
+    val homeUiState: State<HomeUiState> = _homeUiState
 
     init {
         fetchData()
@@ -81,17 +81,17 @@ class HomeViewModel @Inject constructor(
             totalBalanceUseCase.getTotalBalanceFlow().onEach{ result ->
                 when(result){
                     is DataResult.Success -> {
-                        _homeScreenState.value = _homeScreenState.value.copy(
+                        _homeUiState.value = _homeUiState.value.copy(
                             isLoading = false,
-                            data = _homeScreenState.value.data.copy(balance = result.data ?: 0f)
+                            data = _homeUiState.value.data.copy(balance = result.data ?: 0f)
                         )
                     }
                     is DataResult.Loading -> {
-                        _homeScreenState.value = _homeScreenState.value.copy(isLoading = true)
+                        _homeUiState.value = _homeUiState.value.copy(isLoading = true)
                     }
                     is DataResult.Error -> {
                         debugLog("getTotalBalance error: ${result.errorMessage}")
-                        _homeScreenState.value = _homeScreenState.value.copy(
+                        _homeUiState.value = _homeUiState.value.copy(
                             error = result.errorMessage
                         )
                     }
@@ -101,19 +101,19 @@ class HomeViewModel @Inject constructor(
             getTransactionsUseCase().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
-                        _homeScreenState.value = homeScreenState.value.copy(
+                        _homeUiState.value = homeUiState.value.copy(
                             isLoading = false,
-                            data = _homeScreenState.value.data.copy(transactions = result.data?.map {
+                            data = _homeUiState.value.data.copy(transactions = result.data?.map {
                                 it.toTransactionUi()
                             }?.reversed() ?: emptyList())
                         )
                     }
                     is DataResult.Loading -> {
-                        _homeScreenState.value = _homeScreenState.value.copy(isLoading = true)
+                        _homeUiState.value = _homeUiState.value.copy(isLoading = true)
                     }
                     is DataResult.Error -> {
                         debugLog("getTransactions Error: ${result.errorMessage}")
-                        _homeScreenState.value = _homeScreenState.value.copy(
+                        _homeUiState.value = _homeUiState.value.copy(
                             error = result.errorMessage
                         )
                     }
@@ -124,8 +124,8 @@ class HomeViewModel @Inject constructor(
             getWalletsUseCase().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
-                        _homeScreenState.value = homeScreenState.value.copy(
-                            data = _homeScreenState.value.data.copy(
+                        _homeUiState.value = homeUiState.value.copy(
+                            data = _homeUiState.value.data.copy(
                                 wallets = result.data?.map { wallet ->
                                     wallet.toWalletUi()
                                 } ?: emptyList()
@@ -137,7 +137,7 @@ class HomeViewModel @Inject constructor(
                     }
                     is DataResult.Error -> {
                         debugLog("getWallet Error: ${result.errorMessage}")
-                        _homeScreenState.value = _homeScreenState.value.copy(
+                        _homeUiState.value = _homeUiState.value.copy(
                             error = result.errorMessage
                         )
                     }

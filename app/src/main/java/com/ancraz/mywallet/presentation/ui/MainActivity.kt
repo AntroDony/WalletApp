@@ -24,12 +24,14 @@ import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
 import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
+import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
 import com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet.CreateWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceUiState
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.TransactionListScreen
+import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListScreen
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.viewModels.HomeViewModel
 import com.ancraz.mywallet.presentation.viewModels.TransactionViewModel
@@ -57,6 +59,7 @@ private fun MainActivityScreen() {
 
     val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
     val transactionViewModel: TransactionViewModel = hiltViewModel<TransactionViewModel>()
+    val walletViewModel = hiltViewModel<WalletViewModel>()
 
     Scaffold(
         modifier = Modifier
@@ -119,11 +122,11 @@ private fun MainActivityScreen() {
                             }
 
                             is HomeUiEvent.ShowAllTransactions -> {
-                                //todo implement
+                                navController.navigate(NavigationScreen.TransactionListScreen.route)
                             }
 
                             is HomeUiEvent.ShowAllWallets -> {
-                                //todo implement
+                                navController.navigate(NavigationScreen.WalletListScreen.route)
                             }
                         }
                     },
@@ -167,7 +170,6 @@ private fun MainActivityScreen() {
             composable(
                 route = NavigationScreen.CreateWalletScreen.route
             ) { navBackStackEntry ->
-                val walletViewModel = hiltViewModel<WalletViewModel>()
 
                 CreateWalletScreen(
                     modifier = Modifier
@@ -235,6 +237,8 @@ private fun MainActivityScreen() {
 
             composable(route = NavigationScreen.TransactionListScreen.route) {
                 TransactionListScreen(
+                    modifier = Modifier
+                        .padding(innerPadding),
                     uiState = transactionViewModel.transactionListUiState.value,
                     onEvent = { event: UiEvent ->
                         when(event) {
@@ -253,7 +257,26 @@ private fun MainActivityScreen() {
 
 
             composable(route = NavigationScreen.WalletListScreen.route) {
+                WalletListScreen(
+                    modifier = Modifier
+                        .padding(innerPadding),
+                    uiState = walletViewModel.walletListUiState.value,
+                    onEvent = { event: UiEvent ->
+                        when(event){
+                            is WalletListUiEvent.ShowWalletInfo -> {
+                                navController.navigate(NavigationScreen.WalletInfoScreen.route)
+                            }
+                            is WalletListUiEvent.CreateWallet -> {
+                                navController.navigate(NavigationScreen.CreateWalletScreen.route)
+                            }
+                            is UiEvent.GoBack -> {
+                                navController.navigateUp()
+                            }
 
+                            else -> {}
+                        }
+                    }
+                )
             }
         }
     }

@@ -51,10 +51,11 @@ import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
+import com.ancraz.mywallet.presentation.ui.components.CreateWalletButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
-import com.ancraz.mywallet.presentation.ui.components.WalletCard
+import com.ancraz.mywallet.presentation.ui.screens.home.components.WalletCard
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
@@ -75,7 +76,7 @@ fun HomeScreen(
 ) {
     debugLog("HomeScreen state: $uiState")
 
-    
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -119,7 +120,7 @@ fun HomeScreen(
                 onEvent(
                     HomeUiEvent.CreateTransaction(transactionType)
                 )
-                               },
+            },
             onEditBalance = { currentBalance ->
                 onEvent(
                     HomeUiEvent.EditTotalBalance(currentBalance)
@@ -131,20 +132,14 @@ fun HomeScreen(
 
         WalletListContainer(
             wallets = uiState.data.wallets,
-            onEditWallet = { wallet ->
-                onEvent(
-                    HomeUiEvent.ShowWalletInfo(wallet)
-                )
-            },
-            onCreateWallet = {
-                onEvent(HomeUiEvent.CreateWallet)
-            }
+            onEvent = onEvent
         )
 
         HorizontalSpacer()
 
         TransactionListContainer(
-            transactions = uiState.data.transactions
+            transactions = uiState.data.transactions,
+            onEvent = onEvent
         )
     }
 
@@ -274,9 +269,8 @@ private fun TotalBalanceActionButton(
 private fun WalletListContainer(
     wallets: List<WalletUi>,
     modifier: Modifier = Modifier,
-    onEditWallet: (WalletUi) -> Unit,
-    onCreateWallet: () -> Unit
-){
+    onEvent: (HomeUiEvent) -> Unit
+) {
     Column(
         modifier = modifier
             .padding(horizontal = 10.dp),
@@ -293,8 +287,11 @@ private fun WalletListContainer(
             )
 
             Row(
-                modifier = Modifier,
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .clickable {
+                        onEvent(HomeUiEvent.ShowAllWallets)
+                    },
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = "All",
@@ -314,10 +311,10 @@ private fun WalletListContainer(
             }
         }
 
-        if (wallets.isEmpty()){
-            AddNewWalletButton(
+        if (wallets.isEmpty()) {
+            CreateWalletButton(
                 onClick = {
-                    onCreateWallet()
+                    onEvent(HomeUiEvent.CreateWallet)
                 }
             )
         } else {
@@ -325,12 +322,12 @@ private fun WalletListContainer(
                 modifier = Modifier
                     .fillMaxWidth(),
 
-            ) {
-                items(wallets){ wallet ->
+                ) {
+                items(wallets) { wallet ->
                     WalletCard(
                         wallet = wallet,
                         onClick = {
-                            onEditWallet(wallet)
+                            onEvent(HomeUiEvent.ShowWalletInfo(wallet))
                         }
                     )
 
@@ -341,64 +338,12 @@ private fun WalletListContainer(
     }
 }
 
-
-@Composable
-private fun AddNewWalletButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-){
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp)
-            .clickable {
-                onClick()
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        val stroke = Stroke(width = 2f,
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 15f), 0f)
-        )
-        Canvas(Modifier.fillMaxWidth().height(70.dp)){
-            drawRoundRect(
-                color = primaryColor,
-                style = stroke,
-                cornerRadius = CornerRadius(x = 40f, y = 40f)
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Image(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "Add Wallet",
-                colorFilter = ColorFilter.tint(onSecondaryColor),
-                modifier = Modifier
-                    .size(34.dp)
-            )
-
-            VerticalSpacer()
-
-            Text(
-                text = "Add Wallet",
-                color = onSecondaryColor,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-
 @Composable
 private fun TransactionListContainer(
     transactions: List<TransactionUi>,
-    modifier: Modifier = Modifier
-){
+    modifier: Modifier = Modifier,
+    onEvent: (HomeUiEvent) -> Unit
+) {
     Column(
         modifier = modifier
             .padding(horizontal = 10.dp),
@@ -415,7 +360,10 @@ private fun TransactionListContainer(
             )
 
             Row(
-                modifier = Modifier,
+                modifier = Modifier
+                    .clickable {
+                        onEvent(HomeUiEvent.ShowAllTransactions)
+                    },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -436,12 +384,12 @@ private fun TransactionListContainer(
             }
         }
 
-        if (transactions.isEmpty()){
+        if (transactions.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -469,8 +417,8 @@ private fun TransactionListContainer(
         } else {
             LazyColumn(
                 modifier = Modifier
-            ){
-                items(transactions){ transaction ->
+            ) {
+                items(transactions) { transaction ->
                     TransactionCard(
                         transaction = transaction,
                         onClick = {}

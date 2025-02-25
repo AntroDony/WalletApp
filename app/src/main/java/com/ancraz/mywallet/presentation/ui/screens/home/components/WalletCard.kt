@@ -1,10 +1,9 @@
-package com.ancraz.mywallet.presentation.ui.components
+package com.ancraz.mywallet.presentation.ui.screens.home.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -31,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
+import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
+import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor

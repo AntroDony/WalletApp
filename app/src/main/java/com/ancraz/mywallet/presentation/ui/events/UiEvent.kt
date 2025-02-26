@@ -28,8 +28,9 @@ sealed class EditBalanceUiEvent: UiEvent{
     data class UpdateBalanceValue(val newBalance: Float): EditBalanceUiEvent()
 }
 
-sealed class CreateWalletUiEvent: UiEvent{
-    data class AddWallet(val wallet: WalletUi): CreateWalletUiEvent()
+sealed class BuildWalletUiEvent: UiEvent{
+    data class AddWallet(val wallet: WalletUi): BuildWalletUiEvent()
+    data class UpdateWallet(val wallet: WalletUi): BuildWalletUiEvent()
 }
 
 sealed class CreateTransactionUiEvent: UiEvent{

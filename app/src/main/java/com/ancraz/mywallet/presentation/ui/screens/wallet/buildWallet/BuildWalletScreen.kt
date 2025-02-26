@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet
+package com.ancraz.mywallet.presentation.ui.screens.wallet.buildWallet
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -69,8 +69,9 @@ import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.SubmitButton
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
-import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
+import com.ancraz.mywallet.presentation.ui.events.BuildWalletUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
+import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletUiState
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
@@ -83,19 +84,21 @@ import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
-fun CreateWalletScreen(
+fun BuildWalletScreen(
+    uiState: WalletUiState,
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
     val context = LocalContext.current
+    val isWalletEdit = remember { mutableStateOf(uiState.wallet != null) }
 
-    val nameState = remember { mutableStateOf<String?>(null) }
-    val descriptionState = remember { mutableStateOf<String?>(null) }
-    val selectedType = remember { mutableStateOf<WalletType?>(null) }
+    val nameState = remember { mutableStateOf(uiState.wallet?.name) }
+    val descriptionState = remember { mutableStateOf(uiState.wallet?.description) }
+    val selectedType = remember { mutableStateOf(uiState.wallet?.walletType) }
     val currencyList =
         remember {
             mutableStateOf(
-                listOf(
+                uiState.wallet?.accounts ?: listOf(
                     WalletUi.CurrencyAccountUi(
                         currency = CurrencyCode.USD,
                         moneyValue = 0f
@@ -112,7 +115,7 @@ fun CreateWalletScreen(
         HorizontalSpacer()
 
         NavigationToolbar(
-            title = "New Wallet",
+            title = if (isWalletEdit.value) "Edit Wallet" else "New Wallet",
             onClickBack = {
                 onEvent(UiEvent.GoBack)
             }
@@ -174,7 +177,7 @@ fun CreateWalletScreen(
         HorizontalSpacer()
 
         SubmitButton(
-            title = "Add Wallet",
+            title = if (isWalletEdit.value) "Update Wallet" else "Add Wallet",
             onClick = {
                 val wallet = buildWalletObject(
                     name = nameState.value,
@@ -187,7 +190,12 @@ fun CreateWalletScreen(
                 )
 
                 wallet?.let {
-                    onEvent(CreateWalletUiEvent.AddWallet(it))
+                    if (isWalletEdit.value){
+                        onEvent(BuildWalletUiEvent.UpdateWallet(it))
+                    } else {
+                        onEvent(BuildWalletUiEvent.AddWallet(it))
+                    }
+
                     onEvent(UiEvent.GoBack)
                 }
             }
@@ -735,7 +743,20 @@ private fun SelectNewAccountCurrencyDialog(
 @Composable
 private fun CreateWalletScreenPreview() {
     MyWalletTheme {
-        CreateWalletScreen(
+        BuildWalletScreen(
+            uiState = WalletUiState(
+                wallet = WalletUi(
+                    name = "TBC Card",
+                    description = "TBC Bank physic account",
+                    walletType = WalletType.CARD,
+                    accounts = listOf(
+                        WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+                        WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+                        WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+                    ),
+                    totalBalance = 2400f
+                ),
+            ),
             modifier = Modifier
                 .background(backgroundColor),
             onEvent = {}

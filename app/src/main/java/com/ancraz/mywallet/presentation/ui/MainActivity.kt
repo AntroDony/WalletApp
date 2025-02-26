@@ -18,7 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.navigation.NavigationScreen
-import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
+import com.ancraz.mywallet.presentation.ui.events.BuildWalletUiEvent
 import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
@@ -26,7 +26,7 @@ import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
-import com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet.CreateWalletScreen
+import com.ancraz.mywallet.presentation.ui.screens.wallet.buildWallet.BuildWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceUiState
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeScreen
@@ -115,7 +115,7 @@ private fun MainActivityScreen() {
 
                             is HomeUiEvent.CreateWallet -> {
                                 navController.navigate(
-                                    NavigationScreen.CreateWalletScreen.route
+                                    NavigationScreen.BuildWalletScreen.route
                                 )
                             }
 
@@ -170,16 +170,21 @@ private fun MainActivityScreen() {
             }
 
             composable(
-                route = NavigationScreen.CreateWalletScreen.route
+                route = NavigationScreen.BuildWalletScreen.route
             ) { navBackStackEntry ->
 
-                CreateWalletScreen(
+                BuildWalletScreen(
+                    uiState = walletViewModel.walletUiState.value,
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: UiEvent ->
                         when (event) {
-                            is CreateWalletUiEvent.AddWallet -> {
+                            is BuildWalletUiEvent.AddWallet -> {
                                 walletViewModel.addWallet(event.wallet)
+                            }
+
+                            is BuildWalletUiEvent.UpdateWallet -> {
+                                walletViewModel.updateWallet(event.wallet)
                             }
 
                             is UiEvent.GoBack -> {
@@ -266,11 +271,11 @@ private fun MainActivityScreen() {
                     onEvent = { event: UiEvent ->
                         when(event){
                             is WalletListUiEvent.ShowWalletInfo -> {
-                                walletViewModel.selectWalletForInfo(event.wallet)
+                                walletViewModel.getWallet(event.wallet)
                                 navController.navigate(NavigationScreen.WalletInfoScreen.route)
                             }
                             is WalletListUiEvent.CreateWallet -> {
-                                navController.navigate(NavigationScreen.CreateWalletScreen.route)
+                                navController.navigate(NavigationScreen.BuildWalletScreen.route)
                             }
                             is UiEvent.GoBack -> {
                                 navController.navigateUp()
@@ -285,7 +290,7 @@ private fun MainActivityScreen() {
 
             composable(route = NavigationScreen.WalletInfoScreen.route){
                 WalletInfoScreen(
-                    uiState = walletViewModel.walletInfoUiState.value,
+                    uiState = walletViewModel.walletUiState.value,
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: UiEvent ->

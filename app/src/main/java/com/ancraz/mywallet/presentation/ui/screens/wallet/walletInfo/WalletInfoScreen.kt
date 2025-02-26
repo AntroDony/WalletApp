@@ -38,6 +38,7 @@ import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.screens.utils.getWalletCurrenciesString
+import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletUiState
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.errorColor
@@ -49,7 +50,7 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
 fun WalletInfoScreen(
-    uiState: WalletInfoUiState,
+    uiState: WalletUiState,
     modifier: Modifier = Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
@@ -176,19 +177,6 @@ fun WalletInfoScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     ActionButton(
-                        title = "Edit",
-                        containerColor = primaryColor,
-                        contentColor = onPrimaryColor,
-                        modifier = Modifier
-                            .weight(1f),
-                        onClick = {
-                            onEvent(WalletInfoUiEvent.EditWallet(uiState.wallet))
-                        }
-                    )
-
-                    VerticalSpacer()
-
-                    ActionButton(
                         title = "Delete",
                         containerColor = errorColor,
                         contentColor = onBackgroundColor,
@@ -196,6 +184,19 @@ fun WalletInfoScreen(
                             .weight(1f),
                         onClick = {
                             onEvent(WalletInfoUiEvent.DeleteWallet(uiState.wallet))
+                        }
+                    )
+
+                    VerticalSpacer()
+
+                    ActionButton(
+                        title = "Edit",
+                        containerColor = primaryColor,
+                        contentColor = onPrimaryColor,
+                        modifier = Modifier
+                            .weight(1f),
+                        onClick = {
+                            onEvent(WalletInfoUiEvent.EditWallet(uiState.wallet))
                         }
                     )
                 }
@@ -276,7 +277,7 @@ private fun WalletInfoScreenPreview() {
     MyWalletTheme {
         WalletInfoScreen(
             modifier = Modifier.background(backgroundColor),
-            uiState = WalletInfoUiState(
+            uiState = WalletUiState(
                 isLoading = false,
                 wallet = WalletUi(
                     name = "TBC Card",

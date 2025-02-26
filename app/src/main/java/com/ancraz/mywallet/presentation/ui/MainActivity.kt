@@ -24,6 +24,7 @@ import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
 import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
+import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
 import com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet.CreateWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceScreen
@@ -31,6 +32,7 @@ import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceUiStat
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.TransactionListScreen
+import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListScreen
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.viewModels.HomeViewModel
@@ -264,11 +266,39 @@ private fun MainActivityScreen() {
                     onEvent = { event: UiEvent ->
                         when(event){
                             is WalletListUiEvent.ShowWalletInfo -> {
+                                walletViewModel.selectWalletForInfo(event.wallet)
                                 navController.navigate(NavigationScreen.WalletInfoScreen.route)
                             }
                             is WalletListUiEvent.CreateWallet -> {
                                 navController.navigate(NavigationScreen.CreateWalletScreen.route)
                             }
+                            is UiEvent.GoBack -> {
+                                navController.navigateUp()
+                            }
+
+                            else -> {}
+                        }
+                    }
+                )
+            }
+
+
+            composable(route = NavigationScreen.WalletInfoScreen.route){
+                WalletInfoScreen(
+                    uiState = walletViewModel.walletInfoUiState.value,
+                    modifier = Modifier
+                        .padding(innerPadding),
+                    onEvent = { event: UiEvent ->
+                        when(event){
+                            is WalletInfoUiEvent.EditWallet -> {
+
+                            }
+
+                            is WalletInfoUiEvent.DeleteWallet -> {
+                                walletViewModel.deleteWallet(event.wallet)
+                                navController.navigateUp()
+                            }
+
                             is UiEvent.GoBack -> {
                                 navController.navigateUp()
                             }

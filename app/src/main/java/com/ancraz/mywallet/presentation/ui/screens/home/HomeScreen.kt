@@ -1,6 +1,5 @@
 package com.ancraz.mywallet.presentation.ui.screens.home
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,11 +34,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,9 +54,9 @@ import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.screens.home.components.WalletCard
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
+import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
-import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
@@ -312,11 +308,15 @@ private fun WalletListContainer(
         }
 
         if (wallets.isEmpty()) {
+            HorizontalSpacer(height = 10.dp)
+
             CreateWalletButton(
                 onClick = {
                     onEvent(HomeUiEvent.CreateWallet)
                 }
             )
+
+            HorizontalSpacer(height = 10.dp)
         } else {
             LazyRow(
                 modifier = Modifier
@@ -495,31 +495,31 @@ fun HomeScreenPreview() {
                             ),
                             totalBalance = 2400f
                         ),
-                        WalletUi(
-                            name = "Cash",
-                            description = "TBC Bank physic account",
-                            walletType = WalletType.CASH,
-                            accounts = listOf(
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                            ),
-                            totalBalance = 2400f
-                        ),
-                        WalletUi(
-                            name = "Trust Wallet 1",
-                            walletType = WalletType.CRYPTO_WALLET,
-                            accounts = listOf(
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                            ),
-                            totalBalance = 2400f
-                        )
+//                        WalletUi(
+//                            name = "Cash",
+//                            description = "TBC Bank physic account",
+//                            walletType = WalletType.CASH,
+//                            accounts = listOf(
+//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+//                            ),
+//                            totalBalance = 2400f
+//                        ),
+//                        WalletUi(
+//                            name = "Trust Wallet 1",
+//                            walletType = WalletType.CRYPTO_WALLET,
+//                            accounts = listOf(
+//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+//                            ),
+//                            totalBalance = 2400f
+//                        )
                     )
                 )
             ),
-            modifier = Modifier,
+            modifier = Modifier.background(backgroundColor),
             onEvent = {}
         )
     }

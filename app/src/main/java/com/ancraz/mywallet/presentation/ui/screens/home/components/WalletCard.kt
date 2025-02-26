@@ -8,13 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.CurrencyBitcoin
-import androidx.compose.material.icons.filled.Money
-import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.WaterfallChart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -22,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +24,7 @@ import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
+import com.ancraz.mywallet.presentation.ui.screens.utils.getImageByWalletType
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
@@ -71,7 +64,7 @@ fun WalletCard(
                 horizontalArrangement = Arrangement.Start
             ) {
                 Icon(
-                    imageVector = getImageByWalletType(wallet.walletType),
+                    imageVector = wallet.walletType.getImageByWalletType(),
                     contentDescription = wallet.walletType.walletName,
                     tint = primaryColor,
                     modifier = Modifier
@@ -131,17 +124,5 @@ private fun WalletCardPreview(){
             ),
             onClick = {}
         )
-    }
-}
-
-
-private fun getImageByWalletType(walletType: WalletType): ImageVector{
-    return when(walletType){
-        WalletType.CARD -> Icons.Filled.CreditCard
-        WalletType.CASH -> Icons.Filled.Money
-        WalletType.BANK_ACCOUNT -> Icons.Filled.AccountBalance
-        WalletType.CRYPTO_WALLET -> Icons.Filled.CurrencyBitcoin
-        WalletType.INVESTMENTS -> Icons.Filled.WaterfallChart
-        WalletType.OTHER -> Icons.Filled.Payments
     }
 }

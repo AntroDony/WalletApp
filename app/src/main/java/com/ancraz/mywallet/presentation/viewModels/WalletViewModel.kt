@@ -14,6 +14,7 @@ import com.ancraz.mywallet.domain.useCases.wallet.UpdateWalletUseCase
 import com.ancraz.mywallet.presentation.mapper.toWallet
 import com.ancraz.mywallet.presentation.mapper.toWalletUi
 import com.ancraz.mywallet.presentation.models.WalletUi
+import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoUiState
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,13 +34,15 @@ class WalletViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private val _walletListUiState = mutableStateOf(WalletListUiState(isLoading = false))
+    private val _walletListUiState = mutableStateOf(WalletListUiState(isLoading = true))
     val walletListUiState: State<WalletListUiState> = _walletListUiState
+
+    private val _walletInfoUiState = mutableStateOf(WalletInfoUiState(isLoading = true))
+    val walletInfoUiState: State<WalletInfoUiState> = _walletInfoUiState
 
     init {
         fetchData()
     }
-
 
     fun addWallet(walletUi: WalletUi){
         viewModelScope.launch(ioDispatcher) {
@@ -47,10 +50,17 @@ class WalletViewModel @Inject constructor(
         }
     }
 
-    fun deleteWallet(){
+    fun deleteWallet(walletUi: WalletUi){
         viewModelScope.launch(ioDispatcher) {
-
+            deleteWalletUseCase(walletUi.id)
         }
+    }
+
+    fun selectWalletForInfo(walletUi: WalletUi){
+        _walletInfoUiState.value = _walletInfoUiState.value.copy(
+            isLoading = false,
+            wallet = walletUi
+        )
     }
 
 

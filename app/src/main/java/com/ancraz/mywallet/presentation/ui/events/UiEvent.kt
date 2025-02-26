@@ -40,8 +40,17 @@ sealed class TransactionListUiEvent: UiEvent {
     data class ShowTransactionInfo(val transaction: TransactionUi): TransactionListUiEvent()
 }
 
+sealed class TransactionInfoUiEvent: UiEvent {
+    data class DeleteTransaction(val transaction: TransactionUi): TransactionInfoUiEvent()
+}
+
 sealed class WalletListUiEvent: UiEvent{
     data object CreateWallet: WalletListUiEvent()
     data class ShowWalletInfo(val wallet: WalletUi): WalletListUiEvent()
+}
+
+sealed class WalletInfoUiEvent: UiEvent {
+    data class EditWallet(val wallet: WalletUi): WalletInfoUiEvent()
+    data class DeleteWallet(val wallet: WalletUi): WalletInfoUiEvent()
 }
 

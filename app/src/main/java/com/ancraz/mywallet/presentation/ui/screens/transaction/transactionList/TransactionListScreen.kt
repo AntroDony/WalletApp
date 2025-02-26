@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.List
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +24,7 @@ import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
+import com.ancraz.mywallet.presentation.ui.components.LoadingIndicator
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
@@ -60,16 +60,10 @@ fun TransactionListScreen(
         HorizontalSpacer()
 
         if (uiState.isLoading) {
-            Box(
+            LoadingIndicator(
                 modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                )
-            }
-
+                    .fillMaxSize()
+            )
         } else if (uiState.transactionList.isEmpty()) {
             Column(
                 modifier = Modifier

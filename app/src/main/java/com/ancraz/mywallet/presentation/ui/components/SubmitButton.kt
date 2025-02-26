@@ -37,7 +37,6 @@ fun SubmitButton(
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
-                //.padding(vertical = 4.dp)
         )
     }
 }

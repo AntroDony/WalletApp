@@ -106,7 +106,8 @@ private fun MainActivityScreen() {
                             }
 
                             is HomeUiEvent.ShowWalletInfo -> {
-                                //todo implement
+                                walletViewModel.getWallet(event.wallet)
+                                navController.navigate(NavigationScreen.WalletInfoScreen.route)
                             }
 
                             is HomeUiEvent.ShowTransactionInfo -> {
@@ -296,7 +297,7 @@ private fun MainActivityScreen() {
                     onEvent = { event: UiEvent ->
                         when(event){
                             is WalletInfoUiEvent.EditWallet -> {
-
+                                navController.navigate(NavigationScreen.BuildWalletScreen.route)
                             }
 
                             is WalletInfoUiEvent.DeleteWallet -> {

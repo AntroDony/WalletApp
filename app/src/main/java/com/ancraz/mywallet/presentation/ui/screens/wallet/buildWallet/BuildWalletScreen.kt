@@ -65,9 +65,9 @@ import androidx.compose.ui.window.Dialog
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
+import com.ancraz.mywallet.presentation.ui.components.ActionButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
-import com.ancraz.mywallet.presentation.ui.components.SubmitButton
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.events.BuildWalletUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
@@ -176,7 +176,7 @@ fun BuildWalletScreen(
 
         HorizontalSpacer()
 
-        SubmitButton(
+        ActionButton (
             title = if (isWalletEdit.value) "Update Wallet" else "Add Wallet",
             onClick = {
                 val wallet = buildWalletObject(

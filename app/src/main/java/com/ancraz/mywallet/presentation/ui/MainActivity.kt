@@ -22,6 +22,7 @@ import com.ancraz.mywallet.presentation.ui.events.BuildWalletUiEvent
 import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
+import com.ancraz.mywallet.presentation.ui.events.TransactionInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
@@ -31,6 +32,7 @@ import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceUiState
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionScreen
+import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionInfo.TransactionInfoScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.TransactionListScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListScreen
@@ -61,7 +63,7 @@ private fun MainActivityScreen() {
 
     val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
     val transactionViewModel: TransactionViewModel = hiltViewModel<TransactionViewModel>()
-    val walletViewModel = hiltViewModel<WalletViewModel>()
+    val walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>()
 
     Scaffold(
         modifier = Modifier
@@ -86,15 +88,21 @@ private fun MainActivityScreen() {
                             }
 
                             is HomeUiEvent.EditTotalBalance -> {
-                                navController.navigate(NavigationScreen.EditBalanceScreen.route + "/${event.currentBalance}")
+                                navController.navigate(
+                                    NavigationScreen.EditBalanceScreen.route + "/${event.currentBalance}"
+                                )
                             }
 
                             is HomeUiEvent.ShowWalletInfo -> {
-                                navController.navigate(NavigationScreen.WalletInfoScreen.route + "/${event.wallet.id}")
+                                navController.navigate(
+                                    NavigationScreen.WalletInfoScreen.route + "/${event.wallet.id}"
+                                )
                             }
 
                             is HomeUiEvent.ShowTransactionInfo -> {
-                                //todo implement
+                                navController.navigate(
+                                    NavigationScreen.TransactionInfoScreen.route + "/${event.transaction.id}"
+                                )
                             }
 
                             is HomeUiEvent.CreateWallet -> {
@@ -226,7 +234,41 @@ private fun MainActivityScreen() {
                     onEvent = { event: UiEvent ->
                         when(event) {
                             is TransactionListUiEvent.ShowTransactionInfo -> {
-                                navController.navigate(NavigationScreen.TransactionInfoScreen.route)
+                                navController.navigate(NavigationScreen.TransactionInfoScreen.route + "/${event.transaction.id}")
+                            }
+                            is UiEvent.GoBack -> {
+                                navController.navigateUp()
+                            }
+
+                            else -> {}
+                        }
+                    }
+                )
+            }
+
+
+            composable(route = NavigationScreen.TransactionInfoScreen.route + "/{transactionId}") {  navBackStackEntry ->
+                val transactionId = try {
+                    navBackStackEntry.arguments?.getString("transactionId")?.toLong()
+                } catch (e: Exception) {
+                    debugLog("getCurrentBalance argument exception: ${e.message}")
+                    null
+                }
+                transactionId?.let {
+                    transactionViewModel.getTransactionById(it)
+                } ?: run {
+                    debugLog("walletId is null")
+                }
+
+                TransactionInfoScreen(
+                    uiState = transactionViewModel.transactionInfoUiState.value,
+                    modifier = Modifier
+                        .padding(innerPadding),
+                    onEvent = { event: UiEvent ->
+                        when(event){
+                            is TransactionInfoUiEvent.DeleteTransaction -> {
+                                transactionViewModel.deleteTransactionById(event.transaction.id)
+                                navController.navigateUp()
                             }
                             is UiEvent.GoBack -> {
                                 navController.navigateUp()
@@ -275,7 +317,6 @@ private fun MainActivityScreen() {
                 } ?: run {
                     debugLog("walletId is null")
                 }
-
 
 
                 WalletInfoScreen(

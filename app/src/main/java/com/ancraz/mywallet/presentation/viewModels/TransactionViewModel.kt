@@ -12,6 +12,8 @@ import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionCategoryUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.DeleteTransactionCategoryUseCase
+import com.ancraz.mywallet.domain.useCases.transactions.DeleteTransactionUseCase
+import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionByIdUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionCategoriesUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionsUseCase
 import com.ancraz.mywallet.presentation.mapper.toCategoryUi
@@ -20,9 +22,11 @@ import com.ancraz.mywallet.presentation.mapper.toTransaction
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionUiState
+import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionInfo.TransactionInfoUiState
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.TransactionListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -31,11 +35,13 @@ import javax.inject.Inject
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val getTransactionCategoriesUseCase: GetTransactionCategoriesUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
-    private val totalBalanceUseCase: TotalBalanceUseCase,
+    private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
+    private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val getTransactionCategoriesUseCase: GetTransactionCategoriesUseCase,
     private val addTransactionCategoryUseCase: AddTransactionCategoryUseCase,
     private val deleteTransactionCategoryUseCase: DeleteTransactionCategoryUseCase,
+    private val totalBalanceUseCase: TotalBalanceUseCase,
     private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase
 ) : ViewModel() {
 
@@ -46,6 +52,9 @@ class TransactionViewModel @Inject constructor(
 
     private var _transactionListUiState = mutableStateOf(TransactionListUiState())
     val transactionListUiState: State<TransactionListUiState> = _transactionListUiState
+
+    private var _transactionInfoUiState = mutableStateOf(TransactionInfoUiState())
+    val transactionInfoUiState: State<TransactionInfoUiState> = _transactionInfoUiState
 
 
     init {
@@ -61,8 +70,43 @@ class TransactionViewModel @Inject constructor(
     }
 
 
+    fun getTransactionById(id: Long){
+        viewModelScope.launch(ioDispatcher) {
+            debugLog("viewModel getTransactionById")
+            getTransactionByIdUseCase(id).let { result ->
+                when(result){
+                    is DataResult.Success -> {
+                        _transactionInfoUiState.value = _transactionInfoUiState.value.copy(
+                            isLoading = false,
+                            transaction = result.data?.toTransactionUi()
+                        )
+                        cancel()
+                    }
+                    is DataResult.Loading -> {
+                        _transactionInfoUiState.value = _transactionInfoUiState.value.copy(
+                            isLoading = true
+                        )
+                    }
+                    is DataResult.Error -> {
+                        _transactionInfoUiState.value = _transactionInfoUiState.value.copy(
+                            error = result.errorMessage
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+
+    fun deleteTransactionById(id: Long){
+        viewModelScope.launch(ioDispatcher) {
+            deleteTransactionUseCase(id)
+        }
+    }
+
+
     private fun fetchData(){
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             fetchTotalBalance()
             fetchTransactionCategories()
             fetchTransactionList()

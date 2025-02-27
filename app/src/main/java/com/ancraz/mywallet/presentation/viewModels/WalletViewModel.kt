@@ -17,6 +17,7 @@ import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletUiState
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -67,13 +68,14 @@ class WalletViewModel @Inject constructor(
 
     fun getWalletById(id: Long){
         viewModelScope.launch(Dispatchers.IO) {
-            getWalletByIdUseCase(id).onEach { result ->
+            getWalletByIdUseCase(id).let{ result ->
                 when(result){
                     is DataResult.Success -> {
                         _walletUiState.value = _walletUiState.value.copy(
                             isLoading = false,
                             wallet = result.data?.toWalletUi()
                         )
+                        cancel()
                     }
                     is DataResult.Loading -> {
                         _walletUiState.value = _walletUiState.value.copy(
@@ -86,14 +88,13 @@ class WalletViewModel @Inject constructor(
                         )
                     }
                 }
-            }.launchIn(viewModelScope)
+            }
         }
-
     }
 
 
     private fun fetchData(){
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             getWalletsUseCase().onEach { result ->
                 when(result){
                     is DataResult.Success -> {

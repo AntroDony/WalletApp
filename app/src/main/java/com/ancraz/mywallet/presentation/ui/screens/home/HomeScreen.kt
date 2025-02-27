@@ -421,7 +421,11 @@ private fun TransactionListContainer(
                 items(transactions) { transaction ->
                     TransactionCard(
                         transaction = transaction,
-                        onClick = {}
+                        onClick = {
+                            onEvent(
+                                HomeUiEvent.ShowTransactionInfo(transaction)
+                            )
+                        }
                     )
                 }
             }
@@ -495,27 +499,27 @@ fun HomeScreenPreview() {
                             ),
                             totalBalance = 2400f
                         ),
-//                        WalletUi(
-//                            name = "Cash",
-//                            description = "TBC Bank physic account",
-//                            walletType = WalletType.CASH,
-//                            accounts = listOf(
-//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-//                            ),
-//                            totalBalance = 2400f
-//                        ),
-//                        WalletUi(
-//                            name = "Trust Wallet 1",
-//                            walletType = WalletType.CRYPTO_WALLET,
-//                            accounts = listOf(
-//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-//                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-//                            ),
-//                            totalBalance = 2400f
-//                        )
+                        WalletUi(
+                            name = "Cash",
+                            description = "TBC Bank physic account",
+                            walletType = WalletType.CASH,
+                            accounts = listOf(
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+                            ),
+                            totalBalance = 2400f
+                        ),
+                        WalletUi(
+                            name = "Trust Wallet 1",
+                            walletType = WalletType.CRYPTO_WALLET,
+                            accounts = listOf(
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+                            ),
+                            totalBalance = 2400f
+                        )
                     )
                 )
             ),

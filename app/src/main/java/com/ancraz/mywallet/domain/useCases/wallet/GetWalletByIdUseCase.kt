@@ -10,23 +10,17 @@ import javax.inject.Inject
 
 class GetWalletByIdUseCase @Inject constructor(
     private val repository: WalletRepository
-){
+) {
 
-    operator fun invoke(id: Long): Flow<DataResult<Wallet>> {
-        return flow {
-            try {
-                emit(DataResult.Loading())
-
-                repository.getWalletById(id).let { wallet ->
-                    debugLog("GetWalletByIdUseCase : $wallet")
-                    emit(DataResult.Success(wallet))
-                }
+    suspend operator fun invoke(id: Long): DataResult<Wallet> {
+        return try {
+            repository.getWalletById(id).let { wallet ->
+                debugLog("GetWalletByIdUseCase : $wallet")
+                DataResult.Success(wallet)
             }
-            catch (e: Exception){
-                debugLog("GetWalletByIdUseCase exception: ${e.message}")
-                emit(DataResult.Error("${e.message}"))
-            }
+        } catch (e: Exception) {
+            debugLog("GetWalletByIdUseCase exception: ${e.message}")
+            DataResult.Error("${e.message}")
         }
-
     }
 }

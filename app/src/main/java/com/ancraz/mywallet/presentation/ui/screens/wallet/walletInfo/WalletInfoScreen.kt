@@ -31,7 +31,9 @@ import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
+import com.ancraz.mywallet.presentation.ui.components.ActionButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
+import com.ancraz.mywallet.presentation.ui.components.InfoRow
 import com.ancraz.mywallet.presentation.ui.components.LoadingIndicator
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
@@ -204,69 +206,6 @@ fun WalletInfoScreen(
         }
 
         HorizontalSpacer()
-    }
-}
-
-
-@Composable
-private fun InfoRow(
-    title: String,
-    info: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text(
-            text = title,
-            color = primaryColor,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        VerticalSpacer()
-
-        Text(
-            text = info,
-            color = onBackgroundColor,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium
-        )
-    }
-}
-
-
-@Composable
-private fun ActionButton(
-    title: String,
-    containerColor: Color,
-    contentColor: Color,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor
-        )
-    ) {
-        Text(
-            text = title,
-            color = contentColor,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-        )
     }
 }
 

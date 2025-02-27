@@ -1,6 +1,5 @@
 package com.ancraz.mywallet.presentation.viewModels
 
-import android.provider.ContactsContract.Data
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -66,9 +65,9 @@ class WalletViewModel @Inject constructor(
         }
     }
 
-    fun getWallet(walletUi: WalletUi){
+    fun getWalletById(id: Long){
         viewModelScope.launch(Dispatchers.IO) {
-            getWalletByIdUseCase(walletUi.id).onEach { result ->
+            getWalletByIdUseCase(id).onEach { result ->
                 when(result){
                     is DataResult.Success -> {
                         _walletUiState.value = _walletUiState.value.copy(

@@ -69,7 +69,6 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 @Composable
 fun CreateTransactionScreen(
     uiState: CreateTransactionUiState,
-    totalBalance: Float = 0f,
     transactionType: TransactionType,
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
@@ -101,7 +100,7 @@ fun CreateTransactionScreen(
         TransactionConfigContainer(
             valueState = inputValueState,
             currencyState = currencyState,
-            title = "Balance: ${totalBalance.toFormattedString()}",
+            title = "Balance: ${uiState.data.totalBalance.toFormattedString()}",
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
@@ -365,6 +364,7 @@ private fun TransactionInputScreenPreview() {
         CreateTransactionScreen(
             uiState = CreateTransactionUiState(
                 data = CreateTransactionUiState.TransactionScreenData(
+                    totalBalance = 5000f,
                     currencyRates = listOf(
                         CurrencyRateUi(CurrencyCode.EUR, 1.2f),
                         CurrencyRateUi(CurrencyCode.KZT, 0.11f),
@@ -485,7 +485,6 @@ private fun TransactionInputScreenPreview() {
                     )
                 )
             ),
-            totalBalance = 8000f,
             TransactionType.INCOME,
             modifier = Modifier,
             onEvent = {}

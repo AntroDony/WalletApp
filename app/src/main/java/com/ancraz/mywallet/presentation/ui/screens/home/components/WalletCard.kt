@@ -24,7 +24,7 @@ import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
-import com.ancraz.mywallet.presentation.ui.screens.utils.getImageByWalletType
+import com.ancraz.mywallet.presentation.ui.utils.getImageByWalletType
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor

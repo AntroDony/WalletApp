@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.ui.screens.utils
+package com.ancraz.mywallet.presentation.ui.utils
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance

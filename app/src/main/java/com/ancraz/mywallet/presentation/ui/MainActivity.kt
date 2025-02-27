@@ -80,34 +80,17 @@ private fun MainActivityScreen() {
                     onEvent = { event ->
                         when (event) {
                             is HomeUiEvent.CreateTransaction -> {
-                                when (event.transactionType) {
-                                    TransactionType.INCOME -> {
-                                        navigateToTransactionInputScreen(
-                                            navController,
-                                            homeViewModel.homeUiState.value.data.balance,
-                                            event.transactionType
-                                        )
-                                    }
-
-                                    TransactionType.EXPENSE -> {
-                                        navigateToTransactionInputScreen(
-                                            navController,
-                                            homeViewModel.homeUiState.value.data.balance,
-                                            event.transactionType
-                                        )
-                                    }
-
-                                    TransactionType.TRANSFER -> {}
-                                }
+                                navController.navigate(
+                                    NavigationScreen.TransactionInputScreen.route + "/${event.transactionType.name}"
+                                )
                             }
 
                             is HomeUiEvent.EditTotalBalance -> {
-                                navigateToEditBalanceScreen(navController, event.currentBalance)
+                                navController.navigate(NavigationScreen.EditBalanceScreen.route + "/${event.currentBalance}")
                             }
 
                             is HomeUiEvent.ShowWalletInfo -> {
-                                walletViewModel.getWallet(event.wallet)
-                                navController.navigate(NavigationScreen.WalletInfoScreen.route)
+                                navController.navigate(NavigationScreen.WalletInfoScreen.route + "/${event.wallet.id}")
                             }
 
                             is HomeUiEvent.ShowTransactionInfo -> {
@@ -199,15 +182,8 @@ private fun MainActivityScreen() {
             }
 
             composable(
-                route = NavigationScreen.TransactionInputScreen.route + "/{balance}" + "/{transaction}"
+                route = NavigationScreen.TransactionInputScreen.route  + "/{transaction}"
             ) { navBackStackEntry ->
-
-                val currentBalanceValue = try {
-                    (navBackStackEntry.arguments?.getString("balance") ?: "0").toFloat()
-                } catch (e: Exception) {
-                    debugLog("getCurrentBalance argument exception: ${e.message}")
-                    0f
-                }
 
                 val transactionType = try {
                     val transactionString =
@@ -224,7 +200,6 @@ private fun MainActivityScreen() {
 
                 CreateTransactionScreen(
                     uiState = transactionViewModel.createTransactionUiState.value,
-                    totalBalance = currentBalanceValue,
                     transactionType = transactionType,
                     modifier = Modifier.padding(innerPadding),
                     onEvent = { event: UiEvent ->
@@ -272,7 +247,6 @@ private fun MainActivityScreen() {
                     onEvent = { event: UiEvent ->
                         when(event){
                             is WalletListUiEvent.ShowWalletInfo -> {
-                                walletViewModel.getWallet(event.wallet)
                                 navController.navigate(NavigationScreen.WalletInfoScreen.route)
                             }
                             is WalletListUiEvent.CreateWallet -> {
@@ -289,7 +263,21 @@ private fun MainActivityScreen() {
             }
 
 
-            composable(route = NavigationScreen.WalletInfoScreen.route){
+            composable(route = NavigationScreen.WalletInfoScreen.route + "/{walletId}"){ navBackStackEntry ->
+                val walletId = try {
+                    navBackStackEntry.arguments?.getString("walletId")?.toLong()
+                } catch (e: Exception) {
+                    debugLog("getCurrentBalance argument exception: ${e.message}")
+                    null
+                }
+                walletId?.let {
+                    walletViewModel.getWalletById(it)
+                } ?: run {
+                    debugLog("walletId is null")
+                }
+
+
+
                 WalletInfoScreen(
                     uiState = walletViewModel.walletUiState.value,
                     modifier = Modifier
@@ -316,19 +304,6 @@ private fun MainActivityScreen() {
             }
         }
     }
-}
-
-
-private fun navigateToEditBalanceScreen(navController: NavController, balance: Float) {
-    navController.navigate(NavigationScreen.EditBalanceScreen.route + "/$balance")
-}
-
-private fun navigateToTransactionInputScreen(
-    navController: NavController,
-    balance: Float,
-    transactionType: TransactionType
-) {
-    navController.navigate(NavigationScreen.TransactionInputScreen.route + "/$balance" + "/${transactionType.name}")
 }
 
 

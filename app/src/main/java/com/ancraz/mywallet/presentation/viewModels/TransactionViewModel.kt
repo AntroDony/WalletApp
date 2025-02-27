@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.models.Transaction
+import com.ancraz.mywallet.domain.useCases.TotalBalanceUseCase
 import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionCategoryUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionUseCase
@@ -32,6 +33,7 @@ class TransactionViewModel @Inject constructor(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val getTransactionCategoriesUseCase: GetTransactionCategoriesUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
+    private val totalBalanceUseCase: TotalBalanceUseCase,
     private val addTransactionCategoryUseCase: AddTransactionCategoryUseCase,
     private val deleteTransactionCategoryUseCase: DeleteTransactionCategoryUseCase,
     private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase
@@ -61,9 +63,35 @@ class TransactionViewModel @Inject constructor(
 
     private fun fetchData(){
         viewModelScope.launch {
+            fetchTotalBalance()
             fetchTransactionCategories()
             fetchTransactionList()
             fetchCurrencyRates()
+        }
+    }
+
+
+    private fun fetchTotalBalance(){
+        viewModelScope.launch(ioDispatcher) {
+            totalBalanceUseCase.getTotalBalanceFlow().onEach { result ->
+                when(result){
+                    is DataResult.Success -> {
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                            isLoading = false,
+                            data = _createTransactionUiState.value.data.copy(totalBalance = result.data ?: 0f)
+                        )
+                    }
+                    is DataResult.Loading -> {
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(isLoading = true)
+                    }
+                    is DataResult.Error -> {
+                        debugLog("getTotalBalance error: ${result.errorMessage}")
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                            error = result.errorMessage
+                        )
+                    }
+                }
+            }.launchIn(viewModelScope)
         }
     }
 

@@ -36,8 +36,8 @@ import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
-import com.ancraz.mywallet.presentation.ui.screens.utils.getImageByWalletType
-import com.ancraz.mywallet.presentation.ui.screens.utils.getWalletCurrenciesString
+import com.ancraz.mywallet.presentation.ui.utils.getImageByWalletType
+import com.ancraz.mywallet.presentation.ui.utils.getWalletCurrenciesString
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor

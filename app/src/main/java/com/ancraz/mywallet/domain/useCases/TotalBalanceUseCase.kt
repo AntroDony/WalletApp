@@ -55,13 +55,8 @@ class TotalBalanceUseCase @Inject constructor(
     }
 
 
-    private suspend fun convertToUsd(value: Float, currency: CurrencyCode): Float? {
+    private suspend fun convertToUsd(value: Float, currency: CurrencyCode): Float {
         val rateInUsd = dataStoreRepository.getCurrencyRateToUsd(currency)
-        rateInUsd?.let {
-            return value * rateInUsd
-        } ?: run {
-            debugLog("no ${currency.name} rate in dataStore")
-            return null
-        }
+        return value * rateInUsd
     }
 }

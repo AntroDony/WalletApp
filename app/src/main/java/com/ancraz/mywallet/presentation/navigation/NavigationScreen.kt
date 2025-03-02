@@ -7,7 +7,7 @@ sealed class NavigationScreen(val route: String) {
     object TransactionInputScreen: NavigationScreen("transaction_input")
 
     object WalletListScreen: NavigationScreen("wallet_list")
-    object BuildWalletScreen: NavigationScreen("build_wallet")
+    object CreateWalletScreen: NavigationScreen("build_wallet")
     object WalletInfoScreen: NavigationScreen("wallet_info")
 
     object TransactionListScreen: NavigationScreen("transaction_list")

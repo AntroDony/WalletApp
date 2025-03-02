@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.ui.screens.wallet.buildWallet
+package com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -69,7 +69,7 @@ import com.ancraz.mywallet.presentation.ui.components.ActionButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
-import com.ancraz.mywallet.presentation.ui.events.BuildWalletUiEvent
+import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletUiState
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
@@ -84,7 +84,7 @@ import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
-fun BuildWalletScreen(
+fun CreateWalletScreen(
     uiState: WalletUiState,
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
@@ -191,9 +191,9 @@ fun BuildWalletScreen(
 
                 wallet?.let {
                     if (isWalletEdit.value){
-                        onEvent(BuildWalletUiEvent.UpdateWallet(it))
+                        onEvent(CreateWalletUiEvent.UpdateWallet(it))
                     } else {
-                        onEvent(BuildWalletUiEvent.AddWallet(it))
+                        onEvent(CreateWalletUiEvent.AddWallet(it))
                     }
 
                     onEvent(UiEvent.GoBack)
@@ -743,7 +743,7 @@ private fun SelectNewAccountCurrencyDialog(
 @Composable
 private fun CreateWalletScreenPreview() {
     MyWalletTheme {
-        BuildWalletScreen(
+        CreateWalletScreen(
             uiState = WalletUiState(
                 wallet = WalletUi(
                     name = "TBC Card",

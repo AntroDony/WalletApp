@@ -28,13 +28,14 @@ sealed class EditBalanceUiEvent: UiEvent{
     data class UpdateBalanceValue(val newBalance: Float): EditBalanceUiEvent()
 }
 
-sealed class BuildWalletUiEvent: UiEvent{
-    data class AddWallet(val wallet: WalletUi): BuildWalletUiEvent()
-    data class UpdateWallet(val wallet: WalletUi): BuildWalletUiEvent()
+sealed class CreateWalletUiEvent: UiEvent{
+    data class AddWallet(val wallet: WalletUi): CreateWalletUiEvent()
+    data class UpdateWallet(val wallet: WalletUi): CreateWalletUiEvent()
 }
 
 sealed class CreateTransactionUiEvent: UiEvent{
     data class AddTransaction(val transaction: TransactionUi): CreateTransactionUiEvent()
+    data object CreateWallet: CreateTransactionUiEvent()
 }
 
 sealed class TransactionListUiEvent: UiEvent {

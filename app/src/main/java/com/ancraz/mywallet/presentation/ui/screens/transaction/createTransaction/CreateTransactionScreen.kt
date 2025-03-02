@@ -72,8 +72,6 @@ fun CreateTransactionScreen(
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
-    debugLog("CreateTransactionScreen lastWalletId: ${uiState.data.lastUsedWalletId}")
-    
     val context = LocalContext.current
 
     val inputValueState = remember { mutableStateOf(0f.toFormattedString()) }
@@ -267,6 +265,9 @@ fun CreateTransactionScreen(
                     },
                     onClose = {
                         isWalletListOpen.value = false
+                    },
+                    onEvent = { event ->
+                        onEvent(event)
                     }
                 )
             }

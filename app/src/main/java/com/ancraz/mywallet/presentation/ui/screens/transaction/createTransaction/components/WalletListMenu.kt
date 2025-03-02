@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,13 +32,16 @@ import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
+import com.ancraz.mywallet.presentation.ui.components.CreateWalletButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
+import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
+import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
 import com.ancraz.mywallet.presentation.ui.utils.getImageByWalletType
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
@@ -49,6 +51,7 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 fun WalletListMenu(
     wallets: List<WalletUi>,
     modifier: Modifier = Modifier,
+    onEvent: (CreateTransactionUiEvent) -> Unit,
     onSelect: (WalletUi) -> Unit,
     onClose: () -> Unit
 ) {
@@ -76,18 +79,37 @@ fun WalletListMenu(
             )
         }
 
-        LazyColumn(
-            modifier = Modifier
-                .background(surfaceColor)
-        ) {
-            items(wallets) { wallet ->
-                WalletItem(
-                    wallet,
+        if (wallets.isEmpty()){
+            Column(
+                modifier = Modifier
+                    .background(surfaceColor)
+            ) {
+                HorizontalSpacer()
+                CreateWalletButton(
                     modifier = Modifier
-                        .clickable {
-                            onSelect(wallet)
-                        }
+                        .fillMaxWidth()
+                        .padding(screenHorizontalPadding),
+                    onClick = {
+                        onEvent(CreateTransactionUiEvent.CreateWallet)
+                    }
                 )
+                HorizontalSpacer()
+            }
+        }
+        else {
+            LazyColumn(
+                modifier = Modifier
+                    .background(surfaceColor)
+            ) {
+                items(wallets) { wallet ->
+                    WalletItem(
+                        wallet,
+                        modifier = Modifier
+                            .clickable {
+                                onSelect(wallet)
+                            }
+                    )
+                }
             }
         }
     }
@@ -203,6 +225,7 @@ private fun WalletListMenuPreview(){
                     totalBalance = 2400f
                 )
             ),
+            onEvent = {},
             onSelect = {},
             onClose = {}
         )

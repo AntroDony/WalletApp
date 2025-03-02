@@ -11,14 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.navigation.NavigationScreen
-import com.ancraz.mywallet.presentation.ui.events.BuildWalletUiEvent
+import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
 import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
@@ -27,7 +26,7 @@ import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
-import com.ancraz.mywallet.presentation.ui.screens.wallet.buildWallet.BuildWalletScreen
+import com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet.CreateWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceUiState
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeScreen
@@ -107,7 +106,7 @@ private fun MainActivityScreen() {
 
                             is HomeUiEvent.CreateWallet -> {
                                 navController.navigate(
-                                    NavigationScreen.BuildWalletScreen.route
+                                    NavigationScreen.CreateWalletScreen.route
                                 )
                             }
 
@@ -162,20 +161,20 @@ private fun MainActivityScreen() {
             }
 
             composable(
-                route = NavigationScreen.BuildWalletScreen.route
+                route = NavigationScreen.CreateWalletScreen.route
             ) { navBackStackEntry ->
 
-                BuildWalletScreen(
+                CreateWalletScreen(
                     uiState = walletViewModel.walletUiState.value,
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: UiEvent ->
                         when (event) {
-                            is BuildWalletUiEvent.AddWallet -> {
+                            is CreateWalletUiEvent.AddWallet -> {
                                 walletViewModel.addWallet(event.wallet)
                             }
 
-                            is BuildWalletUiEvent.UpdateWallet -> {
+                            is CreateWalletUiEvent.UpdateWallet -> {
                                 walletViewModel.updateWallet(event.wallet)
                             }
 
@@ -214,6 +213,10 @@ private fun MainActivityScreen() {
                         when (event) {
                             is CreateTransactionUiEvent.AddTransaction -> {
                                 transactionViewModel.addNewTransaction(event.transaction)
+                            }
+
+                            is CreateTransactionUiEvent.CreateWallet -> {
+                                navController.navigate(NavigationScreen.CreateWalletScreen)
                             }
 
                             is UiEvent.GoBack -> {
@@ -292,7 +295,7 @@ private fun MainActivityScreen() {
                                 navController.navigate(NavigationScreen.WalletInfoScreen.route + "/${event.wallet.id}")
                             }
                             is WalletListUiEvent.CreateWallet -> {
-                                navController.navigate(NavigationScreen.BuildWalletScreen.route)
+                                navController.navigate(NavigationScreen.CreateWalletScreen.route)
                             }
                             is UiEvent.GoBack -> {
                                 navController.navigateUp()
@@ -326,7 +329,7 @@ private fun MainActivityScreen() {
                     onEvent = { event: UiEvent ->
                         when(event){
                             is WalletInfoUiEvent.EditWallet -> {
-                                navController.navigate(NavigationScreen.BuildWalletScreen.route)
+                                navController.navigate(NavigationScreen.CreateWalletScreen.route)
                             }
 
                             is WalletInfoUiEvent.DeleteWallet -> {

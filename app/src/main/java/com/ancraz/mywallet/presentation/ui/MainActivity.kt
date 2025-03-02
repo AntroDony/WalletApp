@@ -216,7 +216,7 @@ private fun MainActivityScreen() {
                             }
 
                             is CreateTransactionUiEvent.CreateWallet -> {
-                                navController.navigate(NavigationScreen.CreateWalletScreen)
+                                navController.navigate(NavigationScreen.CreateWalletScreen.route)
                             }
 
                             is UiEvent.GoBack -> {

@@ -17,5 +17,9 @@ data class TransactionUi(
 
     val description: String? = null,
 
-    val category: TransactionCategoryUi? = null
+    val category: TransactionCategoryUi? = null,
+
+    val wallet: WalletUi? = null,
+
+    val selectedWalletAccount: WalletUi.CurrencyAccountUi? = null
 )

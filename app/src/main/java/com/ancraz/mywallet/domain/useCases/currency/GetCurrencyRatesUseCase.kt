@@ -53,11 +53,11 @@ class GetCurrencyRatesUseCase @Inject constructor(
         remoteRepository.getCurrenciesRate(desiredCurrencies)
             .onSuccess { currencyData ->
                 debugLog("update data in dataStore")
-                dataStoreRepository.updateLastCurrencyUpdatedTime(
+                dataStoreRepository.setLastCurrencyUpdatedTime(
                     currencyData.updateTime ?: Calendar.getInstance().timeInMillis
                 )
                 currencyData.rates.forEach { rate ->
-                    dataStoreRepository.updateCurrencyRate(rate)
+                    dataStoreRepository.setCurrencyRate(rate)
                 }
             }
             .onError { error ->

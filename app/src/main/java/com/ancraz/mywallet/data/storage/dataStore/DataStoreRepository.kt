@@ -22,6 +22,8 @@ class DataStoreRepository(
 
     private val TOTAL_BALANCE_USD = floatPreferencesKey("total_balance_usd")
 
+    private val LAST_USED_WALLET_ACCOUNT_ID = longPreferencesKey("wallet_account_id")
+
     private val CURRENCY_UPDATE_TIME = longPreferencesKey("currency_update_time")
     private val EURO_RATE_TO_USD = floatPreferencesKey("euro_rate_to_usd")
     private val RUB_RATE_TO_USD = floatPreferencesKey("rub_rate_to_usd")
@@ -87,13 +89,13 @@ class DataStoreRepository(
     }
 
 
-    suspend fun updateLastCurrencyUpdatedTime(timeInMillis: Long) {
+    suspend fun setLastCurrencyUpdatedTime(timeInMillis: Long) {
         context.dataStore.edit { preferences ->
             preferences[CURRENCY_UPDATE_TIME] = timeInMillis
         }
     }
 
-    suspend fun updateCurrencyRate(rate: CurrencyRate) {
+    suspend fun setCurrencyRate(rate: CurrencyRate) {
         context.dataStore.edit { preferences ->
             when (rate.currencyCode) {
                 CurrencyCode.EUR -> {
@@ -116,6 +118,18 @@ class DataStoreRepository(
                     debugLog("cannot update UNKNOWN or USD currency code")
                 }
             }
+        }
+    }
+
+
+    suspend fun getLastUsedWalletId(): Long? {
+        return context.dataStore.data.first()[LAST_USED_WALLET_ACCOUNT_ID]
+    }
+
+
+    suspend fun setLastUsedWalletId(id: Long){
+        context.dataStore.edit { preferences ->
+            preferences[LAST_USED_WALLET_ACCOUNT_ID] = id
         }
     }
 }

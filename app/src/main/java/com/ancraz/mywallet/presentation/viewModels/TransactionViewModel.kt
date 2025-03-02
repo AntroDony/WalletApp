@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.models.Transaction
-import com.ancraz.mywallet.domain.useCases.TotalBalanceUseCase
+import com.ancraz.mywallet.domain.useCases.GetDataStoreDataUseCase
 import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionCategoryUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.AddTransactionUseCase
@@ -16,10 +16,12 @@ import com.ancraz.mywallet.domain.useCases.transactions.DeleteTransactionUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionByIdUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionCategoriesUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionsUseCase
+import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toCategoryUi
 import com.ancraz.mywallet.presentation.mapper.toCurrencyRateUi
 import com.ancraz.mywallet.presentation.mapper.toTransaction
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
+import com.ancraz.mywallet.presentation.mapper.toWalletUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionUiState
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionInfo.TransactionInfoUiState
@@ -41,8 +43,9 @@ class TransactionViewModel @Inject constructor(
     private val getTransactionCategoriesUseCase: GetTransactionCategoriesUseCase,
     private val addTransactionCategoryUseCase: AddTransactionCategoryUseCase,
     private val deleteTransactionCategoryUseCase: DeleteTransactionCategoryUseCase,
-    private val totalBalanceUseCase: TotalBalanceUseCase,
-    private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase
+    private val getDataStoreDataUseCase: GetDataStoreDataUseCase,
+    private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase,
+    private val getWalletsUseCase: GetAllWalletsUseCase
 ) : ViewModel() {
 
     private val ioDispatcher = Dispatchers.IO
@@ -64,7 +67,6 @@ class TransactionViewModel @Inject constructor(
 
     fun addNewTransaction(transactionUi: TransactionUi) {
         viewModelScope.launch(ioDispatcher) {
-            debugLog("newTransaction: $transactionUi")
             addTransactionUseCase.addTransaction(transactionUi.toTransaction())
         }
     }
@@ -107,7 +109,8 @@ class TransactionViewModel @Inject constructor(
 
     private fun fetchData(){
         viewModelScope.launch(ioDispatcher) {
-            fetchTotalBalance()
+            fetchDataStoreData()
+            fetchWalletList()
             fetchTransactionCategories()
             fetchTransactionList()
             fetchCurrencyRates()
@@ -115,9 +118,20 @@ class TransactionViewModel @Inject constructor(
     }
 
 
-    private fun fetchTotalBalance(){
+    private fun fetchDataStoreData(){
         viewModelScope.launch(ioDispatcher) {
-            totalBalanceUseCase.getTotalBalanceFlow().onEach { result ->
+            getDataStoreDataUseCase.getLastUsedWallet()?.let { id ->
+                debugLog("getLastUsedWallet: $id")
+                _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                    data = _createTransactionUiState.value.data.copy(
+                        lastUsedWalletId = id
+                    )
+                )
+
+
+            }
+
+            getDataStoreDataUseCase.getTotalBalanceFlow().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
                         _createTransactionUiState.value = _createTransactionUiState.value.copy(
@@ -156,12 +170,12 @@ class TransactionViewModel @Inject constructor(
                     }
 
                     is DataResult.Loading -> {
-                        _createTransactionUiState.value = CreateTransactionUiState(isLoading = true)
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(isLoading = true)
                     }
 
                     is DataResult.Error -> {
                         debugLog("getExpenseCategories error: ${result.errorMessage}")
-                        _createTransactionUiState.value = CreateTransactionUiState(error = result.errorMessage)
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(error = result.errorMessage)
                     }
                 }
             }.launchIn(viewModelScope)
@@ -180,12 +194,12 @@ class TransactionViewModel @Inject constructor(
                     }
 
                     is DataResult.Loading -> {
-                        _createTransactionUiState.value = CreateTransactionUiState(isLoading = true)
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(isLoading = true)
                     }
 
                     is DataResult.Error -> {
                         debugLog("getExpenseCategories error: ${result.errorMessage}")
-                        _createTransactionUiState.value = CreateTransactionUiState(error = result.errorMessage)
+                        _createTransactionUiState.value = _createTransactionUiState.value.copy(error = result.errorMessage)
                     }
                 }
             }.launchIn(viewModelScope)
@@ -218,6 +232,36 @@ class TransactionViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
         }
+    }
+
+
+    private fun fetchWalletList(){
+        getWalletsUseCase().onEach { result ->
+            when(result){
+                is DataResult.Success -> {
+                    _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                        isLoading = false,
+                        data = _createTransactionUiState.value.data.copy(
+                            walletList = result.data?.map { wallet ->
+                                wallet.toWalletUi()
+                            } ?: emptyList()
+                        )
+                    )
+                }
+
+                is DataResult.Loading -> {
+                    _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                        isLoading = true
+                    )
+                }
+
+                is DataResult.Error -> {
+                    _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                        error = result.errorMessage
+                    )
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
 

@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.data.repository
 
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.data.mappers.toWallet
 import com.ancraz.mywallet.data.mappers.toWalletEntity
 import com.ancraz.mywallet.data.storage.database.dao.WalletDao
@@ -35,5 +36,53 @@ class WalletRepositoryImpl @Inject constructor(
 
     override suspend fun deleteWalletById(id: Long) {
         dao.deleteWalletById(id)
+    }
+
+
+    override suspend fun incomeToWallet(
+        wallet: Wallet,
+        selectedAccount: Wallet.WalletCurrencyAccount,
+        value: Float
+    ) {
+        val newAccountList = wallet.currencyAccountList.map { account ->
+            if (account == selectedAccount){
+                account.copy(value = account.value + value)
+            } else {
+                account
+            }
+        }
+
+        debugLog("incomeToWallet: \n" +
+                "newAccountList: $newAccountList")
+
+        updateWallet(
+            wallet.copy(
+                currencyAccountList = newAccountList
+            )
+        )
+    }
+
+
+    override suspend fun expenseFromWallet(
+        wallet: Wallet,
+        selectedAccount: Wallet.WalletCurrencyAccount,
+        value: Float
+    ) {
+        val newAccountList = wallet.currencyAccountList.map { account ->
+            if (account == selectedAccount){
+                account.copy(value = account.value - value)
+            } else {
+                account
+            }
+        }
+
+        debugLog("expenseFromWallet: \n" +
+                "newAccountList: $newAccountList")
+
+        updateWallet(
+            wallet.copy(
+                currencyAccountList = newAccountList
+            )
+        )
     }
 }

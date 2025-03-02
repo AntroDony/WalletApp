@@ -57,6 +57,7 @@ import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
+import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
@@ -70,9 +71,6 @@ fun HomeScreen(
     modifier: Modifier,
     onEvent: (HomeUiEvent) -> Unit
 ) {
-    debugLog("HomeScreen state: $uiState")
-
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -243,7 +241,7 @@ private fun TotalBalanceActionButton(
             Image(
                 imageVector = icon,
                 contentDescription = text,
-                colorFilter = ColorFilter.tint(Color.White),
+                colorFilter = ColorFilter.tint(onSecondaryColor),
                 modifier = Modifier
                     .padding(12.dp)
                     .size(26.dp)

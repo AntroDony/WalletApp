@@ -85,7 +85,8 @@ object AppModule {
     fun provideTransactionRepository(walletDatabase: WalletDatabase): TransactionRepository {
         return TransactionRepositoryImpl(
             walletDatabase.transactionDao(),
-            walletDatabase.categoryDao()
+            walletDatabase.categoryDao(),
+            walletDatabase.walletDao()
         )
     }
 

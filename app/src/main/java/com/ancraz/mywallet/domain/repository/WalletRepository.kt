@@ -14,4 +14,8 @@ interface WalletRepository {
     suspend fun updateWallet(wallet: Wallet)
 
     suspend fun deleteWalletById(id: Long)
+
+    suspend fun incomeToWallet(wallet: Wallet, selectedAccount: Wallet.WalletCurrencyAccount, value: Float)
+
+    suspend fun expenseFromWallet(wallet: Wallet, selectedAccount: Wallet.WalletCurrencyAccount, value: Float)
 }

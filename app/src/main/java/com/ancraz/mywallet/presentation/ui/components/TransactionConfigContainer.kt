@@ -1,8 +1,8 @@
 package com.ancraz.mywallet.presentation.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
+import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
@@ -57,15 +58,6 @@ fun TransactionConfigContainer(
         CurrencyDropDownMenu(
             currentCurrencyState = currencyState
         )
-
-        Row(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-        }
-
     }
 
 }
@@ -73,14 +65,15 @@ fun TransactionConfigContainer(
 
 @Preview
 @Composable
-fun InputTextFieldPreview(){
+fun InputTextFieldPreview() {
     val valueState = remember { mutableStateOf(8000f.toFormattedString()) }
     val currencyState = remember { mutableStateOf(CurrencyCode.EUR) }
     MyWalletTheme {
         TransactionConfigContainer(
             valueState = valueState,
             currencyState = currencyState,
-            title = "Balance"
+            title = "Balance",
+            modifier = Modifier.background(backgroundColor),
         )
     }
 }

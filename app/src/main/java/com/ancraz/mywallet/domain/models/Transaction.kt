@@ -17,6 +17,10 @@ data class Transaction(
 
     val description: String?,
 
-    val category: TransactionCategory?
+    val category: TransactionCategory?,
+
+    val wallet: Wallet?,
+
+    val selectedWalletAccount: Wallet.WalletCurrencyAccount?
 
 )

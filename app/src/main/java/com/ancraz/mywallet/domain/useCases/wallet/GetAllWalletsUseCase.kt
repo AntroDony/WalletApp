@@ -21,7 +21,6 @@ class GetAllWalletsUseCase @Inject constructor(
         return flow {
             try {
                 repository.getWalletList().collect{ wallets ->
-                    debugLog("GetAllWalletsUseCase : $wallets")
                     emit(DataResult.Success(wallets.map { wallet ->
                         wallet.copy(
                             totalBalance = getTotalBalance(wallet.currencyAccountList)

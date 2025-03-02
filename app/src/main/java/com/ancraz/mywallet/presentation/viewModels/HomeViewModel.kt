@@ -8,7 +8,7 @@ import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
-import com.ancraz.mywallet.domain.useCases.TotalBalanceUseCase
+import com.ancraz.mywallet.domain.useCases.GetDataStoreDataUseCase
 import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionsUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
@@ -25,7 +25,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
-    private val totalBalanceUseCase: TotalBalanceUseCase,
+    private val getDataStoreDataUseCase: GetDataStoreDataUseCase,
     private val getWalletsUseCase: GetAllWalletsUseCase
 ): ViewModel(){
 
@@ -41,7 +41,7 @@ class HomeViewModel @Inject constructor(
     fun editTotalBalance(value: Float, code: CurrencyCode = CurrencyCode.USD){
         viewModelScope.launch(ioDispatcher) {
             debugLog("updateTotalBalance")
-            totalBalanceUseCase.editTotalBalance(value, code)
+            getDataStoreDataUseCase.editTotalBalance(value, code)
         }
     }
 
@@ -55,7 +55,7 @@ class HomeViewModel @Inject constructor(
                         }?.sum()
 
                         walletSumInUsd?.let { value ->
-                            totalBalanceUseCase.editTotalBalance(value, CurrencyCode.USD)
+                            getDataStoreDataUseCase.editTotalBalance(value, CurrencyCode.USD)
                         } ?: run {
                             debugLog("walletSum is null")
                         }
@@ -74,11 +74,11 @@ class HomeViewModel @Inject constructor(
     private fun fetchData(){
         viewModelScope.launch(ioDispatcher) {
 
-            getCurrencyRatesUseCase().onEach{ result ->
-                debugLog("GetCurrencyRateResult: ${result.data} | ${result.errorMessage}")
-            }.launchIn(viewModelScope)
+//            getCurrencyRatesUseCase().onEach{ result ->
+//                debugLog("GetCurrencyRateResult: ${result.data} | ${result.errorMessage}")
+//            }.launchIn(viewModelScope)
 
-            totalBalanceUseCase.getTotalBalanceFlow().onEach{ result ->
+            getDataStoreDataUseCase.getTotalBalanceFlow().onEach{ result ->
                 when(result){
                     is DataResult.Success -> {
                         _homeUiState.value = _homeUiState.value.copy(

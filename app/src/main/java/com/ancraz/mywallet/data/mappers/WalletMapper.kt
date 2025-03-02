@@ -11,7 +11,8 @@ fun WalletEntity.toWallet(): Wallet{
         name = this.name,
         description = this.description,
         walletType = this.type,
-        currencyAccountList = this.currencyAccountList.map { account -> account.toWalletCurrencyAccount() }
+        currencyAccountList = this.currencyAccountList.map { account -> account.toWalletCurrencyAccount() },
+        totalBalance = 0f
     )
 }
 

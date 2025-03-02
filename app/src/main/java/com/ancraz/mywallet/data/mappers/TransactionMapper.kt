@@ -2,9 +2,10 @@ package com.ancraz.mywallet.data.mappers
 
 import com.ancraz.mywallet.data.storage.database.models.TransactionEntity
 import com.ancraz.mywallet.domain.models.Transaction
+import com.ancraz.mywallet.domain.models.Wallet
 
 
-fun TransactionEntity.toTransaction(): Transaction{
+fun TransactionEntity.toTransaction(wallet: Wallet?): Transaction{
     return Transaction(
         id = this.id,
         time = this.time,
@@ -12,7 +13,9 @@ fun TransactionEntity.toTransaction(): Transaction{
         currencyCode = this.currency,
         transactionType = this.transactionType,
         description = this.description,
-        category = this.category?.toTransactionCategory()
+        category = this.category?.toTransactionCategory(),
+        wallet = wallet,
+        selectedWalletAccount = null
     )
 }
 
@@ -25,6 +28,7 @@ fun Transaction.toTransactionEntity(): TransactionEntity{
         currency = this.currencyCode,
         transactionType = this.transactionType,
         description = this.description,
-        category = this.category?.toCategoryEntity()
+        category = this.category?.toCategoryEntity(),
+        walletId = this.wallet?.id
     )
 }

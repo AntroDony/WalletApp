@@ -9,25 +9,12 @@ import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 
 @Keep
-@Entity(
-    tableName = "transactions",)
-//    foreignKeys = [
-//        ForeignKey(
-//            entity = BalanceAccountEntity::class,
-//            parentColumns = arrayOf("account_id"),
-//            childColumns = arrayOf("account_id"),
-//            onUpdate = ForeignKey.CASCADE,
-//            onDelete = ForeignKey.CASCADE
-//        )
-//    ])
+@Entity(tableName = "transactions")
 data class TransactionEntity(
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "transaction_id")
     val id: Long = 0L,
-
-//    @ColumnInfo(name = "account_id")
-//    val accountId: Long,
 
     @ColumnInfo(name = "time")
     val time: Long,
@@ -46,6 +33,9 @@ data class TransactionEntity(
 
     @ColumnInfo(name = "category")
     val category: CategoryEntity? = null,
+
+    @ColumnInfo(name = "wallet_account_id")
+    val walletId: Long? = null
 
 //    @ColumnInfo(name = "to_account")
 //    val toAccount: BalanceAccountEntity? = null,

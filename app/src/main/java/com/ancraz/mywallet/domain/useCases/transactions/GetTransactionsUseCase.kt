@@ -18,7 +18,6 @@ class GetTransactionsUseCase @Inject constructor(
                 emit(DataResult.Loading())
 
                 transactionRepository.getTransactionList().collect{ transactions ->
-                    debugLog("TransactionList UseCase: $transactions")
                     emit(DataResult.Success(transactions))
                 }
             }

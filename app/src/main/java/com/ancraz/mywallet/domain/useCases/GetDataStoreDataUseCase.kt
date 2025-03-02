@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class TotalBalanceUseCase @Inject constructor(
+class GetDataStoreDataUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) {
 
@@ -43,6 +43,10 @@ class TotalBalanceUseCase @Inject constructor(
                 updateBalance(balanceInKzt)
             }
         }
+    }
+
+    suspend fun getLastUsedWallet(): Long? {
+        return dataStoreRepository.getLastUsedWalletId()
     }
 
 

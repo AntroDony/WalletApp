@@ -24,7 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.TransactionUi
+import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.ActionButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InfoRow
@@ -161,6 +163,15 @@ fun TransactionInfoScreen(
                 HorizontalSpacer()
             }
 
+            uiState.transaction.wallet?.let { wallet ->
+                InfoRow(
+                    title = "Wallet:",
+                    info = wallet.name
+                )
+
+                HorizontalSpacer()
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -236,7 +247,13 @@ private fun TransactionInfoScreenPreview() {
                     value = 200f,
                     type = TransactionType.EXPENSE,
                     currency = CurrencyCode.USD,
-                    description = "Transaction 1"
+                    description = "Transaction 1",
+                    wallet = WalletUi(
+                        name = "TBC Card",
+                        walletType = WalletType.CARD,
+                        totalBalance = 8000f,
+                        accounts = emptyList()
+                    )
                 ),
             ),
             onEvent = {}

@@ -2,37 +2,33 @@ package com.ancraz.mywallet.presentation.ui.screens.transaction.createTransactio
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -40,29 +36,32 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.ImageLoader
-import coil3.compose.AsyncImage
-import coil3.svg.SvgDecoder
+import androidx.compose.ui.window.Dialog
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.core.models.WalletType
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.CurrencyRateUi
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
+import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.ActionButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
 import com.ancraz.mywallet.presentation.ui.components.TransactionConfigContainer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
+import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
+import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.components.CategoryListMenu
+import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.components.WalletListMenu
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
-import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
+import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryContainerColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
-import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
 import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
@@ -73,13 +72,35 @@ fun CreateTransactionScreen(
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
+    debugLog("CreateTransactionScreen lastWalletId: ${uiState.data.lastUsedWalletId}")
+    
     val context = LocalContext.current
 
     val inputValueState = remember { mutableStateOf(0f.toFormattedString()) }
     val currencyState = remember { mutableStateOf(CurrencyCode.USD) }
 
     val descriptionState = remember { mutableStateOf<String?>(null) }
+
     val isCategoryListOpen = remember { mutableStateOf(false) }
+    val isWalletListOpen = remember { mutableStateOf(false) }
+    val isWalletAccountsDialogOpen = remember { mutableStateOf(false) }
+
+    val selectedWalletState = remember {
+        mutableStateOf(
+            uiState.data.lastUsedWalletId?.let { walletId ->
+                uiState.data.walletList.find { wallet ->
+                    wallet.id == walletId
+                }
+            }
+        )
+    }
+    val selectedWalletCurrencyAccount = remember {
+        mutableStateOf(selectedWalletState.value?.accounts?.getOrNull(0))
+    }
+
+    LaunchedEffect(selectedWalletState.value) {
+        selectedWalletCurrencyAccount.value = selectedWalletState.value?.accounts?.getOrNull(0)
+    }
 
     Column(
         modifier = modifier
@@ -97,14 +118,63 @@ fun CreateTransactionScreen(
 
         HorizontalSpacer()
 
-        TransactionConfigContainer(
-            valueState = inputValueState,
-            currencyState = currencyState,
-            title = "Balance: ${uiState.data.totalBalance.toFormattedString()}",
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
-        )
+        if (isWalletAccountsDialogOpen.value) {
+            selectedWalletState.value?.let { selectedWallet ->
+                selectedWalletCurrencyAccount.value?.let { selectedAccount ->
+                    SelectWalletAccountDialog(
+                        accounts = selectedWallet.accounts,
+                        currentAccount = selectedAccount,
+                        onSelect = { account ->
+                            selectedWalletCurrencyAccount.value = account
+
+                            isWalletAccountsDialogOpen.value = false
+                            isWalletListOpen.value = false
+                        },
+                        onCancel = {
+                            isWalletAccountsDialogOpen.value = false
+                        }
+                    )
+                }
+            }
+        }
+
+        Column {
+            TransactionConfigContainer(
+                valueState = inputValueState,
+                currencyState = currencyState,
+                title = "Total balance: ${uiState.data.totalBalance.toFormattedString()}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally),
+            )
+
+            HorizontalSpacer()
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = primaryColor,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .clickable {
+                        isWalletListOpen.value = true
+                    }
+            ) {
+                Text(
+                    text = getSelectedWalletInfoString(
+                        selectedWalletState.value,
+                        selectedWalletCurrencyAccount.value
+                    ).uppercase(),
+                    color = primaryColor,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                )
+            }
+        }
 
         HorizontalSpacer()
 
@@ -152,32 +222,51 @@ fun CreateTransactionScreen(
                 }
 
                 CategoryListMenu(
-                    categoryList,
-                    openState = isCategoryListOpen,
-                    onSelected = { category ->
-                        isCategoryListOpen.value = false
-
-                        val transactionObject = buildTransactionObject(
+                    categories = categoryList,
+                    onSelect = { category ->
+                        buildTransactionObject(
                             value = inputValueState.value.toFloatValue(),
                             currency = currencyState.value,
                             type = transactionType,
                             description = descriptionState.value ?: category.name,
-                            category = category
-                        )
+                            category = category,
+                            wallet = selectedWalletState.value,
+                            selectedAccount = selectedWalletCurrencyAccount.value,
+                            onSuccess = { transactionObject ->
+                                debugLog("Transaction: $transactionObject")
 
-                        if (transactionObject == null) {
-                            Toast.makeText(
-                                context,
-                                "Transaction value cannot be 0",
-                                Toast.LENGTH_LONG
-                            )
-                                .show()
-                        } else {
-                            onEvent(
-                                CreateTransactionUiEvent.AddTransaction(transactionObject)
-                            )
-                            onEvent(UiEvent.GoBack)
-                        }
+                                onEvent(
+                                    CreateTransactionUiEvent.AddTransaction(transactionObject)
+                                )
+                                onEvent(UiEvent.GoBack)
+                            },
+                            onError = { message ->
+                                Toast.makeText(
+                                    context,
+                                    message,
+                                    Toast.LENGTH_LONG
+                                )
+                                    .show()
+                            }
+                        )
+                    },
+                    onClose = {
+                        isCategoryListOpen.value = false
+                    }
+                )
+            }
+
+
+            if (isWalletListOpen.value) {
+                WalletListMenu(
+                    wallets = uiState.data.walletList,
+                    onSelect = { wallet ->
+                        selectedWalletState.value = wallet
+
+                        isWalletAccountsDialogOpen.value = true
+                    },
+                    onClose = {
+                        isWalletListOpen.value = false
                     }
                 )
             }
@@ -191,7 +280,7 @@ private fun RateInfoText(
     currentCurrencyState: CurrencyCode,
     rates: List<CurrencyRateUi>,
     modifier: Modifier = Modifier
-){
+) {
     val baseText = "1 USD = "
     val currentRateIndex = rates.map { rate -> rate.currencyCode }.indexOf(currentCurrencyState)
     val rateText = "${rates[currentRateIndex].rate} ${currentCurrencyState.name}"
@@ -254,105 +343,106 @@ private fun TransactionDescriptionTextField(
 
 
 @Composable
-private fun CategoryListMenu(
-    categories: List<TransactionCategoryUi>,
-    openState: MutableState<Boolean>,
+private fun SelectWalletAccountDialog(
+    accounts: List<WalletUi.CurrencyAccountUi>,
+    currentAccount: WalletUi.CurrencyAccountUi,
     modifier: Modifier = Modifier,
-    onSelected: (TransactionCategoryUi) -> Unit
+    onSelect: (WalletUi.CurrencyAccountUi) -> Unit,
+    onCancel: () -> Unit
 ) {
-    Column(
-        modifier = modifier
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
-                .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
-                .background(surfaceColor)
+    val selectedAccountState = remember { mutableStateOf(currentAccount) }
 
-        ) {
-            Image(
-                imageVector = Icons.Filled.ArrowDropDown,
-                contentDescription = "Close",
-                colorFilter = ColorFilter.tint(onSecondaryColor),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(40.dp)
-                    .clickable {
-                        openState.value = false
-                    }
-            )
+    Dialog(
+        onDismissRequest = {
+            onCancel()
         }
-
-        LazyVerticalGrid(
-            modifier = Modifier
-                .background(surfaceColor),
-            columns = GridCells.Fixed(3)
+    ) {
+        Card(
+            modifier = modifier,
+            colors = CardDefaults.cardColors(
+                containerColor = backgroundColor
+            ),
+            border = BorderStroke(width = 1.dp, color = primaryColor)
         ) {
-            items(categories) { category ->
-                CategoryItem(
-                    category,
-                    modifier = Modifier
-                        .clickable {
-                            onSelected(category)
-                        }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Select currency account",
+                    color = onBackgroundColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
                 )
+
+                HorizontalSpacer(height = 20.dp)
+
+                Column(
+                    modifier = Modifier
+                        .wrapContentWidth(),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    accounts.forEach { account ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            RadioButton(
+                                selected = account == selectedAccountState.value,
+                                onClick = {
+                                    selectedAccountState.value = account
+                                }
+                            )
+
+                            VerticalSpacer()
+
+                            Text(
+                                text = "${account.moneyValue.toFormattedString()} ${account.currency}",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = onBackgroundColor
+                            )
+                        }
+                    }
+                }
+
+                HorizontalSpacer(height = 20.dp)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextButton(
+                        onClick = { onCancel() },
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            color = onBackgroundColor,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    TextButton(
+                        onClick = {
+                            onSelect(selectedAccountState.value)
+                        }
+                    ) {
+                        Text(
+                            text = "Save",
+                            color = onBackgroundColor,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         }
-    }
-}
-
-
-@Composable
-private fun CategoryItem(
-    category: TransactionCategoryUi,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            add(SvgDecoder.Factory())
-        }
-        .build()
-
-    val assetUri = "file:///android_asset/${category.iconAssetPath}"
-
-
-    Card(
-        modifier = modifier
-            .padding(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = surfaceColor
-        ),
-        border = BorderStroke(width = 1.dp, color = primaryColor)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            AsyncImage(
-                model = assetUri,
-                contentDescription = category.name,
-                imageLoader = imageLoader,
-                colorFilter = ColorFilter.tint(
-                    Color.White
-                ),
-                modifier = Modifier
-                    .padding(6.dp)
-                    .size(40.dp)
-            )
-
-            Text(
-                text = category.name,
-                color = Color.White,
-                fontSize = 12.sp,
-                maxLines = 1
-            )
-
-            HorizontalSpacer(modifier = Modifier.height(4.dp))
-        }
-
     }
 }
 
@@ -482,11 +572,45 @@ private fun TransactionInputScreenPreview() {
                             iconAssetPath = "categories_icon/house_category.svg",
                             transactionType = TransactionType.INCOME
                         ),
+                    ),
+                    walletList = listOf(
+                        WalletUi(
+                            name = "TBC Card",
+                            description = "TBC Bank physic account",
+                            walletType = WalletType.CARD,
+                            accounts = listOf(
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+                            ),
+                            totalBalance = 2400f
+                        ),
+                        WalletUi(
+                            name = "Cash",
+                            description = "TBC Bank physic account",
+                            walletType = WalletType.CASH,
+                            accounts = listOf(
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+                            ),
+                            totalBalance = 2400f
+                        ),
+                        WalletUi(
+                            name = "Trust Wallet 1",
+                            walletType = WalletType.CRYPTO_WALLET,
+                            accounts = listOf(
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
+                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
+                            ),
+                            totalBalance = 2400f
+                        )
                     )
                 )
             ),
             TransactionType.INCOME,
-            modifier = Modifier,
+            modifier = Modifier.background(backgroundColor),
             onEvent = {}
         )
     }
@@ -497,16 +621,51 @@ private fun buildTransactionObject(
     currency: CurrencyCode,
     type: TransactionType,
     description: String?,
-    category: TransactionCategoryUi
-): TransactionUi? {
+    category: TransactionCategoryUi,
+    wallet: WalletUi?,
+    selectedAccount: WalletUi.CurrencyAccountUi?,
+    onSuccess: (TransactionUi) -> Unit,
+    onError: (String) -> Unit
+) {
+
     if (value == 0f) {
-        return null
+        onError("Transaction value cannot be 0")
+        return
     }
-    return TransactionUi(
-        value = value,
-        currency = currency,
-        type = type,
-        description = description,
-        category = category
+    selectedAccount?.let { account ->
+        if (account.moneyValue < value) {
+            onError(" You are in a minus. Not enough money on selected account")
+           // return
+        } else if (selectedAccount.currency != currency) {
+            onError("Selected currency is incompatible with selected account")
+            return
+        }
+    }
+
+    onSuccess(
+        TransactionUi(
+            value = value,
+            currency = currency,
+            type = type,
+            description = description,
+            category = category,
+            wallet = wallet,
+            selectedWalletAccount = selectedAccount
+        )
     )
+}
+
+
+private fun getSelectedWalletInfoString(
+    wallet: WalletUi?,
+    selectedAccount: WalletUi.CurrencyAccountUi?
+): String {
+    if (wallet == null)
+        return "No wallet"
+
+    val currencyText = selectedAccount?.currency?.let {
+        "(${it.name})"
+    } ?: ""
+
+    return "${wallet.name} $currencyText".trim()
 }

@@ -289,7 +289,7 @@ private fun MainActivityScreen() {
                     onEvent = { event: UiEvent ->
                         when(event){
                             is WalletListUiEvent.ShowWalletInfo -> {
-                                navController.navigate(NavigationScreen.WalletInfoScreen.route)
+                                navController.navigate(NavigationScreen.WalletInfoScreen.route + "/${event.wallet.id}")
                             }
                             is WalletListUiEvent.CreateWallet -> {
                                 navController.navigate(NavigationScreen.BuildWalletScreen.route)

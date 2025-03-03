@@ -122,8 +122,10 @@ class DataStoreRepository(
     }
 
 
-    suspend fun getLastUsedWalletId(): Long? {
-        return context.dataStore.data.first()[LAST_USED_WALLET_ACCOUNT_ID]
+    fun getLastUsedWalletIdFlow(): Flow<Long?> {
+        return context.dataStore.data.map { preferences ->
+            preferences[LAST_USED_WALLET_ACCOUNT_ID]
+        }
     }
 
 

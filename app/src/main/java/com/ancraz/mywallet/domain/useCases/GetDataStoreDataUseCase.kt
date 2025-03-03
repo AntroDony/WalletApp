@@ -45,8 +45,8 @@ class GetDataStoreDataUseCase @Inject constructor(
         }
     }
 
-    suspend fun getLastUsedWallet(): Long? {
-        return dataStoreRepository.getLastUsedWalletId()
+    fun getLastUsedWallet(): Flow<Long?> {
+        return dataStoreRepository.getLastUsedWalletIdFlow()
     }
 
 

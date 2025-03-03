@@ -29,6 +29,7 @@ import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.T
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -120,16 +121,14 @@ class TransactionViewModel @Inject constructor(
 
     private fun fetchDataStoreData(){
         viewModelScope.launch(ioDispatcher) {
-            getDataStoreDataUseCase.getLastUsedWallet()?.let { id ->
+            getDataStoreDataUseCase.getLastUsedWallet().onEach { id ->
                 debugLog("getLastUsedWallet: $id")
                 _createTransactionUiState.value = _createTransactionUiState.value.copy(
                     data = _createTransactionUiState.value.data.copy(
                         lastUsedWalletId = id
                     )
                 )
-
-
-            }
+            }.launchIn(viewModelScope)
 
             getDataStoreDataUseCase.getTotalBalanceFlow().onEach { result ->
                 when(result){

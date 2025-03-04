@@ -115,7 +115,6 @@ class TransactionViewModel @Inject constructor(
     private fun fetchDataStoreData(){
         viewModelScope.launch(ioDispatcher) {
             dataStoreManager.getRecentWalletId().onEach { id ->
-                debugLog("recentWallet id: $id")
                 _createTransactionUiState.value = _createTransactionUiState.value.copy(
                     data = _createTransactionUiState.value.data.copy(
                         recentWalletId = id
@@ -125,7 +124,6 @@ class TransactionViewModel @Inject constructor(
 
 
             dataStoreManager.getRecentCurrency().onEach { currency ->
-                debugLog("recentCurrency: $currency")
                 _createTransactionUiState.value = _createTransactionUiState.value.copy(
                     data = _createTransactionUiState.value.data.copy(
                         recentCurrency = currency

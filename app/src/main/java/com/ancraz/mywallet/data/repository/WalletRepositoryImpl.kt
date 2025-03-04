@@ -52,9 +52,6 @@ class WalletRepositoryImpl @Inject constructor(
             }
         }
 
-        debugLog("incomeToWallet: \n" +
-                "newAccountList: $newAccountList")
-
         updateWallet(
             wallet.copy(
                 currencyAccountList = newAccountList
@@ -75,9 +72,6 @@ class WalletRepositoryImpl @Inject constructor(
                 account
             }
         }
-
-        debugLog("expenseFromWallet: \n" +
-                "newAccountList: $newAccountList")
 
         updateWallet(
             wallet.copy(

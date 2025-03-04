@@ -5,12 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.result.DataResult
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.manager.WalletManager
-import com.ancraz.mywallet.domain.useCases.wallet.AddNewWalletUseCase
-import com.ancraz.mywallet.domain.useCases.wallet.DeleteWalletUseCase
-import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
-import com.ancraz.mywallet.domain.useCases.wallet.GetWalletByIdUseCase
-import com.ancraz.mywallet.domain.useCases.wallet.UpdateWalletUseCase
 import com.ancraz.mywallet.presentation.mapper.toWallet
 import com.ancraz.mywallet.presentation.mapper.toWalletUi
 import com.ancraz.mywallet.presentation.models.WalletUi
@@ -64,6 +60,7 @@ class WalletViewModel @Inject constructor(
     }
 
     fun getWalletById(id: Long){
+        debugLog("viewModel: getWalletById")
         viewModelScope.launch(Dispatchers.IO) {
             walletManager.getWalletById(id).let{ result ->
                 when(result){

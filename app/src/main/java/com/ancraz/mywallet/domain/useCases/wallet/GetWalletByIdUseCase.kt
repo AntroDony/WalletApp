@@ -20,7 +20,6 @@ class GetWalletByIdUseCase @Inject constructor(
     suspend operator fun invoke(id: Long): DataResult<Wallet> {
         return try {
             repository.getWalletById(id).let { wallet ->
-                debugLog("GetWalletByIdUseCase : $wallet")
                 DataResult.Success(
                     wallet.copy(
                         totalBalance = getTotalBalance(wallet.currencyAccountList)

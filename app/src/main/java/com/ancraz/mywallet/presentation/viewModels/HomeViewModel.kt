@@ -8,8 +8,8 @@ import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
-import com.ancraz.mywallet.domain.useCases.GetDataStoreDataUseCase
-import com.ancraz.mywallet.domain.useCases.transactions.GetTransactionsUseCase
+import com.ancraz.mywallet.domain.useCases.dataStore.GetDataStoreDataUseCase
+import com.ancraz.mywallet.domain.useCases.transaction.GetAllTransactionsUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
 import com.ancraz.mywallet.presentation.mapper.toWalletUi
@@ -23,8 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase,
-    private val getTransactionsUseCase: GetTransactionsUseCase,
+    //private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase,
+    private val getAllTransactionsUseCase: GetAllTransactionsUseCase,
     private val getDataStoreDataUseCase: GetDataStoreDataUseCase,
     private val getWalletsUseCase: GetAllWalletsUseCase
 ): ViewModel(){
@@ -98,7 +98,7 @@ class HomeViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
-            getTransactionsUseCase().onEach { result ->
+            getAllTransactionsUseCase().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
                         _homeUiState.value = homeUiState.value.copy(

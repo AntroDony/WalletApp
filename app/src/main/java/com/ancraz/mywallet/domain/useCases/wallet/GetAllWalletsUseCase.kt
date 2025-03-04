@@ -1,6 +1,6 @@
 package com.ancraz.mywallet.domain.useCases.wallet
 
-import com.ancraz.mywallet.core.converter.CurrencyConverter
+import com.ancraz.mywallet.domain.converter.CurrencyConverter
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository

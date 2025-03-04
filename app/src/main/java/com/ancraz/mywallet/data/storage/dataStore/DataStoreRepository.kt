@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.utils.debugLog
@@ -22,7 +23,8 @@ class DataStoreRepository(
 
     private val TOTAL_BALANCE_USD = floatPreferencesKey("total_balance_usd")
 
-    private val LAST_USED_WALLET_ACCOUNT_ID = longPreferencesKey("wallet_account_id")
+    private val RECENT_WALLET_ACCOUNT_ID = longPreferencesKey("wallet_account_id")
+    private val RECENT_CURRENCY_NAME = stringPreferencesKey("currency_name")
 
     private val CURRENCY_UPDATE_TIME = longPreferencesKey("currency_update_time")
     private val EURO_RATE_TO_USD = floatPreferencesKey("euro_rate_to_usd")
@@ -122,16 +124,29 @@ class DataStoreRepository(
     }
 
 
-    fun getLastUsedWalletIdFlow(): Flow<Long?> {
+    fun getRecentWalletIdFlow(): Flow<Long?> {
         return context.dataStore.data.map { preferences ->
-            preferences[LAST_USED_WALLET_ACCOUNT_ID]
+            preferences[RECENT_WALLET_ACCOUNT_ID]
         }
     }
 
 
-    suspend fun setLastUsedWalletId(id: Long){
+    suspend fun setRecentWalletId(id: Long){
         context.dataStore.edit { preferences ->
-            preferences[LAST_USED_WALLET_ACCOUNT_ID] = id
+            preferences[RECENT_WALLET_ACCOUNT_ID] = id
+        }
+    }
+
+    fun getRecentCurrencyNameFlow(): Flow<String> {
+        return context.dataStore.data.map { preferences ->
+            preferences[RECENT_CURRENCY_NAME] ?: "USD"
+        }
+    }
+
+
+    suspend fun setRecentCurrencyName(name: String){
+        context.dataStore.edit { preferences ->
+            preferences[RECENT_CURRENCY_NAME] = name
         }
     }
 }

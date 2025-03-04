@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.domain.useCases.transactions
+package com.ancraz.mywallet.domain.useCases.transaction
 
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog

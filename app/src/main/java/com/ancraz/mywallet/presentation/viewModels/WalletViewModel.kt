@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.result.DataResult
+import com.ancraz.mywallet.domain.manager.WalletManager
 import com.ancraz.mywallet.domain.useCases.wallet.AddNewWalletUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.DeleteWalletUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
@@ -25,11 +26,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WalletViewModel @Inject constructor(
-    private val getWalletsUseCase: GetAllWalletsUseCase,
-    private val getWalletByIdUseCase: GetWalletByIdUseCase,
-    private val addWalletUseCase: AddNewWalletUseCase,
-    private val updateWalletUseCase: UpdateWalletUseCase,
-    private val deleteWalletUseCase: DeleteWalletUseCase
+    private val walletManager: WalletManager
 ): ViewModel()  {
 
     private val ioDispatcher = Dispatchers.IO
@@ -46,13 +43,13 @@ class WalletViewModel @Inject constructor(
 
     fun addWallet(walletUi: WalletUi){
         viewModelScope.launch(ioDispatcher) {
-            addWalletUseCase(walletUi.toWallet())
+            walletManager.addWallet(walletUi.toWallet())
         }
     }
 
     fun updateWallet(walletUi: WalletUi){
         viewModelScope.launch(ioDispatcher) {
-            updateWalletUseCase(walletUi.toWallet())
+            walletManager.updateWallet(walletUi.toWallet())
 
             _walletUiState.value = _walletUiState.value.copy(
                 wallet = null
@@ -62,13 +59,13 @@ class WalletViewModel @Inject constructor(
 
     fun deleteWallet(walletUi: WalletUi){
         viewModelScope.launch(ioDispatcher) {
-            deleteWalletUseCase(walletUi.id)
+            walletManager.deleteWalletById(walletUi.id)
         }
     }
 
     fun getWalletById(id: Long){
         viewModelScope.launch(Dispatchers.IO) {
-            getWalletByIdUseCase(id).let{ result ->
+            walletManager.getWalletById(id).let{ result ->
                 when(result){
                     is DataResult.Success -> {
                         _walletUiState.value = _walletUiState.value.copy(
@@ -95,7 +92,7 @@ class WalletViewModel @Inject constructor(
 
     private fun fetchData(){
         viewModelScope.launch(ioDispatcher) {
-            getWalletsUseCase().onEach { result ->
+            walletManager.getWallets().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
                         _walletListUiState.value = _walletListUiState.value.copy(

@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.domain.useCases.transactions
+package com.ancraz.mywallet.domain.useCases.transaction
 
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class GetTransactionsUseCase @Inject constructor(
+class GetAllTransactionsUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository
 ){
 

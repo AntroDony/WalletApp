@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.core.converter
+package com.ancraz.mywallet.domain.converter
 
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository

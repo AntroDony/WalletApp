@@ -1,10 +1,9 @@
-package com.ancraz.mywallet.domain.useCases.transactions
+package com.ancraz.mywallet.domain.useCases.transaction
 
-import com.ancraz.mywallet.core.converter.CurrencyConverter
+import com.ancraz.mywallet.domain.converter.CurrencyConverter
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository
 import com.ancraz.mywallet.domain.models.Transaction
-import com.ancraz.mywallet.domain.models.Wallet
 import com.ancraz.mywallet.domain.repository.TransactionRepository
 import com.ancraz.mywallet.domain.repository.WalletRepository
 import javax.inject.Inject
@@ -17,7 +16,7 @@ class AddTransactionUseCase @Inject constructor(
 
     private val currencyConverter = CurrencyConverter(dataStoreRepository)
 
-    suspend fun addTransaction(transaction: Transaction){
+    suspend operator fun invoke(transaction: Transaction){
         when(transaction.transactionType){
             TransactionType.INCOME-> {
                 addIncomeTransaction(transaction)
@@ -89,7 +88,7 @@ class AddTransactionUseCase @Inject constructor(
                 }
             }
 
-            dataStoreRepository.setLastUsedWalletId(this.wallet.id)
+            dataStoreRepository.setRecentWalletId(this.wallet.id)
         }
     }
 }

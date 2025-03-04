@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.domain.useCases
+package com.ancraz.mywallet.domain.useCases.dataStore
 
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.result.DataResult
@@ -46,7 +46,7 @@ class GetDataStoreDataUseCase @Inject constructor(
     }
 
     fun getLastUsedWallet(): Flow<Long?> {
-        return dataStoreRepository.getLastUsedWalletIdFlow()
+        return dataStoreRepository.getRecentWalletIdFlow()
     }
 
 

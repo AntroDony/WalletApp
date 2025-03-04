@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.ActionButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
@@ -82,6 +83,7 @@ import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
 import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
+import kotlinx.coroutines.delay
 
 @Composable
 fun CreateWalletScreen(
@@ -180,6 +182,7 @@ fun CreateWalletScreen(
             title = if (isWalletEdit.value) "Update Wallet" else "Add Wallet",
             onClick = {
                 val wallet = buildWalletObject(
+                    id = uiState.wallet?.id,
                     name = nameState.value,
                     description = descriptionState.value,
                     type = selectedType.value,
@@ -191,6 +194,7 @@ fun CreateWalletScreen(
 
                 wallet?.let {
                     if (isWalletEdit.value){
+                        debugLog("wallet: $it")
                         onEvent(CreateWalletUiEvent.UpdateWallet(it))
                     } else {
                         onEvent(CreateWalletUiEvent.AddWallet(it))
@@ -552,6 +556,7 @@ private fun EditAccountValueDialog(
     }
 
     LaunchedEffect(key1 = true) {
+        delay(100)
         focusRequester.requestFocus()
         textFieldValue.value = textFieldValue.value.copy(
             selection = TextRange(textFieldValue.value.text.length)
@@ -766,6 +771,7 @@ private fun CreateWalletScreenPreview() {
 
 
 private fun buildWalletObject(
+    id: Long?,
     name: String?,
     description: String?,
     type: WalletType?,
@@ -781,6 +787,7 @@ private fun buildWalletObject(
         return null
     }
     return WalletUi(
+        id = id ?: 0,
         name = name,
         description = description,
         walletType = type,

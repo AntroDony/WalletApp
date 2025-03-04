@@ -87,8 +87,6 @@ class AddTransactionUseCase @Inject constructor(
                     //todo implement
                 }
             }
-
-            dataStoreRepository.setRecentWalletId(this.wallet.id)
         }
     }
 }

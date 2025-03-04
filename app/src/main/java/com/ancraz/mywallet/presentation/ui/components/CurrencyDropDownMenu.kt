@@ -53,7 +53,7 @@ fun CurrencyDropDownMenu(
             Text(
                 text = items[itemPosition.value].name,
                 color = onSurfaceColor,
-                fontSize = 26.sp,
+                fontSize = 24.sp,
                 modifier = Modifier.padding(8.dp)
             )
 
@@ -66,7 +66,7 @@ fun CurrencyDropDownMenu(
                 contentDescription = "Select currency",
                 colorFilter = ColorFilter.tint(onSurfaceColor),
                 modifier = Modifier
-                    .size(38.dp)
+                    .size(36.dp)
             )
         }
 

@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction
 
+import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.presentation.models.CurrencyRateUi
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
@@ -18,6 +19,7 @@ data class CreateTransactionUiState(
         val expenseCategories: List<TransactionCategoryUi> = emptyList(),
         val currencyRates: List<CurrencyRateUi> = emptyList(),
         val walletList: List<WalletUi> = emptyList(),
-        val lastUsedWalletId: Long? = null
+        val recentWalletId: Long? = null,
+        val recentCurrency: CurrencyCode = CurrencyCode.USD
     )
 }

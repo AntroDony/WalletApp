@@ -130,7 +130,6 @@ class DataStoreRepository(
         }
     }
 
-
     suspend fun setRecentWalletId(id: Long){
         context.dataStore.edit { preferences ->
             preferences[RECENT_WALLET_ACCOUNT_ID] = id
@@ -142,7 +141,6 @@ class DataStoreRepository(
             preferences[RECENT_CURRENCY_NAME] ?: "USD"
         }
     }
-
 
     suspend fun setRecentCurrencyName(name: String){
         context.dataStore.edit { preferences ->

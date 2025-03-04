@@ -44,16 +44,16 @@ fun TransactionConfigContainer(
             modifier = Modifier
         )
 
-        HorizontalSpacer(height = 20.dp)
+        HorizontalSpacer()
 
         Text(
-            text = valueState.value,
+            text = valueState.value.ifEmpty { "0.00" },
             color = onSurfaceColor,
             fontSize = 60.sp,
             modifier = Modifier
         )
 
-        HorizontalSpacer()
+        //HorizontalSpacer(height = 10.dp)
 
         CurrencyDropDownMenu(
             currentCurrencyState = currencyState

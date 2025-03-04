@@ -12,16 +12,7 @@ import com.ancraz.mywallet.domain.manager.TransactionCategoryManager
 import com.ancraz.mywallet.domain.manager.TransactionManager
 import com.ancraz.mywallet.domain.manager.WalletManager
 import com.ancraz.mywallet.domain.models.Transaction
-import com.ancraz.mywallet.domain.useCases.dataStore.GetDataStoreDataUseCase
 import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
-import com.ancraz.mywallet.domain.useCases.transactionCategory.AddTransactionCategoryUseCase
-import com.ancraz.mywallet.domain.useCases.transaction.AddTransactionUseCase
-import com.ancraz.mywallet.domain.useCases.transactionCategory.DeleteTransactionCategoryUseCase
-import com.ancraz.mywallet.domain.useCases.transaction.DeleteTransactionUseCase
-import com.ancraz.mywallet.domain.useCases.transaction.GetTransactionByIdUseCase
-import com.ancraz.mywallet.domain.useCases.transactionCategory.GetTransactionCategoriesUseCase
-import com.ancraz.mywallet.domain.useCases.transaction.GetAllTransactionsUseCase
-import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toCategoryUi
 import com.ancraz.mywallet.presentation.mapper.toCurrencyRateUi
 import com.ancraz.mywallet.presentation.mapper.toTransaction
@@ -34,7 +25,6 @@ import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.T
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -68,6 +58,12 @@ class TransactionViewModel @Inject constructor(
     fun addNewTransaction(transactionUi: TransactionUi) {
         viewModelScope.launch(ioDispatcher) {
             transactionManager.addTransaction(transactionUi.toTransaction())
+
+            //update dataStore values
+            dataStoreManager.updateRecentCurrency(transactionUi.currency)
+            transactionUi.wallet?.id?.let { id ->
+                dataStoreManager.updateRecentWalletId(id)
+            }
         }
     }
 
@@ -118,21 +114,26 @@ class TransactionViewModel @Inject constructor(
 
     private fun fetchDataStoreData(){
         viewModelScope.launch(ioDispatcher) {
-            dataStoreManager.getRecentWalletId().collectLatest { id ->
-                debugLog("getLastUsedWallet: $id")
+            dataStoreManager.getRecentWalletId().onEach { id ->
+                debugLog("recentWallet id: $id")
                 _createTransactionUiState.value = _createTransactionUiState.value.copy(
                     data = _createTransactionUiState.value.data.copy(
-                        lastUsedWalletId = id
+                        recentWalletId = id
                     )
                 )
-            }
+            }.launchIn(viewModelScope)
 
 
-            dataStoreManager.getRecentCurrency().collectLatest {
-                //todo implement
-            }
+            dataStoreManager.getRecentCurrency().onEach { currency ->
+                debugLog("recentCurrency: $currency")
+                _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                    data = _createTransactionUiState.value.data.copy(
+                        recentCurrency = currency
+                    )
+                )
+            }.launchIn(viewModelScope)
 
-            dataStoreManager.getTotalBalance().collectLatest { result ->
+            dataStoreManager.getTotalBalance().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
                         _createTransactionUiState.value = _createTransactionUiState.value.copy(
@@ -150,7 +151,7 @@ class TransactionViewModel @Inject constructor(
                         )
                     }
                 }
-            }
+            }.launchIn(viewModelScope)
         }
     }
 
@@ -160,6 +161,7 @@ class TransactionViewModel @Inject constructor(
             transactionCategoryManager.getCategories(TransactionType.EXPENSE).onEach { result ->
                 when (result) {
                     is DataResult.Success -> {
+                        debugLog("expense categories: ${result.data}")
                         _createTransactionUiState.value = _createTransactionUiState.value.copy(
                             isLoading = false,
                             data = _createTransactionUiState.value.data.copy(
@@ -184,6 +186,7 @@ class TransactionViewModel @Inject constructor(
             transactionCategoryManager.getCategories(TransactionType.INCOME).onEach { result ->
                 when (result) {
                     is DataResult.Success -> {
+                        debugLog("income categories: ${result.data}")
                         _createTransactionUiState.value = _createTransactionUiState.value.copy(
                             isLoading = false,
                             data = _createTransactionUiState.value.data.copy(

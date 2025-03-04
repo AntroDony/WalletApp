@@ -75,7 +75,7 @@ fun CreateTransactionScreen(
     val context = LocalContext.current
 
     val inputValueState = remember { mutableStateOf(0f.toFormattedString()) }
-    val currencyState = remember { mutableStateOf(CurrencyCode.USD) }
+    val currencyState = remember { mutableStateOf(uiState.data.recentCurrency) }
 
     val descriptionState = remember { mutableStateOf<String?>(null) }
 
@@ -85,7 +85,7 @@ fun CreateTransactionScreen(
 
     val selectedWalletState = remember {
         mutableStateOf(
-            uiState.data.lastUsedWalletId?.let { walletId ->
+            uiState.data.recentWalletId?.let { walletId ->
                 uiState.data.walletList.find { wallet ->
                     wallet.id == walletId
                 }
@@ -93,11 +93,17 @@ fun CreateTransactionScreen(
         )
     }
     val selectedWalletCurrencyAccount = remember {
-        mutableStateOf(selectedWalletState.value?.accounts?.getOrNull(0))
+        mutableStateOf(
+            selectedWalletState.value?.accounts?.find { account ->
+                account.currency == currencyState.value
+            } ?: selectedWalletState.value?.accounts?.getOrNull(0)
+        )
     }
 
     LaunchedEffect(selectedWalletState.value) {
-        selectedWalletCurrencyAccount.value = selectedWalletState.value?.accounts?.getOrNull(0)
+        selectedWalletCurrencyAccount.value = selectedWalletState.value?.accounts?.find { account ->
+            account.currency == currencyState.value
+        } ?: selectedWalletState.value?.accounts?.getOrNull(0)
     }
 
     Column(
@@ -167,21 +173,21 @@ fun CreateTransactionScreen(
                         selectedWalletCurrencyAccount.value
                     ).uppercase(),
                     color = primaryColor,
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     modifier = Modifier
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 )
             }
-        }
 
-        HorizontalSpacer()
-
-        if (currencyState.value != CurrencyCode.USD) {
-            RateInfoText(
-                currentCurrencyState = currencyState.value,
-                rates = uiState.data.currencyRates
-            )
             HorizontalSpacer()
+
+            if (currencyState.value != CurrencyCode.USD) {
+                RateInfoText(
+                    currentCurrencyState = currencyState.value,
+                    rates = uiState.data.currencyRates
+                )
+                HorizontalSpacer()
+            }
         }
 
         Box(
@@ -636,7 +642,7 @@ private fun buildTransactionObject(
     selectedAccount?.let { account ->
         if (account.moneyValue < value) {
             onError(" You are in a minus. Not enough money on selected account")
-           // return
+            // return
         } else if (selectedAccount.currency != currency) {
             onError("Selected currency is incompatible with selected account")
             return

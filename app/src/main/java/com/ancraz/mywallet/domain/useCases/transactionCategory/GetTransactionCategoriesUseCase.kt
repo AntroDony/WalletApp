@@ -26,7 +26,7 @@ class GetTransactionCategoriesUseCase @Inject constructor(
                     }
 
                     TransactionType.EXPENSE -> {
-                        transactionRepository.getIncomeCategoryList().collect{ categories ->
+                        transactionRepository.getExpenseCategoryList().collect{ categories ->
                             emit(DataResult.Success(categories))
                         }
                     }

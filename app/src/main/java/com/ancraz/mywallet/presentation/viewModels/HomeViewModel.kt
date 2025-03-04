@@ -7,8 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
-import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
-import com.ancraz.mywallet.domain.useCases.dataStore.GetDataStoreDataUseCase
+import com.ancraz.mywallet.domain.manager.DataStoreManager
 import com.ancraz.mywallet.domain.useCases.transaction.GetAllTransactionsUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
@@ -23,10 +22,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    //private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase,
     private val getAllTransactionsUseCase: GetAllTransactionsUseCase,
-    private val getDataStoreDataUseCase: GetDataStoreDataUseCase,
-    private val getWalletsUseCase: GetAllWalletsUseCase
+    private val getAllWalletsUseCase: GetAllWalletsUseCase,
+    private val dataStoreManager: DataStoreManager
 ): ViewModel(){
 
     private val ioDispatcher = Dispatchers.IO
@@ -41,13 +39,13 @@ class HomeViewModel @Inject constructor(
     fun editTotalBalance(value: Float, code: CurrencyCode = CurrencyCode.USD){
         viewModelScope.launch(ioDispatcher) {
             debugLog("updateTotalBalance")
-            getDataStoreDataUseCase.editTotalBalance(value, code)
+            dataStoreManager.editTotalBalance(value, code)
         }
     }
 
     fun syncData(){
         viewModelScope.launch(ioDispatcher) {
-            getWalletsUseCase().onEach { result ->
+            getAllWalletsUseCase().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
                         val walletSumInUsd = result.data?.map { wallet ->
@@ -55,7 +53,7 @@ class HomeViewModel @Inject constructor(
                         }?.sum()
 
                         walletSumInUsd?.let { value ->
-                            getDataStoreDataUseCase.editTotalBalance(value, CurrencyCode.USD)
+                            dataStoreManager.editTotalBalance(value, CurrencyCode.USD)
                         } ?: run {
                             debugLog("walletSum is null")
                         }
@@ -78,7 +76,7 @@ class HomeViewModel @Inject constructor(
 //                debugLog("GetCurrencyRateResult: ${result.data} | ${result.errorMessage}")
 //            }.launchIn(viewModelScope)
 
-            getDataStoreDataUseCase.getTotalBalanceFlow().onEach{ result ->
+            dataStoreManager.getTotalBalance().onEach{ result ->
                 when(result){
                     is DataResult.Success -> {
                         _homeUiState.value = _homeUiState.value.copy(
@@ -121,7 +119,7 @@ class HomeViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
 
-            getWalletsUseCase().onEach { result ->
+            getAllWalletsUseCase().onEach { result ->
                 when(result){
                     is DataResult.Success -> {
                         _homeUiState.value = homeUiState.value.copy(

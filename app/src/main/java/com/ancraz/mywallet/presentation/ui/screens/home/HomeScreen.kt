@@ -1,3 +1,4 @@
+
 package com.ancraz.mywallet.presentation.ui.screens.home
 
 import androidx.compose.foundation.Image
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,6 +55,7 @@ import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.screens.home.components.WalletCard
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
+import com.ancraz.mywallet.presentation.ui.screens.home.components.TotalBalanceCard
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
@@ -110,15 +113,8 @@ fun HomeScreen(
 
         TotalBalanceCard(
             state = uiState,
-            onNewTransaction = { transactionType ->
-                onEvent(
-                    HomeUiEvent.CreateTransaction(transactionType)
-                )
-            },
-            onEditBalance = { currentBalance ->
-                onEvent(
-                    HomeUiEvent.EditTotalBalance(currentBalance)
-                )
+            onEvent = { event ->
+                onEvent(event)
             }
         )
 
@@ -138,126 +134,6 @@ fun HomeScreen(
     }
 
 }
-
-
-@Composable
-private fun TotalBalanceCard(
-    state: HomeUiState,
-    modifier: Modifier = Modifier,
-    onNewTransaction: (TransactionType) -> Unit,
-    onEditBalance: (Float) -> Unit
-) {
-    Card(
-        modifier = modifier
-            .padding(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = primaryColor
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 12.dp)
-        ) {
-            Text(
-                text = "Total balance",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            if (state.isLoading) {
-                CircularProgressIndicator(
-                    trackColor = onPrimaryColor,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                )
-            } else {
-                Text(
-                    text = "\$ ${state.data.balance.toFormattedString()}",
-                    color = Color.Black,
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                TotalBalanceActionButton(
-                    text = "Income",
-                    icon = Icons.Filled.Add
-                ) {
-                    onNewTransaction(TransactionType.INCOME)
-                }
-
-                TotalBalanceActionButton(
-                    text = "Expense",
-                    icon = Icons.Filled.Remove
-                ) {
-                    onNewTransaction(TransactionType.EXPENSE)
-                }
-
-                TotalBalanceActionButton(
-                    text = "Edit",
-                    icon = Icons.Filled.Edit
-                ) {
-                    onEditBalance(state.data.balance)
-                }
-            }
-
-        }
-    }
-}
-
-@Composable
-private fun TotalBalanceActionButton(
-    text: String,
-    icon: ImageVector,
-    onAction: () -> Unit
-) {
-    Column(
-        modifier = Modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(30.dp))
-                .background(secondaryColor)
-                .clickable {
-                    onAction()
-                }
-        ) {
-            Image(
-                imageVector = icon,
-                contentDescription = text,
-                colorFilter = ColorFilter.tint(onSecondaryColor),
-                modifier = Modifier
-                    .padding(12.dp)
-                    .size(26.dp)
-            )
-        }
-
-        Text(
-            text = text,
-            color = Color.Black,
-            fontSize = 12.sp,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-        )
-    }
-}
-
 
 @Composable
 private fun WalletListContainer(

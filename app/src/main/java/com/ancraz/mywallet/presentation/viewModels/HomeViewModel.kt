@@ -43,6 +43,12 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun changePrivateMode(isPrivate: Boolean){
+        viewModelScope.launch(ioDispatcher) {
+            dataStoreManager.updatePrivateModeStatus(isPrivate)
+        }
+    }
+
     fun syncData(){
         viewModelScope.launch(ioDispatcher) {
             getAllWalletsUseCase().onEach { result ->
@@ -94,6 +100,12 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
+            }.launchIn(viewModelScope)
+
+            dataStoreManager.getPrivateModeStatus().onEach { result ->
+                _homeUiState.value = _homeUiState.value.copy(
+                    data = _homeUiState.value.data.copy(isPrivateMode = result)
+                )
             }.launchIn(viewModelScope)
 
             getAllTransactionsUseCase().onEach { result ->

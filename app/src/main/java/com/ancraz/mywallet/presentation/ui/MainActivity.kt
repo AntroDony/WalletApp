@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -120,6 +121,10 @@ private fun MainActivityScreen() {
 
                             is HomeUiEvent.ShowAllWallets -> {
                                 navController.navigate(NavigationScreen.WalletListScreen.route)
+                            }
+
+                            is HomeUiEvent.ChangePrivateMode -> {
+                                homeViewModel.changePrivateMode(event.isPrivate)
                             }
                         }
                     },
@@ -309,18 +314,22 @@ private fun MainActivityScreen() {
 
 
             composable(route = NavigationScreen.WalletInfoScreen.route + "/{walletId}"){ navBackStackEntry ->
-                val walletId = try {
-                    navBackStackEntry.arguments?.getString("walletId")?.toLong()
-                } catch (e: Exception) {
-                    debugLog("getCurrentBalance argument exception: ${e.message}")
-                    null
-                }
-                walletId?.let {
-                    walletViewModel.getWalletById(it)
-                } ?: run {
-                    debugLog("walletId is null")
-                }
+                debugLog("composable WalletInfoScreen")
 
+                LaunchedEffect(key1 = true) {
+                    val walletId = try {
+                        navBackStackEntry.arguments?.getString("walletId")?.toLong()
+                    } catch (e: Exception) {
+                        debugLog("getCurrentBalance argument exception: ${e.message}")
+                        null
+                    }
+                    debugLog("composable WalletInfoScreen")
+                    walletId?.let {
+                        walletViewModel.getWalletById(it)
+                    } ?: run {
+                        debugLog("walletId is null")
+                    }
+                }
 
                 WalletInfoScreen(
                     uiState = walletViewModel.walletUiState.value,

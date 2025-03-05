@@ -15,13 +15,13 @@ sealed class HomeUiEvent: UiEvent{
     data class ShowWalletInfo(val wallet: WalletUi): HomeUiEvent()
     data class ShowTransactionInfo(val transaction: TransactionUi): HomeUiEvent()
 
+    data class ChangePrivateMode(val isPrivate: Boolean): HomeUiEvent()
+
     data object CreateWallet: HomeUiEvent()
     data object SyncData: HomeUiEvent()
 
     data object ShowAllWallets: HomeUiEvent()
     data object ShowAllTransactions: HomeUiEvent()
-
-
 }
 
 sealed class EditBalanceUiEvent: UiEvent{

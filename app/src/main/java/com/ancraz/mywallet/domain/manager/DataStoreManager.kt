@@ -12,9 +12,13 @@ interface DataStoreManager {
 
     fun getRecentCurrency(): Flow<CurrencyCode>
 
+    fun getPrivateModeStatus(): Flow<Boolean>
+
     suspend fun editTotalBalance(newValue: Float, currencyCode: CurrencyCode)
 
     suspend fun updateRecentWalletId(id: Long)
 
     suspend fun updateRecentCurrency(currencyCode: CurrencyCode)
+
+    suspend fun updatePrivateModeStatus(isPrivate: Boolean)
 }

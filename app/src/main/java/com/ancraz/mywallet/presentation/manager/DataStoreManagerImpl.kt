@@ -3,9 +3,11 @@ package com.ancraz.mywallet.presentation.manager
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.domain.manager.DataStoreManager
+import com.ancraz.mywallet.domain.useCases.dataStore.GetPrivateModeStatusUseCase
 import com.ancraz.mywallet.domain.useCases.dataStore.GetRecentCurrencyUseCase
 import com.ancraz.mywallet.domain.useCases.dataStore.GetRecentWalletIdUseCase
 import com.ancraz.mywallet.domain.useCases.dataStore.GetTotalBalanceUseCase
+import com.ancraz.mywallet.domain.useCases.dataStore.UpdatePrivateModeUseCase
 import com.ancraz.mywallet.domain.useCases.dataStore.UpdateRecentCurrencyUseCase
 import com.ancraz.mywallet.domain.useCases.dataStore.UpdateRecentWalletIdUseCase
 import com.ancraz.mywallet.domain.useCases.dataStore.UpdateTotalBalanceUseCase
@@ -19,7 +21,9 @@ class DataStoreManagerImpl @Inject constructor(
     private val getRecentWalletIdUseCase: GetRecentWalletIdUseCase,
     private val getRecentCurrencyUseCase: GetRecentCurrencyUseCase,
     private val updateRecentWalletIdUseCase: UpdateRecentWalletIdUseCase,
-    private val updateRecentCurrencyUseCase: UpdateRecentCurrencyUseCase
+    private val updateRecentCurrencyUseCase: UpdateRecentCurrencyUseCase,
+    private val getPrivateModeStatusUseCase: GetPrivateModeStatusUseCase,
+    private val updatePrivateModeUseCase: UpdatePrivateModeUseCase
 ): DataStoreManager {
 
     override fun getTotalBalance(): Flow<DataResult<Float>> {
@@ -42,6 +46,10 @@ class DataStoreManagerImpl @Inject constructor(
         }
     }
 
+    override fun getPrivateModeStatus(): Flow<Boolean> {
+        return getPrivateModeStatusUseCase()
+    }
+
     override suspend fun editTotalBalance(newValue: Float, currencyCode: CurrencyCode) {
         updateTotalBalanceUseCase(newValue, currencyCode)
     }
@@ -52,5 +60,9 @@ class DataStoreManagerImpl @Inject constructor(
 
     override suspend fun updateRecentCurrency(currencyCode: CurrencyCode) {
         updateRecentCurrencyUseCase(currencyCode.name)
+    }
+
+    override suspend fun updatePrivateModeStatus(isPrivate: Boolean) {
+        updatePrivateModeUseCase(isPrivate)
     }
 }

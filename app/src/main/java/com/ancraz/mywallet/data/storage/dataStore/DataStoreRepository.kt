@@ -3,6 +3,7 @@ package com.ancraz.mywallet.data.storage.dataStore
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -22,7 +23,7 @@ class DataStoreRepository(
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "wallet_data_store")
 
     private val TOTAL_BALANCE_USD = floatPreferencesKey("total_balance_usd")
-
+    private val PRIVATE_MODE_STATUS = booleanPreferencesKey("private_mode_status")
     private val RECENT_WALLET_ACCOUNT_ID = longPreferencesKey("wallet_account_id")
     private val RECENT_CURRENCY_NAME = stringPreferencesKey("currency_name")
 
@@ -145,6 +146,20 @@ class DataStoreRepository(
     suspend fun setRecentCurrencyName(name: String){
         context.dataStore.edit { preferences ->
             preferences[RECENT_CURRENCY_NAME] = name
+        }
+    }
+
+
+    fun getPrivateModeStatus(): Flow<Boolean>{
+        return context.dataStore.data.map { preferences ->
+            preferences[PRIVATE_MODE_STATUS] ?: false
+        }
+    }
+
+
+    suspend fun updatePrivateModeStatus(value: Boolean){
+        context.dataStore.edit { preferences ->
+            preferences[PRIVATE_MODE_STATUS] = value
         }
     }
 }

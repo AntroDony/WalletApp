@@ -159,7 +159,6 @@ class TransactionViewModel @Inject constructor(
             transactionCategoryManager.getCategories(TransactionType.EXPENSE).onEach { result ->
                 when (result) {
                     is DataResult.Success -> {
-                        debugLog("expense categories: ${result.data}")
                         _createTransactionUiState.value = _createTransactionUiState.value.copy(
                             isLoading = false,
                             data = _createTransactionUiState.value.data.copy(
@@ -184,7 +183,6 @@ class TransactionViewModel @Inject constructor(
             transactionCategoryManager.getCategories(TransactionType.INCOME).onEach { result ->
                 when (result) {
                     is DataResult.Success -> {
-                        debugLog("income categories: ${result.data}")
                         _createTransactionUiState.value = _createTransactionUiState.value.copy(
                             isLoading = false,
                             data = _createTransactionUiState.value.data.copy(

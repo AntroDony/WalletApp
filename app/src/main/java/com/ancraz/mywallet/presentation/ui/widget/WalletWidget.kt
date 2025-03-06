@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -32,25 +33,26 @@ import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
-import androidx.glance.text.TextAlign
 import androidx.glance.text.TextDefaults
 import androidx.glance.unit.ColorProvider
 import com.ancraz.mywallet.R
+import com.ancraz.mywallet.core.utils.Constants
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.ui.MainActivity
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
-import com.ancraz.mywallet.presentation.ui.utils.Constants
+import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 object WalletWidget: GlanceAppWidget() {
 
-    private val destinationKey = ActionParameters.Key<String>(
-        Constants.START_SCREEN_KEY
-    )
+    val totalBalanceKey = floatPreferencesKey(Constants.Prefs.TOTAL_BALANCE_KEY)
+    val isPrivateModeKey = booleanPreferencesKey(Constants.Prefs.PRIVATE_MODE_KEY)
 
-    private val totalBalanceKey = floatPreferencesKey("total_balance_usd")
+    private val destinationKey = ActionParameters.Key<String>(
+        Constants.Widget.START_SCREEN_PATH_KEY
+    )
 
     override val stateDefinition: GlanceStateDefinition<*>
         get() = PreferencesGlanceStateDefinition
@@ -80,6 +82,7 @@ object WalletWidget: GlanceAppWidget() {
         val prefs = currentState<Preferences>()
 
         val totalBalance = prefs[totalBalanceKey] ?: 0f
+        val isPrivateMode = prefs[isPrivateModeKey] ?: false
 
         Box(
             modifier = GlanceModifier
@@ -100,8 +103,24 @@ object WalletWidget: GlanceAppWidget() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+//                    Text(
+//                        text = "Balance:",
+//                        maxLines = 1,
+//                        style = TextDefaults.defaultTextStyle.copy(
+//                            color = ColorProvider(onBackgroundColor),
+//                            fontSize = 16.sp,
+//                            fontWeight = FontWeight.Bold
+//                        ),
+//                        modifier = GlanceModifier
+//
+//                    )
+//
+//                    Spacer(modifier = GlanceModifier
+//                        .width(14.dp)
+//                    )
+
                     Text(
-                        text = "Balance:",
+                        text = if (isPrivateMode) "* * * *" else "\$ ${totalBalance.toFormattedString()}",
                         maxLines = 1,
                         style = TextDefaults.defaultTextStyle.copy(
                             color = ColorProvider(onBackgroundColor),
@@ -109,27 +128,12 @@ object WalletWidget: GlanceAppWidget() {
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = GlanceModifier
-
-                    )
-
-                    Spacer(modifier = GlanceModifier
-                        .width(14.dp)
-                    )
-
-                    Text(
-                        text = "\$ $totalBalance",
-                        maxLines = 1,
-                        style = TextDefaults.defaultTextStyle.copy(
-                            color = ColorProvider(onBackgroundColor),
-                            fontSize = 16.sp
-                        ),
-                        modifier = GlanceModifier
                     )
                 }
 
 
                 Spacer(modifier = GlanceModifier
-                    .height(14.dp)
+                    .height(10.dp)
                 )
 
                 Row(
@@ -138,6 +142,12 @@ object WalletWidget: GlanceAppWidget() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalAlignment = Alignment.Bottom
                 ) {
+
+                    Spacer(modifier = GlanceModifier
+                        .width(14.dp)
+                        .defaultWeight()
+                    )
+
                     CircleIconButton(
                         imageProvider = ImageProvider(R.drawable.ic_widget_add),
                         contentDescription = "Income",
@@ -149,16 +159,14 @@ object WalletWidget: GlanceAppWidget() {
                         ),
                         modifier = GlanceModifier
                             .size(34.dp),
-                        onClick = {
-                            debugLog("actionStartActivity")
-                            actionStartActivity<MainActivity>(
-                                actionParametersOf(destinationKey to Constants.INCOME_SCREEN_VALUE)
-                            )
-                        }
+                        onClick = actionStartActivity<MainActivity>(
+                            actionParametersOf(destinationKey to Constants.Widget.INCOME_SCREEN_PATH_VALUE)
+                        )
                     )
 
                     Spacer(modifier = GlanceModifier
                         .width(14.dp)
+                        .defaultWeight()
                     )
 
                     CircleIconButton(
@@ -172,12 +180,14 @@ object WalletWidget: GlanceAppWidget() {
                         ),
                         modifier = GlanceModifier
                             .size(34.dp),
-                        onClick = {
-                            debugLog("actionStartActivity")
-                            actionStartActivity<MainActivity>(
-                                actionParametersOf(destinationKey to Constants.EXPENSE_SCREEN_VALUE)
-                            )
-                        }
+                        onClick = actionStartActivity<MainActivity>(
+                            actionParametersOf(destinationKey to Constants.Widget.EXPENSE_SCREEN_PATH_VALUE)
+                        )
+                    )
+
+                    Spacer(modifier = GlanceModifier
+                        .width(14.dp)
+                        .defaultWeight()
                     )
                 }
             }

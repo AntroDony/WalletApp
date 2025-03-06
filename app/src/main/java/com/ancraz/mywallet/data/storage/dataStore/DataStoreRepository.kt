@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.ancraz.mywallet.core.models.CurrencyCode
+import com.ancraz.mywallet.core.utils.Constants
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.models.CurrencyRate
 import kotlinx.coroutines.flow.Flow
@@ -22,16 +23,16 @@ class DataStoreRepository(
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "wallet_data_store")
 
-    private val TOTAL_BALANCE_USD = floatPreferencesKey("total_balance_usd")
-    private val PRIVATE_MODE_STATUS = booleanPreferencesKey("private_mode_status")
-    private val RECENT_WALLET_ACCOUNT_ID = longPreferencesKey("wallet_account_id")
-    private val RECENT_CURRENCY_NAME = stringPreferencesKey("currency_name")
+    private val TOTAL_BALANCE_USD = floatPreferencesKey(Constants.Prefs.TOTAL_BALANCE_KEY)
+    private val PRIVATE_MODE_STATUS = booleanPreferencesKey(Constants.Prefs.PRIVATE_MODE_KEY)
+    private val RECENT_WALLET_ACCOUNT_ID = longPreferencesKey(Constants.Prefs.RECENT_WALLET_KEY)
+    private val RECENT_CURRENCY_NAME = stringPreferencesKey(Constants.Prefs.RECENT_CURRENCY_KEY)
 
-    private val CURRENCY_UPDATE_TIME = longPreferencesKey("currency_update_time")
-    private val EURO_RATE_TO_USD = floatPreferencesKey("euro_rate_to_usd")
-    private val RUB_RATE_TO_USD = floatPreferencesKey("rub_rate_to_usd")
-    private val GEL_RATE_TO_USD = floatPreferencesKey("gel_rate_to_usd")
-    private val KZT_RATE_TO_USD = floatPreferencesKey("kzt_rate_to_usd")
+    private val CURRENCY_UPDATE_TIME = longPreferencesKey(Constants.Prefs.CURRENCY_UPDATE_TIME_KEY)
+    private val EURO_RATE_TO_USD = floatPreferencesKey(Constants.Prefs.EURO_RATE_KEY)
+    private val RUB_RATE_TO_USD = floatPreferencesKey(Constants.Prefs.RUB_RATE_KEY)
+    private val GEL_RATE_TO_USD = floatPreferencesKey(Constants.Prefs.GEL_RATE_KEY)
+    private val KZT_RATE_TO_USD = floatPreferencesKey(Constants.Prefs.KZT_RATE_KEY)
 
 
     fun totalBalanceInUsdFlow(): Flow<Float> {

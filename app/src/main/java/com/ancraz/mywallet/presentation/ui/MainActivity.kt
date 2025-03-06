@@ -1,5 +1,7 @@
 package com.ancraz.mywallet.presentation.ui
 
+import android.appwidget.AppWidgetManager
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,10 +14,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.core.utils.Constants
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.navigation.NavigationScreen
 import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
@@ -37,28 +41,22 @@ import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.T
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListScreen
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
-import com.ancraz.mywallet.presentation.ui.utils.Constants
 import com.ancraz.mywallet.presentation.viewModels.HomeViewModel
 import com.ancraz.mywallet.presentation.viewModels.TransactionViewModel
 import com.ancraz.mywallet.presentation.viewModels.WalletViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val startDestinationValue = intent.extras?.getString(Constants.START_SCREEN_KEY)
+        setWidgetId(intent)
 
-        val startScreenRoute = startDestinationValue?.let { key ->
-            when (key){
-                Constants.INCOME_SCREEN_VALUE -> NavigationScreen.TransactionInfoScreen.route + "/${TransactionType.INCOME.name}"
-                Constants.EXPENSE_SCREEN_VALUE -> NavigationScreen.TransactionInfoScreen.route + "/${TransactionType.EXPENSE.name}"
-                else -> NavigationScreen.HomeScreen.route
-            }
-        } ?: NavigationScreen.HomeScreen.route
-
-        debugLog("mainActivity onCreate: $startScreenRoute")
+        val startDestinationValue = intent.extras?.getString(Constants.Widget.START_SCREEN_PATH_KEY)
+        val startScreenRoute = getStartScreenRoute(startDestinationValue)
 
         enableEdgeToEdge()
         setContent {
@@ -67,6 +65,28 @@ class MainActivity : ComponentActivity() {
 
             }
         }
+    }
+
+
+    private fun setWidgetId(intent: Intent) {
+        val widgetId = intent.extras?.getInt(
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID
+        ) ?: return
+
+        lifecycleScope.launch {
+
+        }
+    }
+
+    private fun getStartScreenRoute(intentValue: String?): String{
+        return intentValue?.let { key ->
+            when (key){
+                Constants.Widget.INCOME_SCREEN_PATH_VALUE -> NavigationScreen.TransactionInputScreen.route + "/${TransactionType.INCOME.name}"
+                Constants.Widget.EXPENSE_SCREEN_PATH_VALUE -> NavigationScreen.TransactionInputScreen.route + "/${TransactionType.EXPENSE.name}"
+                else -> NavigationScreen.HomeScreen.route
+            }
+        } ?: NavigationScreen.HomeScreen.route
     }
 }
 

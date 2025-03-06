@@ -37,6 +37,7 @@ import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.T
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListScreen
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
+import com.ancraz.mywallet.presentation.ui.utils.Constants
 import com.ancraz.mywallet.presentation.viewModels.HomeViewModel
 import com.ancraz.mywallet.presentation.viewModels.TransactionViewModel
 import com.ancraz.mywallet.presentation.viewModels.WalletViewModel
@@ -46,10 +47,23 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val startDestinationValue = intent.extras?.getString(Constants.START_SCREEN_KEY)
+
+        val startScreenRoute = startDestinationValue?.let { key ->
+            when (key){
+                Constants.INCOME_SCREEN_VALUE -> NavigationScreen.TransactionInfoScreen.route + "/${TransactionType.INCOME.name}"
+                Constants.EXPENSE_SCREEN_VALUE -> NavigationScreen.TransactionInfoScreen.route + "/${TransactionType.EXPENSE.name}"
+                else -> NavigationScreen.HomeScreen.route
+            }
+        } ?: NavigationScreen.HomeScreen.route
+
+        debugLog("mainActivity onCreate: $startScreenRoute")
+
         enableEdgeToEdge()
         setContent {
             MyWalletTheme {
-                MainActivityScreen()
+                MainActivityScreen(startScreenRoute)
 
             }
         }
@@ -58,7 +72,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-private fun MainActivityScreen() {
+private fun MainActivityScreen(startDestinationRoute: String) {
     val navController = rememberNavController()
 
     val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
@@ -71,7 +85,7 @@ private fun MainActivityScreen() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = NavigationScreen.HomeScreen.route
+            startDestination = startDestinationRoute
         ) {
             composable(
                 route = NavigationScreen.HomeScreen.route
@@ -364,6 +378,6 @@ private fun MainActivityScreen() {
 @Composable
 private fun MainActivityScreenPreview() {
     MyWalletTheme {
-        MainActivityScreen()
+        MainActivityScreen(NavigationScreen.HomeScreen.route)
     }
 }

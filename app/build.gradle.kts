@@ -50,7 +50,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
     packaging {
         resources {
@@ -109,4 +109,8 @@ dependencies {
     //Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
+
+    //Glance
+    implementation(libs.glance.widget)
+    implementation(libs.glance.material3)
 }

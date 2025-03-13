@@ -3,4 +3,89 @@
 
 <!--  Widget  -->
     <string name="widget_description">Wallet widget for quick access to write transactions.</string>
+
+<!--  Home Screen  -->
+    <string name="home_screen_title">Wallet</string>
+    <string name="home_wallet_list_title">Wallets</string>
+    <string name="home_transaction_list_title">Transactions</string>
+    <string name="home_empty_transaction_list_placeholder">"No transactions</string>
+    <string name="home_all_button">Wallets</string>
+
+    <string name="home_total_balance_card_title">Total balance</string>
+    <string name="home_card_private_mode_balance">* * * *</string>
+    <string name="home_card_income_button">Income</string>
+    <string name="home_card_expense_button">Expense</string>
+    <string name="home_card_edit_button">Edit</string>
+
+
+<!--  Edit Balance Screen  -->
+    <string name="edit_balance_screen_title">Edit Balance</string>
+    <string name="edit_balance_total_balance_title">Total Balance</string>
+    <string name="edit_balance_update_button">Update</string>
+
+<!-- Transaction Screen  -->
+    <string name="create_transaction_select_category_button">Select category</string>
+    <string name="create_transaction_currency_rate_base_text">1 USD =</string>
+    <string name="create_transaction_description_placeholder">Description</string>
+    <string name="create_transaction_select_currency_account_dialog_title">Select currency account</string>
+    <string name="edit_transaction_cancel_button">Cancel</string>
+    <string name="edit_transaction_save_button">Save</string>
+    <string name="edit_transaction_no_wallet_title">No wallet</string>
+
+    <string name="transaction_info_screen_title">Transaction Info</string>
+    <string name="transaction_info_error_title">Error...This transaction is not found</string>
+    <string name="transaction_info_type_title">Transaction type:</string>
+    <string name="transaction_info_value_title">Value:</string>
+    <string name="transaction_info_time_title">Time:</string>
+    <string name="transaction_info_description_title">Description:</string>
+    <string name="transaction_info_category_title">Category:</string>
+    <string name="transaction_info_wallet_title">Wallet:</string>
+    <string name="transaction_info_delete_button">Delete</string>
+
+    <string name="transaction_list_screen_title">Transactions</string>
+    <string name="transaction_list_empty_list_title">You have not any transactions yet</string>
+
+
+<!--  Wallet Screen  -->
+    <string name="wallet_list_screen_title">Wallets</string>
+    <string name="empty_wallet_list_text">You have not any wallets yet</string>
+
+    <string name="wallet_card_balance_title">Balance:</string>
+    <string name="wallet_balance_title">Balance</string>
+    <string name="wallet_card_currencies_title">Currencies:</string>
+
+    <string name="edit_wallet_screen_title">Edit Wallet</string>
+    <string name="create_wallet_screen_title">New Wallet</string>
+
+    <string name="wallet_name_title">Name</string>
+    <string name="wallet_name_placeholder_title">Wallet name</string>
+    <string name="wallet_description_title">Description</string>
+    <string name="wallet_description_placeholder_title">Wallet description</string>
+    <string name="wallet_type_title">Type</string>
+    <string name="wallet_currency_accounts_title">Currency Accounts</string>
+
+    <string name="update_wallet_button">Update Wallet</string>
+    <string name="create_wallet_button">Add Wallet</string>
+
+    <string name="add_wallet_account_button">Add Account</string>
+    <string name="edit_wallet_account_value_title">Edit value</string>
+    <string name="select_wallet_account_currency_title">Edit value</string>
+    <string name="edit_wallet_cancel_button">Cancel</string>
+    <string name="edit_wallet_save_button">Save</string>
+
+
+    <string name="wallet_info_screen_title">Wallet Info</string>
+    <string name="wallet_info_not_found_error_title">Error...This wallet is not found</string>
+    <string name="wallet_info_name_title">Wallet name:</string>
+    <string name="wallet_info_type_title">Wallet type:</string>
+    <string name="wallet_info_description_title">Description:</string>
+    <string name="wallet_info_total_balance_title">Total balance:</string>
+    <string name="wallet_info_currencies_title">Wallet currencies:</string>
+
+    <string name="wallet_delete_button">Delete</string>
+    <string name="wallet_edit_button">Edit</string>
+
+
+
+
 </resources>

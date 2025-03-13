@@ -28,10 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.models.WalletType
@@ -70,7 +72,7 @@ fun HomeScreen(
                 .padding(horizontal = 14.dp)
         ) {
             Text(
-                text = "My Wallet",
+                text = stringResource(R.string.home_screen_title),
                 color = onSurfaceColor,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -134,7 +136,7 @@ private fun WalletListContainer(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Wallets",
+                text = stringResource(R.string.home_wallet_list_title),
                 fontSize = 16.sp,
                 color = onBackgroundColor
             )
@@ -147,7 +149,7 @@ private fun WalletListContainer(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "All",
+                    text = stringResource(R.string.home_all_button),
                     fontSize = 16.sp,
                     color = onBackgroundColor
                 )
@@ -211,7 +213,7 @@ private fun TransactionListContainer(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Transactions",
+                text = stringResource(R.string.home_transaction_list_title),
                 fontSize = 16.sp,
                 color = onBackgroundColor
             )
@@ -224,7 +226,7 @@ private fun TransactionListContainer(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "All",
+                    text = stringResource(R.string.home_all_button),
                     fontSize = 16.sp,
                     color = onBackgroundColor
                 )
@@ -262,7 +264,7 @@ private fun TransactionListContainer(
                             .size(100.dp)
                     )
                     Text(
-                        text = "No transactions",
+                        text = stringResource(R.string.home_empty_transaction_list_placeholder),
                         color = onSurfaceColor,
                         fontSize = 16.sp,
                         modifier = Modifier

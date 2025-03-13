@@ -17,11 +17,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.models.WalletType
@@ -60,7 +62,7 @@ fun TransactionInfoScreen(
         HorizontalSpacer()
 
         NavigationToolbar(
-            title = "Transaction Info",
+            title = stringResource(R.string.transaction_info_screen_title),
             onClickBack = {
                 onEvent(UiEvent.GoBack)
             }
@@ -96,7 +98,7 @@ fun TransactionInfoScreen(
                     HorizontalSpacer()
 
                     Text(
-                        text = "Error...This transaction is not found",
+                        text = stringResource(R.string.transaction_info_error_title),
                         color = onBackgroundColor,
                         fontSize = 18.sp,
                         textAlign = TextAlign.Center
@@ -108,7 +110,7 @@ fun TransactionInfoScreen(
         } else {
 
             InfoRow(
-                title = "Transaction type:",
+                title = stringResource(R.string.transaction_info_type_title),
                 info = uiState.transaction.type.name
             )
 
@@ -122,7 +124,7 @@ fun TransactionInfoScreen(
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    text = "Value:",
+                    text = stringResource(R.string.transaction_info_value_title),
                     color = primaryColor,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -138,7 +140,7 @@ fun TransactionInfoScreen(
             HorizontalSpacer()
 
             InfoRow(
-                title = "Time:",
+                title = stringResource(R.string.transaction_info_time_title),
                 info = uiState.transaction.time.timeToString()
             )
 
@@ -146,7 +148,7 @@ fun TransactionInfoScreen(
 
             uiState.transaction.description?.let { desc ->
                 InfoRow(
-                    title = "Description:",
+                    title = stringResource(R.string.transaction_info_description_title),
                     info = desc
                 )
 
@@ -156,7 +158,7 @@ fun TransactionInfoScreen(
 
             uiState.transaction.category?.let { category ->
                 InfoRow(
-                    title = "Category:",
+                    title = stringResource(R.string.transaction_info_category_title),
                     info = category.name
                 )
 
@@ -165,7 +167,7 @@ fun TransactionInfoScreen(
 
             uiState.transaction.wallet?.let { wallet ->
                 InfoRow(
-                    title = "Wallet:",
+                    title = stringResource(R.string.transaction_info_wallet_title),
                     info = wallet.name
                 )
 
@@ -185,7 +187,7 @@ fun TransactionInfoScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     ActionButton(
-                        title = "Delete",
+                        title = stringResource(R.string.transaction_info_delete_button),
                         containerColor = errorColor,
                         contentColor = onBackgroundColor,
                         modifier = Modifier

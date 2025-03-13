@@ -23,20 +23,26 @@ class CurrencyRateDataSource(
         desiredCurrenciesString: String,
         baseCurrencyCode: String
     ): Result<CurrencyData, NetworkError> {
-        val response = httpClient.get(
-            constructUrl("/rates/latest")
-        ){
-            parameter("apikey", apiKey)
-            parameter("base", baseCurrencyCode)
-            parameter("symbols", desiredCurrenciesString)
+        try {
+            val response = httpClient.get(
+                constructUrl("/rates/latest")
+            ){
+                parameter("apikey", apiKey)
+                parameter("base", baseCurrencyCode)
+                parameter("symbols", desiredCurrenciesString)
+            }
+
+            debugLog("CurrencyApiResponse: ${response.body<String>()}")
+
+            return safeCall<String> {
+                response
+            }.map { responseStr ->
+                responseStr.toCurrencyData()
+            }
+        } catch (e: Exception){
+            debugLog("getDesiredCurrenciesRate exception: ${e.message}")
+            return Result.Error(error = NetworkError.UNKNOWN)
         }
 
-        debugLog("CurrencyApiResponse: ${response.body<String>()}")
-
-        return safeCall<String> {
-            response
-        }.map { responseStr ->
-            responseStr.toCurrencyData()
-        }
     }
 }

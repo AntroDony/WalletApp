@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -62,9 +63,9 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.ActionButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
@@ -117,7 +118,7 @@ fun CreateWalletScreen(
         HorizontalSpacer()
 
         NavigationToolbar(
-            title = if (isWalletEdit.value) "Edit Wallet" else "New Wallet",
+            title = if (isWalletEdit.value) stringResource(R.string.edit_wallet_screen_title) else stringResource(R.string.create_wallet_screen_title),
             onClickBack = {
                 onEvent(UiEvent.GoBack)
             }
@@ -126,35 +127,35 @@ fun CreateWalletScreen(
         HorizontalSpacer(height = 20.dp)
 
         TitleText(
-            text = "Name"
+            text = stringResource(R.string.wallet_name_title)
         )
 
         HorizontalSpacer()
 
         InputTextField(
             textState = nameState,
-            placeholderText = "Wallet name",
+            placeholderText = stringResource(R.string.wallet_name_placeholder_title),
             maxLines = 1
         )
 
         HorizontalSpacer()
 
         TitleText(
-            text = "Description"
+            text = stringResource(R.string.wallet_description_title)
         )
 
         HorizontalSpacer()
 
         InputTextField(
             textState = descriptionState,
-            placeholderText = "Wallet description",
+            placeholderText = stringResource(R.string.wallet_description_placeholder_title),
             maxLines = 3
         )
 
         HorizontalSpacer()
 
         TitleText(
-            text = "Type"
+            text = stringResource(R.string.wallet_type_title)
         )
 
         HorizontalSpacer()
@@ -167,7 +168,7 @@ fun CreateWalletScreen(
         HorizontalSpacer()
 
         TitleText(
-            text = "Currency Accounts"
+            text = stringResource(R.string.wallet_currency_accounts_title)
         )
 
         CurrencyAccountList(
@@ -179,7 +180,11 @@ fun CreateWalletScreen(
         HorizontalSpacer()
 
         ActionButton (
-            title = if (isWalletEdit.value) "Update Wallet" else "Add Wallet",
+            title = if (isWalletEdit.value) {
+                stringResource(R.string.update_wallet_button)
+            } else {
+                stringResource(R.string.create_wallet_button)
+            },
             onClick = {
                 val wallet = buildWalletObject(
                     id = uiState.wallet?.id,
@@ -194,7 +199,6 @@ fun CreateWalletScreen(
 
                 wallet?.let {
                     if (isWalletEdit.value){
-                        debugLog("wallet: $it")
                         onEvent(CreateWalletUiEvent.UpdateWallet(it))
                     } else {
                         onEvent(CreateWalletUiEvent.AddWallet(it))
@@ -528,7 +532,7 @@ private fun AddAccountButton(
             VerticalSpacer()
 
             Text(
-                text = "Add Account",
+                text = stringResource(R.string.add_wallet_account_button),
                 color = onSecondaryColor,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
@@ -583,7 +587,7 @@ private fun EditAccountValueDialog(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Edit value",
+                    text = stringResource(R.string.edit_wallet_account_value_title),
                     color = onBackgroundColor,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -619,7 +623,7 @@ private fun EditAccountValueDialog(
                         onClick = { onCancel() },
                     ) {
                         Text(
-                            text = "Cancel",
+                            text = stringResource(R.string.edit_wallet_cancel_button),
                             color = onBackgroundColor,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
@@ -632,7 +636,7 @@ private fun EditAccountValueDialog(
                         }
                     ) {
                         Text(
-                            text = "Save",
+                            text = stringResource(R.string.edit_wallet_save_button),
                             color = onBackgroundColor,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
@@ -675,7 +679,7 @@ private fun SelectNewAccountCurrencyDialog(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Edit value",
+                    text = stringResource(R.string.select_wallet_account_currency_title),
                     color = onBackgroundColor,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -718,7 +722,7 @@ private fun SelectNewAccountCurrencyDialog(
                         onClick = { onCancel() },
                     ) {
                         Text(
-                            text = "Cancel",
+                            text = stringResource(R.string.edit_wallet_cancel_button),
                             color = onBackgroundColor,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
@@ -731,7 +735,7 @@ private fun SelectNewAccountCurrencyDialog(
                         }
                     ) {
                         Text(
-                            text = "Save",
+                            text = stringResource(R.string.edit_wallet_save_button),
                             color = onBackgroundColor,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold

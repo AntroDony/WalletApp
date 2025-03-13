@@ -9,7 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.ancraz.mywallet.R
 import com.ancraz.mywallet.presentation.ui.components.ActionButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
@@ -40,7 +42,7 @@ fun EditBalanceScreen(
         HorizontalSpacer()
 
         NavigationToolbar(
-            title = "Edit Balance",
+            title = stringResource(R.string.edit_balance_screen_title),
             onClickBack = {
                 onEvent(UiEvent.GoBack)
             }
@@ -51,7 +53,7 @@ fun EditBalanceScreen(
         TransactionConfigContainer(
             valueState = valueState,
             currencyState = currencyState,
-            title = "Total Balance",
+            title = stringResource(R.string.edit_balance_total_balance_title),
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.CenterHorizontally)
@@ -67,7 +69,7 @@ fun EditBalanceScreen(
         HorizontalSpacer()
 
         ActionButton(
-            title = "Update",
+            title = stringResource(R.string.edit_balance_update_button),
             onClick = {
                 val newBalanceValue = valueState.value.toFloatValue()
                 onEvent(EditBalanceUiEvent.UpdateBalanceValue(newBalanceValue))

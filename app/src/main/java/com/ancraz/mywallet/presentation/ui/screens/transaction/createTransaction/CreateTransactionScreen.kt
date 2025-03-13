@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.models.WalletType
@@ -168,10 +170,13 @@ fun CreateTransactionScreen(
                     }
             ) {
                 Text(
-                    text = getSelectedWalletInfoString(
-                        selectedWalletState.value,
-                        selectedWalletCurrencyAccount.value
-                    ).uppercase(),
+                    text = (
+                            getSelectedWalletInfoString(
+                                selectedWalletState.value,
+                                selectedWalletCurrencyAccount.value
+                            )
+                                ?: stringResource(R.string.edit_transaction_no_wallet_title)
+                            ).uppercase(),
                     color = primaryColor,
                     fontSize = 18.sp,
                     modifier = Modifier
@@ -210,7 +215,7 @@ fun CreateTransactionScreen(
                     HorizontalSpacer()
 
                     ActionButton(
-                        title = "Select category",
+                        title = stringResource(R.string.create_transaction_select_category_button),
                         onClick = {
                             isCategoryListOpen.value = true
                         }
@@ -237,8 +242,6 @@ fun CreateTransactionScreen(
                             wallet = selectedWalletState.value,
                             selectedAccount = selectedWalletCurrencyAccount.value,
                             onSuccess = { transactionObject ->
-                                debugLog("Transaction: $transactionObject")
-
                                 onEvent(
                                     CreateTransactionUiEvent.AddTransaction(transactionObject)
                                 )
@@ -288,7 +291,7 @@ private fun RateInfoText(
     rates: List<CurrencyRateUi>,
     modifier: Modifier = Modifier
 ) {
-    val baseText = "1 USD = "
+    val baseText = stringResource(R.string.create_transaction_currency_rate_base_text)
     val currentRateIndex = rates.map { rate -> rate.currencyCode }.indexOf(currentCurrencyState)
     val rateText = "${rates[currentRateIndex].rate} ${currentCurrencyState.name}"
     Box(
@@ -298,7 +301,7 @@ private fun RateInfoText(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = baseText + rateText,
+            text = "$baseText $rateText",
             textAlign = TextAlign.Center,
             fontSize = 18.sp,
             color = onSurfaceColor,
@@ -324,7 +327,7 @@ private fun TransactionDescriptionTextField(
         textStyle = textStyle,
         placeholder = {
             Text(
-                text = "Description",
+                text = stringResource(R.string.create_transaction_description_placeholder),
                 fontSize = 16.sp
             )
         },
@@ -379,7 +382,7 @@ private fun SelectWalletAccountDialog(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Select currency account",
+                    text = stringResource(R.string.create_transaction_select_currency_account_dialog_title),
                     color = onBackgroundColor,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -428,7 +431,7 @@ private fun SelectWalletAccountDialog(
                         onClick = { onCancel() },
                     ) {
                         Text(
-                            text = "Cancel",
+                            text = stringResource(R.string.edit_transaction_cancel_button),
                             color = onBackgroundColor,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
@@ -441,7 +444,7 @@ private fun SelectWalletAccountDialog(
                         }
                     ) {
                         Text(
-                            text = "Save",
+                            text = stringResource(R.string.edit_transaction_save_button),
                             color = onBackgroundColor,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
@@ -666,9 +669,9 @@ private fun buildTransactionObject(
 private fun getSelectedWalletInfoString(
     wallet: WalletUi?,
     selectedAccount: WalletUi.CurrencyAccountUi?
-): String {
+): String? {
     if (wallet == null)
-        return "No wallet"
+        return null
 
     val currencyText = selectedAccount?.currency?.let {
         "(${it.name})"

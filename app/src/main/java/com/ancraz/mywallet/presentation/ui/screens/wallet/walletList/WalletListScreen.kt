@@ -22,10 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
@@ -61,7 +63,7 @@ fun WalletListScreen(
         HorizontalSpacer()
 
         NavigationToolbar(
-            title = "Wallets",
+            title = stringResource(R.string.wallet_list_screen_title),
             onClickBack = {
                 onEvent(UiEvent.GoBack)
             }
@@ -92,7 +94,7 @@ fun WalletListScreen(
                 HorizontalSpacer()
 
                 Text(
-                    text = "You have not any wallets yet",
+                    text = stringResource(R.string.empty_wallet_list_text),
                     color = onBackgroundColor,
                     fontSize = 18.sp
                 )
@@ -195,7 +197,7 @@ private fun WalletCard(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Balance:",
+                    text = stringResource(R.string.wallet_card_balance_title),
                     color = onBackgroundColor.copy(alpha = 0.7f),
                     fontSize = 16.sp
                 )
@@ -217,7 +219,7 @@ private fun WalletCard(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Currencies:",
+                    text = stringResource(R.string.wallet_card_currencies_title),
                     color = onBackgroundColor.copy(alpha = 0.7f),
                     fontSize = 16.sp
                 )

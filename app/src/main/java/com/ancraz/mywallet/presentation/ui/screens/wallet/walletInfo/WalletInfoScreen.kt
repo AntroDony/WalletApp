@@ -12,22 +12,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachMoney
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
@@ -66,7 +63,7 @@ fun WalletInfoScreen(
         HorizontalSpacer()
 
         NavigationToolbar(
-            title = "Wallet Info",
+            title = stringResource(R.string.wallet_info_screen_title),
             onClickBack = {
                 onEvent(UiEvent.GoBack)
             }
@@ -102,7 +99,7 @@ fun WalletInfoScreen(
                     HorizontalSpacer()
 
                     Text(
-                        text = "Error...This wallet is not found",
+                        text = stringResource(R.string.wallet_info_not_found_error_title),
                         color = onBackgroundColor,
                         fontSize = 18.sp,
                         textAlign = TextAlign.Center
@@ -113,14 +110,14 @@ fun WalletInfoScreen(
 
         } else {
             InfoRow(
-                title = "Wallet name:",
+                title = stringResource(R.string.wallet_info_name_title),
                 info = uiState.wallet.name
             )
 
             HorizontalSpacer()
 
             InfoRow(
-                title = "Wallet type:",
+                title = stringResource(R.string.wallet_info_type_title),
                 info = uiState.wallet.walletType.walletName
             )
 
@@ -128,7 +125,7 @@ fun WalletInfoScreen(
 
             uiState.wallet.description?.let {
                 InfoRow(
-                    title = "Description:",
+                    title = stringResource(R.string.wallet_info_description_title),
                     info = uiState.wallet.description
                 )
 
@@ -136,14 +133,14 @@ fun WalletInfoScreen(
             }
 
             InfoRow(
-                title = "Total balance:",
+                title = stringResource(R.string.wallet_info_total_balance_title),
                 info = "${uiState.wallet.totalBalance.toFormattedString()} USD"
             )
 
             HorizontalSpacer()
 
             InfoRow(
-                title = "Wallet currencies:",
+                title = stringResource(R.string.wallet_info_currencies_title),
                 info = uiState.wallet.getWalletCurrenciesString()
             )
 
@@ -178,7 +175,7 @@ fun WalletInfoScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     ActionButton(
-                        title = "Delete",
+                        title = stringResource(R.string.wallet_delete_button),
                         containerColor = errorColor,
                         contentColor = onBackgroundColor,
                         modifier = Modifier
@@ -191,7 +188,7 @@ fun WalletInfoScreen(
                     VerticalSpacer()
 
                     ActionButton(
-                        title = "Edit",
+                        title = stringResource(R.string.wallet_edit_button),
                         containerColor = primaryColor,
                         contentColor = onPrimaryColor,
                         modifier = Modifier

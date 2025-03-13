@@ -30,13 +30,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeUiState
@@ -73,7 +74,7 @@ fun TotalBalanceCard(
                     .align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = "Total balance",
+                    text = stringResource(R.string.home_total_balance_card_title),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = onPrimaryColor,
@@ -107,7 +108,7 @@ fun TotalBalanceCard(
                 )
             } else {
                 Text(
-                    text = if (isPrivateMode) "* * * *" else "\$ ${state.data.balance.toFormattedString()}",
+                    text = if (isPrivateMode) stringResource(R.string.home_card_private_mode_balance) else "\$ ${state.data.balance.toFormattedString()}",
                     color = Color.Black,
                     fontSize = 40.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -123,21 +124,21 @@ fun TotalBalanceCard(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 TotalBalanceActionButton(
-                    text = "Income",
+                    text = stringResource(R.string.home_card_income_button),
                     icon = Icons.Filled.Add
                 ) {
                     onEvent(HomeUiEvent.CreateTransaction(TransactionType.INCOME))
                 }
 
                 TotalBalanceActionButton(
-                    text = "Expense",
+                    text = stringResource(R.string.home_card_expense_button),
                     icon = Icons.Filled.Remove
                 ) {
                     onEvent(HomeUiEvent.CreateTransaction(TransactionType.EXPENSE))
                 }
 
                 TotalBalanceActionButton(
-                    text = "Edit",
+                    text = stringResource(R.string.home_card_edit_button),
                     icon = Icons.Filled.Edit
                 ) {
                     onEvent(HomeUiEvent.EditTotalBalance(state.data.balance))

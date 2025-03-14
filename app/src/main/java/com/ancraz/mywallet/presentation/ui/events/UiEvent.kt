@@ -1,6 +1,7 @@
 package com.ancraz.mywallet.presentation.ui.events
 
 import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.presentation.models.AnalyticsPeriod
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 
@@ -22,6 +23,7 @@ sealed class HomeUiEvent: UiEvent{
 
     data object ShowAllWallets: HomeUiEvent()
     data object ShowAllTransactions: HomeUiEvent()
+    data object ShowAnalytics: HomeUiEvent()
 }
 
 sealed class EditBalanceUiEvent: UiEvent{
@@ -40,6 +42,7 @@ sealed class CreateTransactionUiEvent: UiEvent{
 
 sealed class TransactionListUiEvent: UiEvent {
     data class ShowTransactionInfo(val transaction: TransactionUi): TransactionListUiEvent()
+    data class GetTransactionsByType(val transactionType: TransactionType?): TransactionListUiEvent()
 }
 
 sealed class TransactionInfoUiEvent: UiEvent {
@@ -54,5 +57,12 @@ sealed class WalletListUiEvent: UiEvent{
 sealed class WalletInfoUiEvent: UiEvent {
     data class EditWallet(val wallet: WalletUi): WalletInfoUiEvent()
     data class DeleteWallet(val wallet: WalletUi): WalletInfoUiEvent()
+}
+
+sealed class AnalyticsUiEvent: UiEvent{
+    data class GetAnalyticsByPeriod(val period: AnalyticsPeriod): AnalyticsUiEvent()
+    data class GetTransactionsByType(val transactionType: TransactionType?): AnalyticsUiEvent()
+    data class ShowTransactionInfo(val transaction: TransactionUi): AnalyticsUiEvent()
+
 }
 

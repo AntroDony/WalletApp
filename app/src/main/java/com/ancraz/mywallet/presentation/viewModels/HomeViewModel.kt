@@ -88,10 +88,6 @@ class HomeViewModel @Inject constructor(
     private fun fetchData() {
         viewModelScope.launch(ioDispatcher) {
 
-//            getCurrencyRatesUseCase().onEach{ result ->
-//                debugLog("GetCurrencyRateResult: ${result.data} | ${result.errorMessage}")
-//            }.launchIn(viewModelScope)
-
             dataStoreManager.getPrivateModeStatus().onEach { result ->
                 _homeUiState.value = _homeUiState.value.copy(
                     data = _homeUiState.value.data.copy(isPrivateMode = result)

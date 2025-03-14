@@ -8,7 +8,7 @@
     <string name="home_screen_title">Wallet</string>
     <string name="home_wallet_list_title">Wallets</string>
     <string name="home_transaction_list_title">Transactions</string>
-    <string name="home_empty_transaction_list_placeholder">"No transactions</string>
+    <string name="home_empty_transaction_list_placeholder">No transactions</string>
     <string name="home_all_button">All</string>
 
     <string name="home_total_balance_card_title">Total balance</string>
@@ -16,6 +16,7 @@
     <string name="home_card_income_button">Income</string>
     <string name="home_card_expense_button">Expense</string>
     <string name="home_card_edit_button">Edit</string>
+    <string name="home_card_analytics_button">Analytics</string>
 
 
 <!--  Edit Balance Screen  -->
@@ -86,6 +87,13 @@
     <string name="wallet_edit_button">Edit</string>
 
 
+<!--  Analytics Screen -->
+    <string name="analytics_screen_title">Analytics</string>
+    <string name="analytics_total_balance_title">Total balance</string>
+    <string name="analytics_income_title">Income</string>
+    <string name="analytics_expense_title">Expense</string>
+    <string name="analytics_transaction_title">Transactions</string>
+    <string name="analytics_empty_transaction_list_placeholder">No transactions</string>
 
 
 </resources>

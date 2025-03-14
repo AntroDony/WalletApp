@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.Visibility
@@ -109,7 +111,7 @@ fun TotalBalanceCard(
             } else {
                 Text(
                     text = if (isPrivateMode) stringResource(R.string.home_card_private_mode_balance) else "\$ ${state.data.balance.toFormattedString()}",
-                    color = Color.Black,
+                    color = onPrimaryColor,
                     fontSize = 40.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
@@ -142,6 +144,13 @@ fun TotalBalanceCard(
                     icon = Icons.Filled.Edit
                 ) {
                     onEvent(HomeUiEvent.EditTotalBalance(state.data.balance))
+                }
+
+                TotalBalanceActionButton(
+                    text = stringResource(R.string.home_card_analytics_button),
+                    icon = Icons.AutoMirrored.Outlined.TrendingUp
+                ) {
+                    onEvent(HomeUiEvent.ShowAnalytics)
                 }
             }
 

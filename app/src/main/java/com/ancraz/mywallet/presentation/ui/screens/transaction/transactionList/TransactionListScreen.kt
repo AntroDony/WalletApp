@@ -3,7 +3,6 @@ package com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,6 +28,7 @@ import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.LoadingIndicator
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.TransactionCard
+import com.ancraz.mywallet.presentation.ui.components.TransactionTypeSelector
 import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
@@ -56,6 +56,14 @@ fun TransactionListScreen(
             title = stringResource(R.string.transaction_list_screen_title),
             onClickBack = {
                 onEvent(UiEvent.GoBack)
+            }
+        )
+
+        HorizontalSpacer(height = 30.dp)
+
+        TransactionTypeSelector(
+            onTypeSelected = { type ->
+                onEvent(TransactionListUiEvent.GetTransactionsByType(type))
             }
         )
 

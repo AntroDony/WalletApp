@@ -1,7 +1,5 @@
 package com.ancraz.mywallet.presentation.ui
 
-import android.appwidget.AppWidgetManager
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,7 +12,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -22,6 +19,7 @@ import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.utils.Constants
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.navigation.NavigationScreen
+import com.ancraz.mywallet.presentation.ui.events.AnalyticsUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
 import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
@@ -31,6 +29,7 @@ import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
+import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet.CreateWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceUiState
@@ -41,19 +40,17 @@ import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.T
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListScreen
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
+import com.ancraz.mywallet.presentation.viewModels.AnalyticsViewModel
 import com.ancraz.mywallet.presentation.viewModels.HomeViewModel
 import com.ancraz.mywallet.presentation.viewModels.TransactionViewModel
 import com.ancraz.mywallet.presentation.viewModels.WalletViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setWidgetId(intent)
 
         val startDestinationValue = intent.extras?.getString(Constants.Widget.START_SCREEN_PATH_KEY)
         val startScreenRoute = getStartScreenRoute(startDestinationValue)
@@ -67,17 +64,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-    private fun setWidgetId(intent: Intent) {
-        val widgetId = intent.extras?.getInt(
-            AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
-        ) ?: return
-
-        lifecycleScope.launch {
-
-        }
-    }
 
     private fun getStartScreenRoute(intentValue: String?): String{
         return intentValue?.let { key ->
@@ -155,6 +141,10 @@ private fun MainActivityScreen(startDestinationRoute: String) {
 
                             is HomeUiEvent.ShowAllWallets -> {
                                 navController.navigate(NavigationScreen.WalletListScreen.route)
+                            }
+
+                            is HomeUiEvent.ShowAnalytics -> {
+                                navController.navigate(NavigationScreen.AnalyticsScreen.route)
                             }
 
                             is HomeUiEvent.ChangePrivateMode -> {
@@ -378,6 +368,38 @@ private fun MainActivityScreen(startDestinationRoute: String) {
                             is WalletInfoUiEvent.DeleteWallet -> {
                                 walletViewModel.deleteWallet(event.wallet)
                                 navController.navigateUp()
+                            }
+
+                            is UiEvent.GoBack -> {
+                                navController.navigateUp()
+                            }
+
+                            else -> {}
+                        }
+                    }
+                )
+            }
+
+            composable(route = NavigationScreen.AnalyticsScreen.route){
+                val analyticsViewModel = hiltViewModel<AnalyticsViewModel>()
+
+                debugLog("composable AnalyticsScreen")
+
+                AnalyticsScreen(
+                    uiState = analyticsViewModel.analyticsUiState.value,
+                    modifier = Modifier
+                        .padding(innerPadding),
+                    onEvent = { event: UiEvent ->
+                        when(event){
+                            is AnalyticsUiEvent.ShowTransactionInfo -> {
+                                navController.navigate(NavigationScreen.TransactionInfoScreen.route + "/${event.transaction.id}")
+                            }
+                            is AnalyticsUiEvent.GetTransactionsByType -> {
+                                analyticsViewModel.filterAnalyticsByTransactionType(event.transactionType)
+                            }
+
+                            is AnalyticsUiEvent.GetAnalyticsByPeriod -> {
+                                analyticsViewModel.filterAnalyticsByPeriod(event.period)
                             }
 
                             is UiEvent.GoBack -> {

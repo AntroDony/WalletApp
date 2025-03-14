@@ -13,4 +13,6 @@ sealed class NavigationScreen(val route: String) {
     object TransactionListScreen: NavigationScreen("transaction_list")
     object TransactionInfoScreen: NavigationScreen("transaction_info")
 
+    object AnalyticsScreen: NavigationScreen("analytics")
+
 }

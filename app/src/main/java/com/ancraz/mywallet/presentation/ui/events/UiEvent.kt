@@ -60,8 +60,8 @@ sealed class WalletInfoUiEvent: UiEvent {
 }
 
 sealed class AnalyticsUiEvent: UiEvent{
-    data class GetAnalyticsByPeriod(val period: AnalyticsPeriod): AnalyticsUiEvent()
-    data class GetTransactionsByType(val transactionType: TransactionType?): AnalyticsUiEvent()
+    data class GetAnalyticsByPeriod(val transactionType: TransactionType?, val period: AnalyticsPeriod): AnalyticsUiEvent()
+    data class GetTransactionsByType(val transactionType: TransactionType?, val period: AnalyticsPeriod): AnalyticsUiEvent()
     data class ShowTransactionInfo(val transaction: TransactionUi): AnalyticsUiEvent()
 
 }

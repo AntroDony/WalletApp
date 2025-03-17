@@ -18,7 +18,7 @@ class GetAllTransactionsUseCase @Inject constructor(
                 emit(DataResult.Loading())
 
                 transactionRepository.getTransactionList().collect{ transactions ->
-                    emit(DataResult.Success(transactions))
+                    emit(DataResult.Success(transactions.reversed()))
                 }
             }
             catch (e: Exception){

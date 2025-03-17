@@ -132,7 +132,7 @@ class HomeViewModel @Inject constructor(
                             isLoading = false,
                             data = _homeUiState.value.data.copy(transactions = result.data?.map {
                                 it.toTransactionUi()
-                            }?.reversed() ?: emptyList())
+                            } ?: emptyList())
                         )
                     }
 

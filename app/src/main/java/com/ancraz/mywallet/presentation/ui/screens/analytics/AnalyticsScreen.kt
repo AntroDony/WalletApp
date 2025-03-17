@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -66,7 +67,8 @@ fun AnalyticsScreen(
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
-    val selectedPeriod = remember { uiState.data.period }
+    val selectedPeriodState = remember { mutableStateOf(uiState.data.period) }
+    val selectedTypeState = remember { mutableStateOf<TransactionType?>(null) }
 
     Column(
         modifier = modifier
@@ -98,8 +100,15 @@ fun AnalyticsScreen(
             HorizontalSpacer(height = 30.dp)
 
             PeriodSelector(
-                selectedPeriod = selectedPeriod,
-                onEvent = onEvent
+                selectedPeriodState = selectedPeriodState,
+                onPeriodSelected = { period ->
+                    onEvent(
+                        AnalyticsUiEvent.GetAnalyticsByPeriod(
+                            transactionType = selectedTypeState.value,
+                            period = selectedPeriodState.value
+                        )
+                    )
+                }
             )
 
             HorizontalSpacer(height = 30.dp)
@@ -112,7 +121,18 @@ fun AnalyticsScreen(
 
             TransactionListView(
                 transactionList = uiState.data.filteredTransactionList,
-                onEvent = onEvent
+                onTransactionTypeSelected = { selectedType ->
+                    selectedTypeState.value = selectedType
+                    onEvent(
+                        AnalyticsUiEvent.GetTransactionsByType(
+                            selectedType,
+                            selectedPeriodState.value
+                        )
+                    )
+                },
+                onClickTransaction = { transaction ->
+                    onEvent(AnalyticsUiEvent.ShowTransactionInfo(transaction))
+                }
             )
         }
     }
@@ -164,11 +184,10 @@ private fun TotalBalanceView(
 
 @Composable
 private fun PeriodSelector(
-    selectedPeriod: AnalyticsPeriod,
+    selectedPeriodState: MutableState<AnalyticsPeriod>,
     modifier: Modifier = Modifier,
-    onEvent: (UiEvent) -> Unit
+    onPeriodSelected: (AnalyticsPeriod) -> Unit
 ) {
-    val selectedPeriodState = remember { mutableStateOf(selectedPeriod) }
 
     val periodList = listOf(
         AnalyticsPeriod.Day,
@@ -191,8 +210,8 @@ private fun PeriodSelector(
                 modifier = Modifier.weight(1f),
                 onClick = {
                     selectedPeriodState.value = period
-                    onEvent(
-                        AnalyticsUiEvent.GetAnalyticsByPeriod(period)
+                    onPeriodSelected(
+                        period
                     )
                 }
             )
@@ -306,12 +325,13 @@ private fun AnalyticsView(
 private fun TransactionListView(
     transactionList: List<TransactionUi>,
     modifier: Modifier = Modifier,
-    onEvent: (UiEvent) -> Unit
+    onTransactionTypeSelected: (TransactionType?) -> Unit,
+    onClickTransaction: (TransactionUi) -> Unit
 ) {
     TransactionTypeSelector(
         onTypeSelected = { type ->
-            onEvent(
-                AnalyticsUiEvent.GetTransactionsByType(type)
+            onTransactionTypeSelected(
+                type
             )
         }
     )
@@ -356,7 +376,7 @@ private fun TransactionListView(
                 TransactionCard(
                     transaction = transaction,
                     onClick = {
-                        onEvent(AnalyticsUiEvent.ShowTransactionInfo(transaction))
+                        onClickTransaction(transaction)
                     }
                 )
             }

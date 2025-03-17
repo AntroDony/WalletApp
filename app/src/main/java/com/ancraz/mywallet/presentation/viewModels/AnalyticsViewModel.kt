@@ -9,7 +9,11 @@ import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.models.Transaction
+import com.ancraz.mywallet.domain.useCases.analytics.GetExpenseSumUseCase
+import com.ancraz.mywallet.domain.useCases.analytics.GetIncomeSumUseCase
+import com.ancraz.mywallet.domain.useCases.analytics.GetTransactionsByPeriodUseCase
 import com.ancraz.mywallet.domain.useCases.transaction.GetAllTransactionsUseCase
+import com.ancraz.mywallet.presentation.mapper.toTransaction
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
 import com.ancraz.mywallet.presentation.models.AnalyticsPeriod
 import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsUiState
@@ -22,7 +26,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AnalyticsViewModel @Inject constructor(
-    private val getAllTransactionsUseCase: GetAllTransactionsUseCase
+    private val getAllTransactionsUseCase: GetAllTransactionsUseCase,
+    private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
+    private val getIncomeSumUseCase: GetIncomeSumUseCase,
+    private val getExpenseSumUseCase: GetExpenseSumUseCase
 ) : ViewModel() {
 
     private val ioDispatcher = Dispatchers.IO
@@ -30,33 +37,67 @@ class AnalyticsViewModel @Inject constructor(
     private val _analyticsUiState = mutableStateOf(AnalyticsUiState())
     val analyticsUiState: State<AnalyticsUiState> = _analyticsUiState
 
-
     init {
         fetchData()
     }
 
+    fun filterAnalyticsByPeriod(
+        transactionType: TransactionType? = null,
+        period: AnalyticsPeriod
+    ) {
+        viewModelScope.launch(ioDispatcher) {
+            getTransactionsByPeriodUseCase(
+                period = period,
+                transactionList = _analyticsUiState.value.data.transactionList.map { it.toTransaction() }
+            ).let { result ->
+                val incomeSum = getIncomeSumUseCase(result)
+                val expenseSum = getExpenseSumUseCase(result)
 
-    fun filterAnalyticsByPeriod(period: AnalyticsPeriod) {
-//        _analyticsUiState.value = _analyticsUiState.value.copy(
-//            data = _analyticsUiState.value.data.copy(
-//                fil
-//            )
-//        )
+                _analyticsUiState.value = _analyticsUiState.value.copy(
+                    data = _analyticsUiState.value.data.copy(
+                        totalBalanceInUsd = incomeSum - expenseSum,
+                        incomeValueInUsd = incomeSum,
+                        expenseValueInUsd = expenseSum,
+                        filteredTransactionList = if (transactionType == null) {
+                            result.map { it.toTransactionUi() }
+                        } else {
+                            result.map {
+                                it.toTransactionUi()
+                            }.filter {
+                                it.type == transactionType
+                            }
+                        }
+                    )
+                )
+            }
+        }
     }
 
 
-    fun filterAnalyticsByTransactionType(transactionType: TransactionType?) {
-        _analyticsUiState.value = _analyticsUiState.value.copy(
-            data = _analyticsUiState.value.data.copy(
-                filteredTransactionList = if (transactionType == null) {
-                    _analyticsUiState.value.data.transactionList
-                } else {
-                    _analyticsUiState.value.data.transactionList.filter { transaction ->
-                        transaction.type == transactionType
-                    }
-                }
-            )
-        )
+    fun filterAnalyticsByTransactionType(
+        transactionType: TransactionType?,
+        period: AnalyticsPeriod
+    ) {
+        viewModelScope.launch(ioDispatcher) {
+            getTransactionsByPeriodUseCase(
+                period = period,
+                transactionList = _analyticsUiState.value.data.transactionList.map { it.toTransaction() }
+            ).let { result ->
+                _analyticsUiState.value = _analyticsUiState.value.copy(
+                    data = _analyticsUiState.value.data.copy(
+                        filteredTransactionList = if (transactionType == null) {
+                            result.map { it.toTransactionUi() }
+                        } else {
+                            result
+                                .map { it.toTransactionUi() }
+                                .filter { transaction ->
+                                    transaction.type == transactionType
+                                }
+                        }
+                    )
+                )
+            }
+        }
     }
 
 
@@ -74,6 +115,9 @@ class AnalyticsViewModel @Inject constructor(
                                     transaction.toTransactionUi()
                                 } ?: emptyList()
                             )
+                        )
+                        filterAnalyticsByPeriod(
+                            period = AnalyticsPeriod.Day
                         )
                     }
 

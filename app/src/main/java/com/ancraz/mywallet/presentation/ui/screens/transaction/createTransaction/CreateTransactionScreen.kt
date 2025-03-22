@@ -291,6 +291,10 @@ private fun RateInfoText(
     rates: List<CurrencyRateUi>,
     modifier: Modifier = Modifier
 ) {
+    if (rates.isEmpty()){
+        return
+    }
+
     val baseText = stringResource(R.string.create_transaction_currency_rate_base_text)
     val currentRateIndex = rates.map { rate -> rate.currencyCode }.indexOf(currentCurrencyState)
     val rateText = "${rates[currentRateIndex].rate} ${currentCurrencyState.name}"

@@ -13,15 +13,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBackIos
+import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.outlined.TrendingDown
 import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.AnalyticsPeriod
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
@@ -58,6 +64,7 @@ import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
+import com.ancraz.mywallet.presentation.ui.utils.getFormattedPeriodLabel
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 import java.util.Calendar
 
@@ -69,6 +76,12 @@ fun AnalyticsScreen(
 ) {
     val selectedPeriodState = remember { mutableStateOf(uiState.data.period) }
     val selectedTypeState = remember { mutableStateOf<TransactionType?>(null) }
+
+    val datePageNumber = remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(selectedPeriodState.value) {
+        datePageNumber.value = 0
+    }
 
     Column(
         modifier = modifier
@@ -94,7 +107,9 @@ fun AnalyticsScreen(
             )
         } else {
             TotalBalanceView(
-                uiState = uiState
+                uiState = uiState,
+                period = selectedPeriodState.value,
+                offset = datePageNumber.value
             )
 
             HorizontalSpacer(height = 30.dp)
@@ -105,7 +120,8 @@ fun AnalyticsScreen(
                     onEvent(
                         AnalyticsUiEvent.GetAnalyticsByPeriod(
                             transactionType = selectedTypeState.value,
-                            period = selectedPeriodState.value
+                            period = selectedPeriodState.value,
+                            offset = datePageNumber.value
                         )
                     )
                 }
@@ -114,19 +130,48 @@ fun AnalyticsScreen(
             HorizontalSpacer(height = 30.dp)
 
             AnalyticsDataView(
-                uiState = uiState
+                uiState = uiState,
+                pageState = datePageNumber,
+                onPreviousPageClick = {
+                    datePageNumber.value -= 1
+
+                    onEvent(
+                        AnalyticsUiEvent.GetAnalyticsByPeriod(
+                            transactionType = selectedTypeState.value,
+                            period = selectedPeriodState.value,
+                            offset = datePageNumber.value
+                        )
+                    )
+
+                    debugLog("pageNumber: ${datePageNumber.value}")
+                },
+                onNextPageClick = {
+                    datePageNumber.value += 1
+
+                    onEvent(
+                        AnalyticsUiEvent.GetAnalyticsByPeriod(
+                            transactionType = selectedTypeState.value,
+                            period = selectedPeriodState.value,
+                            offset = datePageNumber.value
+                        )
+                    )
+
+                    debugLog("pageNumber: ${datePageNumber.value}")
+                }
             )
 
             HorizontalSpacer(height = 30.dp)
 
             TransactionListView(
                 transactionList = uiState.data.filteredTransactionList,
-                onTransactionTypeSelected = { selectedType ->
-                    selectedTypeState.value = selectedType
+                onTransactionTypeSelected = { selectedTransactionType ->
+                    selectedTypeState.value = selectedTransactionType
+
                     onEvent(
                         AnalyticsUiEvent.GetTransactionsByType(
-                            selectedType,
-                            selectedPeriodState.value
+                            transactionType = selectedTransactionType,
+                            selectedPeriodState.value,
+                            offset = datePageNumber.value
                         )
                     )
                 },
@@ -142,6 +187,8 @@ fun AnalyticsScreen(
 @Composable
 private fun TotalBalanceView(
     uiState: AnalyticsUiState,
+    period: AnalyticsPeriod,
+    offset: Int,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -151,7 +198,11 @@ private fun TotalBalanceView(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = stringResource(R.string.analytics_total_balance_title),
+            text = stringResource(R.string.analytics_balance_title) + " ${
+                getFormattedPeriodLabel(
+                    period, offset
+                )
+            }",
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             color = onBackgroundColor,
@@ -254,26 +305,66 @@ private fun PeriodItem(
 @Composable
 private fun AnalyticsDataView(
     uiState: AnalyticsUiState,
-    modifier: Modifier = Modifier
+    pageState: MutableState<Int>,
+    modifier: Modifier = Modifier,
+    onPreviousPageClick: () -> Unit,
+    onNextPageClick: () -> Unit
 ) {
+    val isNextPageButtonActive = pageState.value < 0
+
     Row(
         modifier = modifier
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
+        Image(
+            imageVector = Icons.AutoMirrored.Outlined.ArrowBackIos,
+            contentDescription = "Previous page",
+            colorFilter = ColorFilter.tint(color = primaryColor),
+            modifier = Modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .clickable {
+                    onPreviousPageClick()
+                },
+        )
+
         AnalyticsView(
             title = stringResource(R.string.analytics_income_title),
             value = uiState.data.incomeValueInUsd,
             icon = Icons.AutoMirrored.Outlined.TrendingUp,
-            contentColor = primaryColor
+            contentColor = primaryColor,
+            modifier = Modifier.weight(1f)
         )
 
         AnalyticsView(
             title = stringResource(R.string.analytics_expense_title),
             value = uiState.data.expenseValueInUsd,
             icon = Icons.AutoMirrored.Outlined.TrendingDown,
-            contentColor = errorColor
+            contentColor = errorColor,
+            modifier = Modifier.weight(1f)
+        )
+
+
+        Image(
+            imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+            contentDescription = "Previous page",
+            colorFilter = if (isNextPageButtonActive) {
+                ColorFilter.tint(color = primaryColor)
+            } else {
+                ColorFilter.tint(color = secondaryColor)
+            },
+            modifier = Modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .clickable {
+                    if (isNextPageButtonActive) {
+                        debugLog("nextPage click")
+                        onNextPageClick()
+                    }
+                }
         )
     }
 }

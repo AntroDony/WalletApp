@@ -1,6 +1,5 @@
 package com.ancraz.mywallet.presentation.viewModels
 
-import android.provider.ContactsContract.Data
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -43,11 +42,15 @@ class AnalyticsViewModel @Inject constructor(
 
     fun filterAnalyticsByPeriod(
         transactionType: TransactionType? = null,
-        period: AnalyticsPeriod
+        period: AnalyticsPeriod,
+        offset: Int
     ) {
         viewModelScope.launch(ioDispatcher) {
+            debugLog("filterAnalyticsByPeriod: $transactionType | $period | $offset")
+
             getTransactionsByPeriodUseCase(
                 period = period,
+                offset = offset,
                 transactionList = _analyticsUiState.value.data.transactionList.map { it.toTransaction() }
             ).let { result ->
                 val incomeSum = getIncomeSumUseCase(result)
@@ -76,11 +79,13 @@ class AnalyticsViewModel @Inject constructor(
 
     fun filterAnalyticsByTransactionType(
         transactionType: TransactionType?,
-        period: AnalyticsPeriod
+        period: AnalyticsPeriod,
+        offset: Int
     ) {
         viewModelScope.launch(ioDispatcher) {
             getTransactionsByPeriodUseCase(
                 period = period,
+                offset = offset,
                 transactionList = _analyticsUiState.value.data.transactionList.map { it.toTransaction() }
             ).let { result ->
                 _analyticsUiState.value = _analyticsUiState.value.copy(
@@ -117,7 +122,8 @@ class AnalyticsViewModel @Inject constructor(
                             )
                         )
                         filterAnalyticsByPeriod(
-                            period = AnalyticsPeriod.Day
+                            period = AnalyticsPeriod.Day,
+                            offset = 0
                         )
                     }
 

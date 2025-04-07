@@ -89,7 +89,7 @@
 
 <!--  Analytics Screen -->
     <string name="analytics_screen_title">Analytics</string>
-    <string name="analytics_total_balance_title">Total balance</string>
+    <string name="analytics_balance_title">Balance on </string>
     <string name="analytics_income_title">Income</string>
     <string name="analytics_expense_title">Expense</string>
     <string name="analytics_transaction_title">Transactions</string>

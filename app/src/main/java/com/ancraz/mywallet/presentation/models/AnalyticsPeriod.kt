@@ -9,4 +9,5 @@ sealed class AnalyticsPeriod(val name: String) {
         val from: Long,
         val to: Long
     ): AnalyticsPeriod("Custom")
+
 }

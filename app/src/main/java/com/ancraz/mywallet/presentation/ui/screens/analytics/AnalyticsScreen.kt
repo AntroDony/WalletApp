@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.presentation.ui.screens.analytics
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +22,10 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.outlined.TrendingDown
 import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.automirrored.rounded.List
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,14 +51,17 @@ import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.AnalyticsPeriod
+import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.LoadingIndicator
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.components.TransactionTypeSelector
+import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.events.AnalyticsUiEvent
 import com.ancraz.mywallet.presentation.ui.events.UiEvent
+import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.components.CategoryListMenu
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.errorColor
@@ -77,10 +85,30 @@ fun AnalyticsScreen(
     val selectedPeriodState = remember { mutableStateOf(uiState.data.period) }
     val selectedTypeState = remember { mutableStateOf<TransactionType?>(null) }
 
+    val isCategoryListOpen = remember { mutableStateOf(false) }
+    val categoryList = uiState.data.transactionCategoryList
+    val selectedFilterCategoryState = remember { mutableStateOf<TransactionCategoryUi?>(null) }
+
     val datePageNumber = remember { mutableIntStateOf(0) }
 
     LaunchedEffect(selectedPeriodState.value) {
         datePageNumber.value = 0
+    }
+
+    LaunchedEffect(
+        selectedPeriodState.value,
+        selectedTypeState.value,
+        selectedFilterCategoryState.value,
+        datePageNumber.value
+    ) {
+        onEvent(
+            AnalyticsUiEvent.FilterAnalyticsData(
+                type = selectedTypeState.value,
+                category = selectedFilterCategoryState.value,
+                period = selectedPeriodState.value,
+                periodOffset = datePageNumber.value
+            )
+        )
     }
 
     Column(
@@ -106,6 +134,30 @@ fun AnalyticsScreen(
                     .fillMaxSize()
             )
         } else {
+            if (isCategoryListOpen.value) {
+                CategoryListMenu(
+                    categories = categoryList,
+                    onSelect = { category ->
+                        selectedFilterCategoryState.value = category
+//
+//                        onEvent(
+//                            AnalyticsUiEvent.FilterAnalyticsData(
+//                                type = selectedTypeState.value,
+//                                category = selectedFilterCategoryState.value,
+//                                period = selectedPeriodState.value,
+//                                periodOffset = datePageNumber.value
+//                            )
+//                        )
+
+                        isCategoryListOpen.value = false
+                    },
+                    onClose = {
+                        isCategoryListOpen.value = false
+                    }
+                )
+            }
+
+
             TotalBalanceView(
                 uiState = uiState,
                 period = selectedPeriodState.value,
@@ -116,15 +168,16 @@ fun AnalyticsScreen(
 
             PeriodSelector(
                 selectedPeriodState = selectedPeriodState,
-                onPeriodSelected = { period ->
-                    onEvent(
-                        AnalyticsUiEvent.GetAnalyticsByPeriod(
-                            transactionType = selectedTypeState.value,
-                            period = selectedPeriodState.value,
-                            offset = datePageNumber.value
-                        )
-                    )
-                }
+//                onPeriodSelected = { period ->
+//                    onEvent(
+//                        AnalyticsUiEvent.FilterAnalyticsData(
+//                            type = selectedTypeState.value,
+//                            category = selectedFilterCategoryState.value,
+//                            period = selectedPeriodState.value,
+//                            periodOffset = datePageNumber.value
+//                        )
+//                    )
+//                }
             )
 
             HorizontalSpacer(height = 30.dp)
@@ -135,45 +188,57 @@ fun AnalyticsScreen(
                 onPreviousPageClick = {
                     datePageNumber.value -= 1
 
-                    onEvent(
-                        AnalyticsUiEvent.GetAnalyticsByPeriod(
-                            transactionType = selectedTypeState.value,
-                            period = selectedPeriodState.value,
-                            offset = datePageNumber.value
-                        )
-                    )
+//                    onEvent(
+//                        AnalyticsUiEvent.FilterAnalyticsData(
+//                            type = selectedTypeState.value,
+//                            category = selectedFilterCategoryState.value,
+//                            period = selectedPeriodState.value,
+//                            periodOffset = datePageNumber.value
+//                        )
+//                    )
 
                     debugLog("pageNumber: ${datePageNumber.value}")
                 },
                 onNextPageClick = {
                     datePageNumber.value += 1
 
-                    onEvent(
-                        AnalyticsUiEvent.GetAnalyticsByPeriod(
-                            transactionType = selectedTypeState.value,
-                            period = selectedPeriodState.value,
-                            offset = datePageNumber.value
-                        )
-                    )
+//                    onEvent(
+//                        AnalyticsUiEvent.FilterAnalyticsData(
+//                            type = selectedTypeState.value,
+//                            category = selectedFilterCategoryState.value,
+//                            period = selectedPeriodState.value,
+//                            periodOffset = datePageNumber.value
+//                        )
+//                    )
 
                     debugLog("pageNumber: ${datePageNumber.value}")
                 }
             )
 
-            HorizontalSpacer(height = 30.dp)
+            HorizontalSpacer()
+
+            FilterAnalyticsView(
+                filterCategoryState = selectedFilterCategoryState,
+                onSelectCategory = {
+                    isCategoryListOpen.value = true
+                }
+            )
+
+            HorizontalSpacer()
 
             TransactionListView(
                 transactionList = uiState.data.filteredTransactionList,
                 onTransactionTypeSelected = { selectedTransactionType ->
                     selectedTypeState.value = selectedTransactionType
-
-                    onEvent(
-                        AnalyticsUiEvent.GetTransactionsByType(
-                            transactionType = selectedTransactionType,
-                            selectedPeriodState.value,
-                            offset = datePageNumber.value
-                        )
-                    )
+//
+//                    onEvent(
+//                        AnalyticsUiEvent.FilterAnalyticsData(
+//                            type = selectedTransactionType,
+//                            category = selectedFilterCategoryState.value,
+//                            period = selectedPeriodState.value,
+//                            periodOffset = datePageNumber.value
+//                        )
+//                    )
                 },
                 onClickTransaction = { transaction ->
                     onEvent(AnalyticsUiEvent.ShowTransactionInfo(transaction))
@@ -237,7 +302,7 @@ private fun TotalBalanceView(
 private fun PeriodSelector(
     selectedPeriodState: MutableState<AnalyticsPeriod>,
     modifier: Modifier = Modifier,
-    onPeriodSelected: (AnalyticsPeriod) -> Unit
+    //onPeriodSelected: (AnalyticsPeriod) -> Unit
 ) {
 
     val periodList = listOf(
@@ -261,9 +326,9 @@ private fun PeriodSelector(
                 modifier = Modifier.weight(1f),
                 onClick = {
                     selectedPeriodState.value = period
-                    onPeriodSelected(
-                        period
-                    )
+//                    onPeriodSelected(
+//                        period
+//                    )
                 }
             )
         }
@@ -411,6 +476,81 @@ private fun AnalyticsView(
     }
 }
 
+@Composable
+private fun FilterAnalyticsView(
+    filterCategoryState: MutableState<TransactionCategoryUi?>,
+    modifier: Modifier = Modifier,
+    onSelectCategory: () -> Unit
+){
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor
+        ),
+        border = BorderStroke(width = 1.dp, color = primaryColor)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 14.dp, horizontal = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.filter_title),
+                color = onBackgroundColor,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            VerticalSpacer(width = 20.dp)
+
+            Text(
+                text = filterCategoryState.value?.name ?:stringResource(R.string.filter_no_title),
+                color = onBackgroundColor,
+                fontSize = 16.sp,
+                maxLines = 1,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .weight(1f)
+            )
+
+            VerticalSpacer(width = 20.dp)
+
+            Row {
+                Image(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(onBackgroundColor),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable{
+                            onSelectCategory()
+                        }
+                )
+
+                VerticalSpacer(width = 20.dp)
+
+                Image(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(onBackgroundColor),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            filterCategoryState.value = null
+                        }
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun TransactionListView(
@@ -488,7 +628,7 @@ private fun AnalyticsScreenPreview() {
                     totalBalanceInUsd = 10000f,
                     incomeValueInUsd = 2500f,
                     expenseValueInUsd = 300f,
-                    transactionList = listOf(
+                    filteredTransactionList = listOf(
                         TransactionUi(
                             time = Calendar.getInstance().timeInMillis,
                             value = 200f,

@@ -1,6 +1,7 @@
 package com.ancraz.mywallet.presentation.ui.screens.analytics
 
 import com.ancraz.mywallet.presentation.models.AnalyticsPeriod
+import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
 
 data class AnalyticsUiState(
@@ -14,7 +15,7 @@ data class AnalyticsUiState(
         val incomeValueInUsd: Float = 0f,
         val expenseValueInUsd: Float = 0f,
         val period: AnalyticsPeriod = AnalyticsPeriod.Day,
-        val transactionList: List<TransactionUi> = emptyList(),
         val filteredTransactionList: List<TransactionUi> = emptyList(),
+        val transactionCategoryList: List<TransactionCategoryUi> = emptyList()
     )
 }

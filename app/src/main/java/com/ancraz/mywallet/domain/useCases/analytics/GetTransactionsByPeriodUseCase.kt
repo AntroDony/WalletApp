@@ -12,7 +12,6 @@ import javax.inject.Inject
 class GetTransactionsByPeriodUseCase @Inject constructor() {
 
     operator fun invoke(period: AnalyticsPeriod, transactionList: List<Transaction>, offset: Int): List<Transaction>{
-        debugLog("invoke offset: $offset")
         var periodRange = Pair<Long, Long>(0, System.currentTimeMillis())
 
         when(period){
@@ -37,6 +36,12 @@ class GetTransactionsByPeriodUseCase @Inject constructor() {
                 periodRange = (period.from to period.to)
             }
         }
+
+        debugLog("periodRange: ${periodRange.first} | ${periodRange.second}")
+        debugLog("transactionsTime: ${transactionList.map { 
+            it.time
+        }}")
+
         return transactionList.filter {
            it.time in periodRange.first .. periodRange.second
         }
@@ -51,7 +56,7 @@ class GetTransactionsByPeriodUseCase @Inject constructor() {
 
 
     private fun getStartAndEndOfWeek(offset: Int): Pair<Long, Long> {
-        val today = LocalDate.now().minusWeeks(offset.toLong())
+        val today = LocalDate.now().plusWeeks(offset.toLong())
         val startOfWeek = today.with(DayOfWeek.MONDAY)
             .atStartOfDay(ZoneId.systemDefault())
             .toInstant()
@@ -68,7 +73,7 @@ class GetTransactionsByPeriodUseCase @Inject constructor() {
 
 
     private fun getStartAndEndOfMonth(offset: Int): Pair<Long, Long> {
-        val targetMonth = LocalDate.now().minusMonths(offset.toLong())
+        val targetMonth = LocalDate.now().plusMonths(offset.toLong())
 
         val startOfMonth = targetMonth.withDayOfMonth(1)
             .atStartOfDay(ZoneId.systemDefault())
@@ -86,7 +91,7 @@ class GetTransactionsByPeriodUseCase @Inject constructor() {
 
 
     private fun getStartAndEndOfYear(offset: Int): Pair<Long, Long> {
-        val targetYear = LocalDate.now().minusYears(offset.toLong())
+        val targetYear = LocalDate.now().plusYears(offset.toLong())
 
         val startOfYear = targetYear.withDayOfYear(1)
             .atStartOfDay(ZoneId.systemDefault())

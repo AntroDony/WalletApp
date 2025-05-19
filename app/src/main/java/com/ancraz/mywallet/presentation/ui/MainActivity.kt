@@ -394,19 +394,12 @@ private fun MainActivityScreen(startDestinationRoute: String) {
                             is AnalyticsUiEvent.ShowTransactionInfo -> {
                                 navController.navigate(NavigationScreen.TransactionInfoScreen.route + "/${event.transaction.id}")
                             }
-                            is AnalyticsUiEvent.GetTransactionsByType -> {
-                                analyticsViewModel.filterAnalyticsByTransactionType(
-                                    event.transactionType,
-                                    event.period,
-                                    offset = event.offset
-                                )
-                            }
-
-                            is AnalyticsUiEvent.GetAnalyticsByPeriod -> {
-                                analyticsViewModel.filterAnalyticsByPeriod(
-                                    event.transactionType,
-                                    event.period,
-                                    offset = event.offset
+                            is AnalyticsUiEvent.FilterAnalyticsData -> {
+                                analyticsViewModel.filterAnalyticsData(
+                                    transactionType = event.type,
+                                    transactionCategory = event.category,
+                                    period = event.period,
+                                    periodOffset = event.periodOffset
                                 )
                             }
 

@@ -37,11 +37,6 @@ class GetTransactionsByPeriodUseCase @Inject constructor() {
             }
         }
 
-        debugLog("periodRange: ${periodRange.first} | ${periodRange.second}")
-        debugLog("transactionsTime: ${transactionList.map { 
-            it.time
-        }}")
-
         return transactionList.filter {
            it.time in periodRange.first .. periodRange.second
         }

@@ -139,15 +139,6 @@ fun AnalyticsScreen(
                     categories = categoryList,
                     onSelect = { category ->
                         selectedFilterCategoryState.value = category
-//
-//                        onEvent(
-//                            AnalyticsUiEvent.FilterAnalyticsData(
-//                                type = selectedTypeState.value,
-//                                category = selectedFilterCategoryState.value,
-//                                period = selectedPeriodState.value,
-//                                periodOffset = datePageNumber.value
-//                            )
-//                        )
 
                         isCategoryListOpen.value = false
                     },
@@ -168,16 +159,6 @@ fun AnalyticsScreen(
 
             PeriodSelector(
                 selectedPeriodState = selectedPeriodState,
-//                onPeriodSelected = { period ->
-//                    onEvent(
-//                        AnalyticsUiEvent.FilterAnalyticsData(
-//                            type = selectedTypeState.value,
-//                            category = selectedFilterCategoryState.value,
-//                            period = selectedPeriodState.value,
-//                            periodOffset = datePageNumber.value
-//                        )
-//                    )
-//                }
             )
 
             HorizontalSpacer(height = 30.dp)
@@ -188,28 +169,10 @@ fun AnalyticsScreen(
                 onPreviousPageClick = {
                     datePageNumber.value -= 1
 
-//                    onEvent(
-//                        AnalyticsUiEvent.FilterAnalyticsData(
-//                            type = selectedTypeState.value,
-//                            category = selectedFilterCategoryState.value,
-//                            period = selectedPeriodState.value,
-//                            periodOffset = datePageNumber.value
-//                        )
-//                    )
-
                     debugLog("pageNumber: ${datePageNumber.value}")
                 },
                 onNextPageClick = {
                     datePageNumber.value += 1
-
-//                    onEvent(
-//                        AnalyticsUiEvent.FilterAnalyticsData(
-//                            type = selectedTypeState.value,
-//                            category = selectedFilterCategoryState.value,
-//                            period = selectedPeriodState.value,
-//                            periodOffset = datePageNumber.value
-//                        )
-//                    )
 
                     debugLog("pageNumber: ${datePageNumber.value}")
                 }
@@ -230,15 +193,6 @@ fun AnalyticsScreen(
                 transactionList = uiState.data.filteredTransactionList,
                 onTransactionTypeSelected = { selectedTransactionType ->
                     selectedTypeState.value = selectedTransactionType
-//
-//                    onEvent(
-//                        AnalyticsUiEvent.FilterAnalyticsData(
-//                            type = selectedTransactionType,
-//                            category = selectedFilterCategoryState.value,
-//                            period = selectedPeriodState.value,
-//                            periodOffset = datePageNumber.value
-//                        )
-//                    )
                 },
                 onClickTransaction = { transaction ->
                     onEvent(AnalyticsUiEvent.ShowTransactionInfo(transaction))

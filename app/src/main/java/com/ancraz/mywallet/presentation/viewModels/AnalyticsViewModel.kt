@@ -67,16 +67,11 @@ class AnalyticsViewModel @Inject constructor(
                 transactionList.filter { it.category == category }
             } ?: transactionList
 
-
-            debugLog("filteredByCategoryTransactions: $filteredByCategoryTransactionList")
-
             getTransactionsByPeriodUseCase(
                 period = period,
                 offset = periodOffset,
                 transactionList = filteredByCategoryTransactionList.map { it.toTransaction() }
             ).let { result ->
-                debugLog("periodFilterResult: ${result.size}")
-
                 val incomeSum = getIncomeSumUseCase(result)
                 val expenseSum = getExpenseSumUseCase(result)
                 val resultTransactionList = if (transactionType == null) {
@@ -88,9 +83,6 @@ class AnalyticsViewModel @Inject constructor(
                         it.type == transactionType
                     }
                 }
-
-                debugLog("filterResult:\n" +
-                        "transactions: $resultTransactionList")
 
                 _analyticsUiState.value = _analyticsUiState.value.copy(
                     data = _analyticsUiState.value.data.copy(

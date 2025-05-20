@@ -16,6 +16,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachMoney
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -29,6 +31,7 @@ import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.ActionButton
+import com.ancraz.mywallet.presentation.ui.components.DeleteDialog
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InfoRow
 import com.ancraz.mywallet.presentation.ui.components.LoadingIndicator
@@ -53,6 +56,7 @@ fun WalletInfoScreen(
     modifier: Modifier = Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
+    val isDeleteDialogOpened = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -109,6 +113,21 @@ fun WalletInfoScreen(
 
 
         } else {
+            if (isDeleteDialogOpened.value){
+                DeleteDialog(
+                    title = stringResource(R.string.delete_wallet_dialog_title),
+                    text = stringResource(R.string.delete_wallet_dialog_text),
+                    onConfirm = {
+                        isDeleteDialogOpened.value = false
+                        onEvent(WalletInfoUiEvent.DeleteWallet(uiState.wallet))
+                    },
+                    onDismiss = {
+                        isDeleteDialogOpened.value = false
+                    }
+                )
+            }
+
+
             InfoRow(
                 title = stringResource(R.string.wallet_info_name_title),
                 info = uiState.wallet.name
@@ -181,7 +200,7 @@ fun WalletInfoScreen(
                         modifier = Modifier
                             .weight(1f),
                         onClick = {
-                            onEvent(WalletInfoUiEvent.DeleteWallet(uiState.wallet))
+                            isDeleteDialogOpened.value = true
                         }
                     )
 

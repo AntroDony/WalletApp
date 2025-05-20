@@ -14,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachMoney
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -30,6 +32,7 @@ import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.ActionButton
+import com.ancraz.mywallet.presentation.ui.components.DeleteDialog
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.InfoRow
 import com.ancraz.mywallet.presentation.ui.components.LoadingIndicator
@@ -53,6 +56,9 @@ fun TransactionInfoScreen(
     modifier: Modifier = Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
+
+    val isDeleteDialogOpened = remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -108,6 +114,24 @@ fun TransactionInfoScreen(
 
 
         } else {
+
+            if (isDeleteDialogOpened.value){
+                DeleteDialog(
+                    title = stringResource(R.string.delete_transaction_dialog_title),
+                    text = stringResource(R.string.delete_transaction_dialog_text),
+                    onConfirm = {
+                        isDeleteDialogOpened.value = false
+                        onEvent(
+                            TransactionInfoUiEvent.DeleteTransaction(
+                                transaction = uiState.transaction
+                            )
+                        )
+                    },
+                    onDismiss = {
+                        isDeleteDialogOpened.value = false
+                    }
+                )
+            }
 
             InfoRow(
                 title = stringResource(R.string.transaction_info_type_title),
@@ -193,11 +217,7 @@ fun TransactionInfoScreen(
                         modifier = Modifier
                             .weight(1f),
                         onClick = {
-                            onEvent(
-                                TransactionInfoUiEvent.DeleteTransaction(
-                                    transaction = uiState.transaction
-                                )
-                            )
+                            isDeleteDialogOpened.value = true
                         }
                     )
                 }

@@ -46,6 +46,9 @@
     <string name="transaction_list_screen_title">Transactions</string>
     <string name="transaction_list_empty_list_title">You have not any transactions yet</string>
 
+    <string name="delete_transaction_dialog_title">Delete Transaction</string>
+    <string name="delete_transaction_dialog_text">Do you really want to delete this transaction?</string>
+
 
 <!--  Wallet Screen  -->
     <string name="wallet_list_screen_title">Wallets</string>
@@ -85,6 +88,10 @@
 
     <string name="wallet_delete_button">Delete</string>
     <string name="wallet_edit_button">Edit</string>
+
+
+    <string name="delete_wallet_dialog_title">Delete Wallet</string>
+    <string name="delete_wallet_dialog_text">Do you really want to delete this wallet?</string>
 
 
 <!--  Analytics Screen -->

@@ -1,6 +1,5 @@
 package com.ancraz.mywallet.presentation.viewModels
 
-import android.appwidget.AppWidgetManager
 import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -10,9 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.result.DataResult
-import com.ancraz.mywallet.core.utils.Constants
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.manager.DataStoreManager
+import com.ancraz.mywallet.domain.models.Transaction
+import com.ancraz.mywallet.domain.models.Wallet
 import com.ancraz.mywallet.domain.useCases.transaction.GetAllTransactionsUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
@@ -22,8 +22,8 @@ import com.ancraz.mywallet.presentation.ui.widget.WalletWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,6 +39,11 @@ class HomeViewModel @Inject constructor(
 
     private var _homeUiState = mutableStateOf(HomeUiState())
     val homeUiState: State<HomeUiState> = _homeUiState
+
+    private val privateModeStatusFlow = dataStoreManager.getPrivateModeStatus()
+    private val totalBalanceFlow = dataStoreManager.getTotalBalance()
+    private val walletListFlow: Flow<DataResult<List<Wallet>>> = getAllWalletsUseCase()
+    private val transactionListFlow: Flow<DataResult<List<Transaction>>> = getAllTransactionsUseCase()
 
     init {
         fetchData()
@@ -59,7 +64,7 @@ class HomeViewModel @Inject constructor(
 
     fun syncData() {
         viewModelScope.launch(ioDispatcher) {
-            getAllWalletsUseCase().onEach { result ->
+            getAllWalletsUseCase().collect { result ->
                 when (result) {
                     is DataResult.Success -> {
                         val walletSumInUsd = result.data?.map { wallet ->
@@ -81,99 +86,52 @@ class HomeViewModel @Inject constructor(
                         debugLog("syncData error: ${result.errorMessage}")
                     }
                 }
-            }.launchIn(viewModelScope)
+            }
         }
     }
 
     private fun fetchData() {
         viewModelScope.launch(ioDispatcher) {
+            try {
+                combine(
+                    privateModeStatusFlow,
+                    totalBalanceFlow,
+                    walletListFlow,
+                    transactionListFlow
+                ) { privateModeStatus, totalBalanceDataResult, walletListDataResult, transactionListDataResult ->
+                    if (totalBalanceDataResult is DataResult.Error
+                        || walletListDataResult is DataResult.Error
+                        || transactionListDataResult is DataResult.Error
+                    ) {                        _homeUiState.value = _homeUiState.value.copy(
+                            error = "${totalBalanceDataResult.errorMessage} | " +
+                                    "${walletListDataResult.errorMessage} | " +
+                                    "${transactionListDataResult.errorMessage}"
+                        )
+                    }
 
-            dataStoreManager.getPrivateModeStatus().onEach { result ->
+                    HomeUiState(
+                        isLoading = false,
+                        data = HomeUiState.HomeScreenData(
+                            isPrivateMode = privateModeStatus,
+                            balance = totalBalanceDataResult.data ?: 0f,
+                            wallets = walletListDataResult.data?.map { it.toWalletUi() } ?: emptyList(),
+                            transactions = transactionListDataResult.data?.map { it.toTransactionUi() } ?: emptyList()
+                        )
+                    )
+                }.collect {
+                    _homeUiState.value = it
+
+                    updateWidgetState(
+                        balance = it.data.balance,
+                        isPrivateMode = it.data.isPrivateMode
+                    )
+                }
+            } catch (e: Exception){
+                debugLog("fetchData exception: ${e.message}")
                 _homeUiState.value = _homeUiState.value.copy(
-                    data = _homeUiState.value.data.copy(isPrivateMode = result)
+                    error = e.message
                 )
-                updateWidgetState(
-                    balance = _homeUiState.value.data.balance,
-                    isPrivateMode = _homeUiState.value.data.isPrivateMode
-                )
-            }.launchIn(viewModelScope)
-
-
-            dataStoreManager.getTotalBalance().onEach { result ->
-                when (result) {
-                    is DataResult.Success -> {
-                        _homeUiState.value = _homeUiState.value.copy(
-                            isLoading = false,
-                            data = _homeUiState.value.data.copy(balance = result.data ?: 0f)
-                        )
-                        updateWidgetState(
-                            balance = _homeUiState.value.data.balance,
-                            isPrivateMode = _homeUiState.value.data.isPrivateMode
-                        )
-                    }
-
-                    is DataResult.Loading -> {
-                        _homeUiState.value = _homeUiState.value.copy(isLoading = true)
-                    }
-
-                    is DataResult.Error -> {
-                        debugLog("getTotalBalance error: ${result.errorMessage}")
-                        _homeUiState.value = _homeUiState.value.copy(
-                            error = result.errorMessage
-                        )
-                    }
-                }
-            }.launchIn(viewModelScope)
-
-            getAllTransactionsUseCase().onEach { result ->
-                when (result) {
-                    is DataResult.Success -> {
-                        _homeUiState.value = homeUiState.value.copy(
-                            isLoading = false,
-                            data = _homeUiState.value.data.copy(transactions = result.data?.map {
-                                it.toTransactionUi()
-                            } ?: emptyList())
-                        )
-                    }
-
-                    is DataResult.Loading -> {
-                        _homeUiState.value = _homeUiState.value.copy(isLoading = true)
-                    }
-
-                    is DataResult.Error -> {
-                        debugLog("getTransactions Error: ${result.errorMessage}")
-                        _homeUiState.value = _homeUiState.value.copy(
-                            error = result.errorMessage
-                        )
-                    }
-                }
-            }.launchIn(viewModelScope)
-
-
-            getAllWalletsUseCase().onEach { result ->
-                when (result) {
-                    is DataResult.Success -> {
-                        _homeUiState.value = homeUiState.value.copy(
-                            data = _homeUiState.value.data.copy(
-                                wallets = result.data?.map { wallet ->
-                                    wallet.toWalletUi()
-                                } ?: emptyList()
-                            )
-                        )
-                    }
-
-                    is DataResult.Loading -> {
-                        debugLog("getWallet Loading")
-                    }
-
-                    is DataResult.Error -> {
-                        debugLog("getWallet Error: ${result.errorMessage}")
-                        _homeUiState.value = _homeUiState.value.copy(
-                            error = result.errorMessage
-                        )
-                    }
-                }
-            }.launchIn(viewModelScope)
+            }
         }
     }
 
@@ -181,9 +139,6 @@ class HomeViewModel @Inject constructor(
     private suspend fun updateWidgetState(balance: Float, isPrivateMode: Boolean) {
         try {
             val glanceIds = GlanceAppWidgetManager(context).getGlanceIds(WalletWidget::class.java)
-            //val glanceId = GlanceAppWidgetManager(context).getGlanceIdBy(AppWidgetManager.EXTRA_APPWIDGET_ID)
-
-            debugLog("glanceWidgetIds: $glanceIds")
 
             glanceIds.forEach { glanceId ->
                 updateAppWidgetState(context, glanceId) { prefs ->
@@ -193,10 +148,8 @@ class HomeViewModel @Inject constructor(
 
                 WalletWidget.update(context, glanceId)
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             debugLog("updateWidgetState exception: ${e.message}")
         }
-
-
     }
 }

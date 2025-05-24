@@ -102,7 +102,7 @@
     <string name="analytics_transaction_title">Transactions</string>
     <string name="analytics_empty_transaction_list_placeholder">No transactions</string>
 
-    <string name="filter_title">Category:</string>
+    <string name="filter_title">Filter:</string>
     <string name="filter_no_title">All Categories</string>
     <string name="filter_set_button">Set</string>
     <string name="filter_clear_button">Clear</string>

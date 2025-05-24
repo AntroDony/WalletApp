@@ -255,8 +255,7 @@ private fun TotalBalanceView(
 @Composable
 private fun PeriodSelector(
     selectedPeriodState: MutableState<AnalyticsPeriod>,
-    modifier: Modifier = Modifier,
-    //onPeriodSelected: (AnalyticsPeriod) -> Unit
+    modifier: Modifier = Modifier
 ) {
 
     val periodList = listOf(
@@ -280,9 +279,6 @@ private fun PeriodSelector(
                 modifier = Modifier.weight(1f),
                 onClick = {
                     selectedPeriodState.value = period
-//                    onPeriodSelected(
-//                        period
-//                    )
                 }
             )
         }

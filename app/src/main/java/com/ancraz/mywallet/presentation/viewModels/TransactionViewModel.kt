@@ -106,7 +106,7 @@ class TransactionViewModel @Inject constructor(
             fetchDataStoreData()
             fetchWalletList()
             fetchTransactionCategories()
-            fetchTransactionList()
+            //fetchTransactionList()
             fetchCurrencyRates()
         }
     }

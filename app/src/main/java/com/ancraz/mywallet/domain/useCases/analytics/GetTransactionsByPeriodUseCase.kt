@@ -17,7 +17,6 @@ class GetTransactionsByPeriodUseCase @Inject constructor() {
         when(period){
             is AnalyticsPeriod.Day -> {
                 val day = LocalDate.now().plusDays(offset.toLong())
-                debugLog("day: $day | ${offset.toLong()}")
                 periodRange = getStartAndEndOfDay(day)
             }
             is AnalyticsPeriod.Week -> {

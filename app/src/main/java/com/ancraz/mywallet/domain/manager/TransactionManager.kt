@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface TransactionManager {
 
-    fun getTransactions(): Flow<DataResult<List<Transaction>>>
+    fun getTransactions(): Flow<List<Transaction>>
 
     suspend fun getTransactionById(id: Long): DataResult<Transaction>
 

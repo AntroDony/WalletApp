@@ -8,7 +8,6 @@ import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.CurrencyCode
-import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.manager.DataStoreManager
 import com.ancraz.mywallet.domain.models.Transaction
@@ -24,6 +23,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,8 +43,8 @@ class HomeViewModel @Inject constructor(
 
     private val privateModeStatusFlow = dataStoreManager.getPrivateModeStatus()
     private val totalBalanceFlow = dataStoreManager.getTotalBalance()
-    private val walletListFlow: Flow<DataResult<List<Wallet>>> = getAllWalletsUseCase()
-    private val transactionListFlow: Flow<DataResult<List<Transaction>>> = getAllTransactionsUseCase()
+    private val walletListFlow: Flow<List<Wallet>> = getAllWalletsUseCase()
+    private val transactionListFlow: Flow<List<Transaction>> = getAllTransactionsUseCase()
 
     init {
         fetchData()
@@ -51,7 +52,6 @@ class HomeViewModel @Inject constructor(
 
     fun editTotalBalance(value: Float, code: CurrencyCode = CurrencyCode.USD) {
         viewModelScope.launch(ioDispatcher) {
-            debugLog("updateTotalBalance")
             dataStoreManager.editTotalBalance(value, code)
         }
     }
@@ -64,27 +64,13 @@ class HomeViewModel @Inject constructor(
 
     fun syncData() {
         viewModelScope.launch(ioDispatcher) {
-            getAllWalletsUseCase().collect { result ->
-                when (result) {
-                    is DataResult.Success -> {
-                        val walletSumInUsd = result.data?.map { wallet ->
-                            wallet.totalBalance
-                        }?.sum()
+            getAllWalletsUseCase().collect { walletList ->
+                val walletSumInUsd = walletList.map { wallet ->
+                    wallet.totalBalance
+                }.sum()
 
-                        walletSumInUsd?.let { value ->
-                            dataStoreManager.editTotalBalance(value, CurrencyCode.USD)
-                        } ?: run {
-                            debugLog("walletSum is null")
-                        }
-                    }
-
-                    is DataResult.Loading -> {
-                        debugLog("syncData loading")
-                    }
-
-                    is DataResult.Error -> {
-                        debugLog("syncData error: ${result.errorMessage}")
-                    }
+                walletSumInUsd.let { value ->
+                    dataStoreManager.editTotalBalance(value, CurrencyCode.USD)
                 }
             }
         }
@@ -98,32 +84,22 @@ class HomeViewModel @Inject constructor(
                     totalBalanceFlow,
                     walletListFlow,
                     transactionListFlow
-                ) { privateModeStatus, totalBalanceDataResult, walletListDataResult, transactionListDataResult ->
-                    if (totalBalanceDataResult is DataResult.Error
-                        || walletListDataResult is DataResult.Error
-                        || transactionListDataResult is DataResult.Error
-                    ) {                        _homeUiState.value = _homeUiState.value.copy(
-                            error = "${totalBalanceDataResult.errorMessage} | " +
-                                    "${walletListDataResult.errorMessage} | " +
-                                    "${transactionListDataResult.errorMessage}"
-                        )
-                    }
-
+                ) { privateModeStatus, totalBalance, walletList, transactionList ->
                     HomeUiState(
                         isLoading = false,
                         data = HomeUiState.HomeScreenData(
                             isPrivateMode = privateModeStatus,
-                            balance = totalBalanceDataResult.data ?: 0f,
-                            wallets = walletListDataResult.data?.map { it.toWalletUi() } ?: emptyList(),
-                            transactions = transactionListDataResult.data?.map { it.toTransactionUi() } ?: emptyList()
+                            balance = totalBalance,
+                            wallets = walletList.map { it.toWalletUi() },
+                            transactions = transactionList.map { it.toTransactionUi() }
                         )
                     )
-                }.collect {
-                    _homeUiState.value = it
+                }.collect { uiState ->
+                    _homeUiState.value = uiState
 
                     updateWidgetState(
-                        balance = it.data.balance,
-                        isPrivateMode = it.data.isPrivateMode
+                        balance = uiState.data.balance,
+                        isPrivateMode = uiState.data.isPrivateMode
                     )
                 }
             } catch (e: Exception){

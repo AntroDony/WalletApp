@@ -15,26 +15,24 @@ class GetTransactionCategoriesUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository
 ) {
 
-    operator fun invoke(transactionType: TransactionType? = null): Flow<DataResult<List<TransactionCategory>>>{
+    operator fun invoke(transactionType: TransactionType? = null): Flow<List<TransactionCategory>>{
         return channelFlow {
             try {
-                send(DataResult.Loading())
-
                 when(transactionType){
                     TransactionType.INCOME -> {
                         transactionRepository.getIncomeCategoryList().collect{ categories ->
-                            send(DataResult.Success(categories))
+                            send(categories)
                         }
                     }
 
                     TransactionType.EXPENSE -> {
                         transactionRepository.getExpenseCategoryList().collect{ categories ->
-                            send(DataResult.Success(categories))
+                            send(categories)
                         }
                     }
 
                     TransactionType.TRANSFER -> {
-                        //no categories for this type
+                        send(emptyList())
                     }
 
                     null -> {
@@ -44,7 +42,7 @@ class GetTransactionCategoriesUseCase @Inject constructor(
                         ){ expenseCategories, incomeCategories ->
                             expenseCategories + incomeCategories
                         }.collectLatest {
-                            send(DataResult.Success(it.distinct()))
+                            send(it.distinct())
                         }
                     }
                 }
@@ -52,7 +50,6 @@ class GetTransactionCategoriesUseCase @Inject constructor(
             }
             catch (e: Exception){
                 debugLog("getTransactionCategories exception: ${e.message}")
-                send(DataResult.Error("${e.message}"))
             }
         }
     }

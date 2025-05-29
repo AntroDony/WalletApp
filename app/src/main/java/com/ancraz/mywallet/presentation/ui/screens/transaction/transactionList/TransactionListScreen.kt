@@ -43,7 +43,6 @@ fun TransactionListScreen(
     modifier: Modifier = Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()

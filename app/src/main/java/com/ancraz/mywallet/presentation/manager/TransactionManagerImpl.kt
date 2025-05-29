@@ -17,7 +17,7 @@ class TransactionManagerImpl @Inject constructor(
     private val deleteTransactionUseCase: DeleteTransactionUseCase
 ): TransactionManager {
 
-    override fun getTransactions(): Flow<DataResult<List<Transaction>>> {
+    override fun getTransactions(): Flow<List<Transaction>> {
         return getAllTransactionsUseCase()
     }
 

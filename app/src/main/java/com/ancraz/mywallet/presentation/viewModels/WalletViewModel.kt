@@ -89,30 +89,14 @@ class WalletViewModel @Inject constructor(
 
     private fun fetchData(){
         viewModelScope.launch(ioDispatcher) {
-            walletManager.getWallets().onEach { result ->
-                when(result){
-                    is DataResult.Success -> {
-                        _walletListUiState.value = _walletListUiState.value.copy(
-                            isLoading = false,
-                            walletList = result.data?.map { wallet ->
-                                wallet.toWalletUi()
-                            } ?: emptyList()
-                        )
+            walletManager.getWallets().collect { wallets ->
+                _walletListUiState.value = _walletListUiState.value.copy(
+                    isLoading = false,
+                    walletList = wallets.map { wallet ->
+                        wallet.toWalletUi()
                     }
-
-                    is DataResult.Loading -> {
-                        _walletListUiState.value = _walletListUiState.value.copy(
-                            isLoading = true
-                        )
-                    }
-
-                    is DataResult.Error -> {
-                        _walletListUiState.value = _walletListUiState.value.copy(
-                            error = result.errorMessage
-                        )
-                    }
-                }
-            }.launchIn(viewModelScope)
+                )
+            }
         }
     }
 }

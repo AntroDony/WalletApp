@@ -19,12 +19,13 @@ class GetCurrencyRatesUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) {
 
-    operator fun invoke(): Flow<DataResult<List<CurrencyRate>>> {
+    operator fun invoke(): Flow<List<CurrencyRate>> {
         return flow {
             val currencyLastUpdateTime = dataStoreRepository.getCurrencyLastUpdateTime()
             if (currencyLastUpdateTime == null || needUpdateCurrencyRates(currencyLastUpdateTime)) {
-                getCurrencyRatesFromApi { onError ->
-                    emit(onError)
+                getCurrencyRatesFromApi { onError: DataResult<List<CurrencyRate>> ->
+                    debugLog("getCurrencyRatesFromApi error: ${onError.errorMessage}")
+                    emit(emptyList())
                 }
             }
 
@@ -41,9 +42,9 @@ class GetCurrencyRatesUseCase @Inject constructor(
 
                 }
 
-                emit(DataResult.Success(resultList))
+                emit(resultList)
             } catch (e: Exception) {
-                emit(DataResult.Error(e.localizedMessage ?: "GetCurrencyRatesUseCase Exception"))
+                debugLog("GetCurrencyRatesUseCase exception: ${e.message}")
             }
         }
     }

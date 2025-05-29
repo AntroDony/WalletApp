@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface TransactionCategoryManager {
 
-    fun getCategories(transactionType: TransactionType): Flow<DataResult<List<TransactionCategory>>>
+    fun getCategories(transactionType: TransactionType): Flow<List<TransactionCategory>>
 
     suspend fun addCategory(category: TransactionCategory)
 

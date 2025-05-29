@@ -8,7 +8,7 @@ class GetRecentWalletIdUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) {
 
-    operator fun invoke(): Flow<Long?>{
+    operator fun invoke(): Flow<Long>{
         return dataStoreRepository.getRecentWalletIdFlow()
     }
 }

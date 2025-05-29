@@ -23,6 +23,8 @@ import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -41,6 +43,9 @@ class AnalyticsViewModel @Inject constructor(
 
     private val _analyticsUiState = mutableStateOf(AnalyticsUiState())
     val analyticsUiState: State<AnalyticsUiState> = _analyticsUiState
+
+    private val transactionCategoryListFlow: Flow<List<TransactionCategory>> = getTransactionCategoriesUseCase()
+    private val allTransactionsListFlow: Flow<List<Transaction>> = getAllTransactionsUseCase()
 
     private var transactionList = emptyList<TransactionUi>()
 
@@ -98,61 +103,35 @@ class AnalyticsViewModel @Inject constructor(
 
     private fun fetchData() {
         viewModelScope.launch(ioDispatcher) {
-            getAllTransactionsUseCase().onEach { result ->
-                when (result) {
-                    is DataResult.Success -> {
-                        transactionList = result.data?.map { transaction: Transaction ->
-                                transaction.toTransactionUi()
-                        } ?: emptyList()
+            try {
+                combine(
+                    allTransactionsListFlow,
+                    transactionCategoryListFlow
+                ) { allTransactionsList, categoryList ->
+                    transactionList = allTransactionsList.map { it.toTransactionUi() }
+                    filterAnalyticsData(
+                        transactionType = null,
+                        transactionCategory = null,
+                        period = AnalyticsPeriod.Day,
+                        periodOffset = 0
+                    )
 
-                        _analyticsUiState.value = _analyticsUiState.value.copy(
-                            data = _analyticsUiState.value.data.copy(
-                                filteredTransactionList = transactionList
-                            )
-                        )
-                        filterAnalyticsData(
-                            transactionType = null,
-                            transactionCategory = null,
-                            period = AnalyticsPeriod.Day,
-                            periodOffset = 0
-                        )
-                    }
 
-                    is DataResult.Loading -> {
-                        debugLog("getTransaction Loading")
-                    }
-
-                    is DataResult.Error -> {
-                        _analyticsUiState.value = _analyticsUiState.value.copy(
-                            error = result.errorMessage
+                    AnalyticsUiState(
+                        isLoading = false,
+                        data = AnalyticsUiState.AnalyticsScreenData(
+                            filteredTransactionList = transactionList,
+                            transactionCategoryList = categoryList.map { it.toCategoryUi() }
                         )
-                    }
+                    )
+                }.collect { uiState ->
+                    _analyticsUiState.value = uiState
                 }
-
-            }.launchIn(viewModelScope)
-
-
-            getTransactionCategoriesUseCase().onEach { result ->
-                when(result){
-                    is DataResult.Success -> {
-                        _analyticsUiState.value = _analyticsUiState.value.copy(
-                            data = _analyticsUiState.value.data.copy(
-                                transactionCategoryList = result.data?.map { categoryList: TransactionCategory ->
-                                    categoryList.toCategoryUi()
-                                } ?: emptyList()
-                            )
-                        )
-                    }
-                    is DataResult.Loading -> {
-                        debugLog("getCategories Loading")
-                    }
-                    is DataResult.Error -> {
-                        _analyticsUiState.value = _analyticsUiState.value.copy(
-                            error = result.errorMessage
-                        )
-                    }
-                }
-            }.launchIn(viewModelScope)
+            } catch (e: Exception) {
+                _analyticsUiState.value = _analyticsUiState.value.copy(
+                    error = e.message
+                )
+            }
         }
     }
 }

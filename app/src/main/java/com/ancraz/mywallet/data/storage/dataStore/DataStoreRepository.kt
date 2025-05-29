@@ -126,9 +126,9 @@ class DataStoreRepository(
     }
 
 
-    fun getRecentWalletIdFlow(): Flow<Long?> {
+    fun getRecentWalletIdFlow(): Flow<Long> {
         return context.dataStore.data.map { preferences ->
-            preferences[RECENT_WALLET_ACCOUNT_ID]
+            preferences[RECENT_WALLET_ACCOUNT_ID] ?: 0L
         }
     }
 

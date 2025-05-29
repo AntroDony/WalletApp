@@ -97,7 +97,7 @@ private fun MainActivityScreen(startDestinationRoute: String) {
                 route = NavigationScreen.HomeScreen.route
             ) {
                 HomeScreen(
-                    homeViewModel.homeUiState.value,
+                    uiState = homeViewModel.homeUiState.value,
                     modifier = Modifier.padding(innerPadding),
                     onEvent = { event ->
                         when (event) {
@@ -192,7 +192,6 @@ private fun MainActivityScreen(startDestinationRoute: String) {
             composable(
                 route = NavigationScreen.CreateWalletScreen.route
             ) { navBackStackEntry ->
-
                 CreateWalletScreen(
                     uiState = walletViewModel.walletUiState.value,
                     modifier = Modifier
@@ -291,7 +290,6 @@ private fun MainActivityScreen(startDestinationRoute: String) {
                 } ?: run {
                     debugLog("walletId is null")
                 }
-
                 TransactionInfoScreen(
                     uiState = transactionViewModel.transactionInfoUiState.value,
                     modifier = Modifier
@@ -338,8 +336,6 @@ private fun MainActivityScreen(startDestinationRoute: String) {
 
 
             composable(route = NavigationScreen.WalletInfoScreen.route + "/{walletId}"){ navBackStackEntry ->
-                debugLog("composable WalletInfoScreen")
-
                 LaunchedEffect(key1 = true) {
                     val walletId = try {
                         navBackStackEntry.arguments?.getString("walletId")?.toLong()
@@ -347,7 +343,6 @@ private fun MainActivityScreen(startDestinationRoute: String) {
                         debugLog("getCurrentBalance argument exception: ${e.message}")
                         null
                     }
-                    debugLog("composable WalletInfoScreen")
                     walletId?.let {
                         walletViewModel.getWalletById(it)
                     } ?: run {
@@ -382,8 +377,6 @@ private fun MainActivityScreen(startDestinationRoute: String) {
 
             composable(route = NavigationScreen.AnalyticsScreen.route){
                 val analyticsViewModel = hiltViewModel<AnalyticsViewModel>()
-
-                debugLog("composable AnalyticsScreen")
 
                 AnalyticsScreen(
                     uiState = analyticsViewModel.analyticsUiState.value,

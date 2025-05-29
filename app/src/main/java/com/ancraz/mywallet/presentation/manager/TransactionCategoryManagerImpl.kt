@@ -1,7 +1,6 @@
 package com.ancraz.mywallet.presentation.manager
 
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.domain.manager.TransactionCategoryManager
 import com.ancraz.mywallet.domain.models.TransactionCategory
 import com.ancraz.mywallet.domain.useCases.transactionCategory.AddTransactionCategoryUseCase
@@ -16,7 +15,7 @@ class TransactionCategoryManagerImpl @Inject constructor(
     private val deleteTransactionCategoryUseCase: DeleteTransactionCategoryUseCase
 ): TransactionCategoryManager  {
 
-    override fun getCategories(transactionType: TransactionType): Flow<DataResult<List<TransactionCategory>>> {
+    override fun getCategories(transactionType: TransactionType): Flow<List<TransactionCategory>> {
         return getTransactionCategoriesUseCase(transactionType)
     }
 

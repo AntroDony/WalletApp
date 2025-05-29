@@ -74,6 +74,11 @@ fun CreateTransactionScreen(
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        debugLog("composable CreateTransactionScreen")
+    }
+
+
     val context = LocalContext.current
 
     val inputValueState = remember { mutableStateOf(0f.toFormattedString()) }

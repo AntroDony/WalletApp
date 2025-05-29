@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
@@ -11,7 +12,10 @@ import com.ancraz.mywallet.domain.manager.DataStoreManager
 import com.ancraz.mywallet.domain.manager.TransactionCategoryManager
 import com.ancraz.mywallet.domain.manager.TransactionManager
 import com.ancraz.mywallet.domain.manager.WalletManager
+import com.ancraz.mywallet.domain.models.CurrencyRate
 import com.ancraz.mywallet.domain.models.Transaction
+import com.ancraz.mywallet.domain.models.TransactionCategory
+import com.ancraz.mywallet.domain.models.Wallet
 import com.ancraz.mywallet.domain.useCases.currency.GetCurrencyRatesUseCase
 import com.ancraz.mywallet.presentation.mapper.toCategoryUi
 import com.ancraz.mywallet.presentation.mapper.toCurrencyRateUi
@@ -25,6 +29,8 @@ import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.T
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -49,6 +55,21 @@ class TransactionViewModel @Inject constructor(
 
     private var _transactionInfoUiState = mutableStateOf(TransactionInfoUiState())
     val transactionInfoUiState: State<TransactionInfoUiState> = _transactionInfoUiState
+
+
+    private val totalBalanceFlow: Flow<Float> = dataStoreManager.getTotalBalance()
+    private val recentWalletIdFlow: Flow<Long> = dataStoreManager.getRecentWalletId()
+    private val recentCurrencyFlow: Flow<CurrencyCode> = dataStoreManager.getRecentCurrency()
+    private val incomeTransactionCategoriesFlow: Flow<List<TransactionCategory>>
+        = transactionCategoryManager.getCategories(TransactionType.INCOME)
+    private val expenseTransactionCategoriesFlow: Flow<List<TransactionCategory>>
+        = transactionCategoryManager.getCategories(TransactionType.EXPENSE)
+    private val transactionListFlow: Flow<List<Transaction>> = transactionManager.getTransactions()
+    private val walletListFlow: Flow<List<Wallet>> = walletManager.getWallets()
+    private val currencyRatesFlow: Flow<List<CurrencyRate>>  = getCurrencyRatesUseCase()
+
+
+    private var transactionList: List<TransactionUi> = emptyList()
 
 
     init {
@@ -103,190 +124,57 @@ class TransactionViewModel @Inject constructor(
 
     private fun fetchData(){
         viewModelScope.launch(ioDispatcher) {
-            fetchDataStoreData()
-            fetchWalletList()
-            fetchTransactionCategories()
-            //fetchTransactionList()
-            fetchCurrencyRates()
-        }
-    }
+            try {
+                combine(
+                    totalBalanceFlow,
+                    recentWalletIdFlow,
+                    recentCurrencyFlow,
+                    incomeTransactionCategoriesFlow,
+                    expenseTransactionCategoriesFlow,
+                    transactionListFlow,
+                    walletListFlow,
+                    currencyRatesFlow
+                ){ values: Array<Any?> ->
+                    val totalBalance = values[0] as Float
+                    val recentWalletId = values[1] as Long
+                    val recentCurrency = values[2] as CurrencyCode
+                    val incomeCategories = values[3] as List<TransactionCategory>
+                    val expenseCategories = values[4] as List<TransactionCategory>
+                    val transactions = values[5] as List<Transaction>
+                    val wallets = values[6] as List<Wallet>
+                    val currencyRates = values[7] as List<CurrencyRate>
 
+                    transactionList = transactions.map { it.toTransactionUi() }
 
-    private fun fetchDataStoreData(){
-        viewModelScope.launch(ioDispatcher) {
-            dataStoreManager.getRecentWalletId().onEach { id ->
-                _createTransactionUiState.value = _createTransactionUiState.value.copy(
-                    data = _createTransactionUiState.value.data.copy(
-                        recentWalletId = id
-                    )
-                )
-            }.launchIn(viewModelScope)
-
-
-            dataStoreManager.getRecentCurrency().onEach { currency ->
-                _createTransactionUiState.value = _createTransactionUiState.value.copy(
-                    data = _createTransactionUiState.value.data.copy(
-                        recentCurrency = currency
-                    )
-                )
-            }.launchIn(viewModelScope)
-
-            dataStoreManager.getTotalBalance().onEach { result ->
-                when(result){
-                    is DataResult.Success -> {
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
-                            isLoading = false,
-                            data = _createTransactionUiState.value.data.copy(totalBalance = result.data ?: 0f)
-                        )
-                    }
-                    is DataResult.Loading -> {
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(isLoading = true)
-                    }
-                    is DataResult.Error -> {
-                        debugLog("getTotalBalance error: ${result.errorMessage}")
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
-                            error = result.errorMessage
-                        )
-                    }
-                }
-            }.launchIn(viewModelScope)
-        }
-    }
-
-
-    private fun fetchTransactionCategories() {
-        viewModelScope.launch(ioDispatcher) {
-            transactionCategoryManager.getCategories(TransactionType.EXPENSE).onEach { result ->
-                when (result) {
-                    is DataResult.Success -> {
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
-                            isLoading = false,
-                            data = _createTransactionUiState.value.data.copy(
-                                expenseCategories = result.data?.map { category ->
-                                    category.toCategoryUi()
-                                } ?: emptyList()
-                            )
-                        )
-                    }
-
-                    is DataResult.Loading -> {
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(isLoading = true)
-                    }
-
-                    is DataResult.Error -> {
-                        debugLog("getExpenseCategories error: ${result.errorMessage}")
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(error = result.errorMessage)
-                    }
-                }
-            }.launchIn(viewModelScope)
-
-            transactionCategoryManager.getCategories(TransactionType.INCOME).onEach { result ->
-                when (result) {
-                    is DataResult.Success -> {
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
-                            isLoading = false,
-                            data = _createTransactionUiState.value.data.copy(
-                                incomeCategories = result.data?.map { category ->
-                                    category.toCategoryUi()
-                                } ?: emptyList()
-                            )
-                        )
-                    }
-
-                    is DataResult.Loading -> {
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(isLoading = true)
-                    }
-
-                    is DataResult.Error -> {
-                        debugLog("getExpenseCategories error: ${result.errorMessage}")
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(error = result.errorMessage)
-                    }
-                }
-            }.launchIn(viewModelScope)
-        }
-    }
-
-
-    private fun fetchTransactionList(){
-        viewModelScope.launch {
-            transactionManager.getTransactions().onEach { result ->
-                when(result){
-                    is DataResult.Success -> {
-                        _transactionListUiState.value = _transactionListUiState.value.copy(
-                            isLoading = false,
-                            transactionList = result.data?.map { transaction: Transaction ->
-                                transaction.toTransactionUi()
-                            } ?: emptyList()
-                        )
-                    }
-                    is DataResult.Loading -> {
-                        _transactionListUiState.value = _transactionListUiState.value.copy(
-                            isLoading = true
-                        )
-                    }
-                    is DataResult.Error -> {
-                        _transactionListUiState.value = _transactionListUiState.value.copy(
-                            error = result.errorMessage
-                        )
-                    }
-                }
-            }.launchIn(viewModelScope)
-        }
-    }
-
-
-    private fun fetchWalletList(){
-        walletManager.getWallets().onEach { result ->
-            when(result){
-                is DataResult.Success -> {
-                    _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                    CreateTransactionUiState(
                         isLoading = false,
-                        data = _createTransactionUiState.value.data.copy(
-                            walletList = result.data?.map { wallet ->
-                                wallet.toWalletUi()
-                            } ?: emptyList()
+                        data = CreateTransactionUiState.TransactionScreenData(
+                            totalBalance = totalBalance,
+                            incomeCategories = incomeCategories.map { it.toCategoryUi() },
+                            expenseCategories = expenseCategories.map { it.toCategoryUi() },
+                            currencyRates = currencyRates.map { it.toCurrencyRateUi() },
+                            walletList = wallets.map { it.toWalletUi() },
+                            recentWalletId = recentWalletId,
+                            recentCurrency = recentCurrency
                         )
                     )
-                }
+                }.collect{
+                    _createTransactionUiState.value = it
 
-                is DataResult.Loading -> {
-                    _createTransactionUiState.value = _createTransactionUiState.value.copy(
-                        isLoading = true
-                    )
-                }
-
-                is DataResult.Error -> {
-                    _createTransactionUiState.value = _createTransactionUiState.value.copy(
-                        error = result.errorMessage
+                    _transactionListUiState.value = TransactionListUiState(
+                        isLoading = false,
+                        transactionList = transactionList
                     )
                 }
             }
-        }.launchIn(viewModelScope)
-    }
+            catch (e: Exception){
+                debugLog("fetchData exception: ${e.message}")
 
+                _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                    error = e.message
+                )
+            }
 
-    private fun fetchCurrencyRates() {
-        viewModelScope.launch {
-            getCurrencyRatesUseCase().onEach { result ->
-                when(result){
-                    is DataResult.Success -> {
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(
-                            data = _createTransactionUiState.value.data.copy(
-                                currencyRates = result.data?.map { rate ->
-                                    rate.toCurrencyRateUi()
-                                } ?: emptyList()
-                            )
-                        )
-                    }
-                    is DataResult.Loading -> {
-                        debugLog("loading currency rates in transactionState")
-                    }
-                    is DataResult.Error -> {
-                        debugLog("fetchCurrencyRates error: ${result.errorMessage}")
-                        _createTransactionUiState.value = _createTransactionUiState.value.copy(error = result.errorMessage)
-                    }
-                }
-            }.launchIn(viewModelScope)
         }
     }
 }

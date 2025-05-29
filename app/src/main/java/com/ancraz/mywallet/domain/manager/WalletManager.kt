@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface WalletManager {
 
-    fun getWallets(): Flow<DataResult<List<Wallet>>>
+    fun getWallets(): Flow<List<Wallet>>
 
     suspend fun getWalletById(id: Long): DataResult<Wallet>
 

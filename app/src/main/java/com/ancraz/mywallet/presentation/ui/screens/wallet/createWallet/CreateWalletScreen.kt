@@ -66,6 +66,7 @@ import androidx.compose.ui.window.Dialog
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.ActionButton
 import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
@@ -92,6 +93,11 @@ fun CreateWalletScreen(
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        debugLog("composable CreateWalletScreen")
+    }
+
+
     val context = LocalContext.current
     val isWalletEdit = remember { mutableStateOf(uiState.wallet != null) }
 

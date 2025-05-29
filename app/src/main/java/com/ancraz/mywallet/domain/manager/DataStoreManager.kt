@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface DataStoreManager {
 
-    fun getTotalBalance(): Flow<DataResult<Float>>
+    fun getTotalBalance(): Flow<Float>
 
-    fun getRecentWalletId(): Flow<Long?>
+    fun getRecentWalletId(): Flow<Long>
 
     fun getRecentCurrency(): Flow<CurrencyCode>
 

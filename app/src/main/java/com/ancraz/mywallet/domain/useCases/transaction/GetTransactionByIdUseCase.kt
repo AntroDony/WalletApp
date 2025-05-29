@@ -12,7 +12,6 @@ class GetTransactionByIdUseCase @Inject constructor(
     suspend operator fun invoke(id: Long): DataResult<Transaction> {
         return try {
             transactionRepository.getTransactionById(id).let { transaction ->
-                debugLog("GetTransactionByIdUseCase : $transaction")
                 DataResult.Success(transaction)
             }
         } catch (e: Exception) {

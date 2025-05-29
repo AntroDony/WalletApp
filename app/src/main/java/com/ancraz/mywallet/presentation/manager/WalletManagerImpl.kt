@@ -19,7 +19,7 @@ class WalletManagerImpl @Inject constructor(
     private val deleteWalletUseCase: DeleteWalletUseCase
 ): WalletManager {
 
-    override fun getWallets(): Flow<DataResult<List<Wallet>>> {
+    override fun getWallets(): Flow<List<Wallet>> {
         return getAllWalletsUseCase()
     }
 

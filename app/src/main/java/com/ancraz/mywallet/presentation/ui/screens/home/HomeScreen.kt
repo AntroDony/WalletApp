@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +38,7 @@ import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.models.WalletType
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.CreateWalletButton
@@ -59,6 +61,10 @@ fun HomeScreen(
     modifier: Modifier,
     onEvent: (HomeUiEvent) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        debugLog("composable HomeScreen")
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()

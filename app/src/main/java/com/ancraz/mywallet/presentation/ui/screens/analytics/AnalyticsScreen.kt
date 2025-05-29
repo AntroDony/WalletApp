@@ -82,6 +82,8 @@ fun AnalyticsScreen(
     modifier: Modifier,
     onEvent: (UiEvent) -> Unit
 ) {
+    val screenJustStarted = remember { mutableStateOf(true) }
+
     val selectedPeriodState = remember { mutableStateOf(uiState.data.period) }
     val selectedTypeState = remember { mutableStateOf<TransactionType?>(null) }
 
@@ -101,6 +103,11 @@ fun AnalyticsScreen(
         selectedFilterCategoryState.value,
         datePageNumber.value
     ) {
+        if (screenJustStarted.value){
+            screenJustStarted.value = false
+            return@LaunchedEffect
+        }
+
         onEvent(
             AnalyticsUiEvent.FilterAnalyticsData(
                 type = selectedTypeState.value,
@@ -376,7 +383,6 @@ private fun AnalyticsDataView(
                 .clip(CircleShape)
                 .clickable {
                     if (isNextPageButtonActive) {
-                        debugLog("nextPage click")
                         onNextPageClick()
                     }
                 }

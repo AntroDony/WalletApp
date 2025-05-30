@@ -2,6 +2,7 @@ package com.ancraz.mywallet.presentation.ui.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
@@ -14,8 +15,11 @@ import androidx.glance.action.ActionParameters
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.background
 import androidx.glance.appwidget.components.CircleIconButton
+import androidx.glance.appwidget.components.Scaffold
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
@@ -23,6 +27,7 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
@@ -39,6 +44,7 @@ import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.utils.Constants
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.ui.MainActivity
+import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
@@ -57,6 +63,9 @@ object WalletWidget: GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*>
         get() = PreferencesGlanceStateDefinition
 
+    override val sizeMode: SizeMode
+        get() = SizeMode.Single
+
 
     override fun onCompositionError(
         context: Context,
@@ -73,7 +82,6 @@ object WalletWidget: GlanceAppWidget() {
         provideContent {
             WidgetContent()
         }
-
     }
 
 
@@ -84,47 +92,31 @@ object WalletWidget: GlanceAppWidget() {
         val totalBalance = prefs[totalBalanceKey] ?: 0f
         val isPrivateMode = prefs[isPrivateModeKey] ?: false
 
-        Box(
+        Scaffold (
+            backgroundColor = ColorProvider(backgroundColor),
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(
-                    day = backgroundColor,
-                    night = backgroundColor
-                )
+                .cornerRadius(15.dp)
         ) {
-            Column(
+            Row(
                 modifier = GlanceModifier
                     .fillMaxSize()
-                    .padding(20.dp)
+                    .padding(12.dp)
+                    .cornerRadius(15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = GlanceModifier
-                        .fillMaxWidth(),
+                Column(
+                    modifier = GlanceModifier,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-//                    Text(
-//                        text = "Balance:",
-//                        maxLines = 1,
-//                        style = TextDefaults.defaultTextStyle.copy(
-//                            color = ColorProvider(onBackgroundColor),
-//                            fontSize = 16.sp,
-//                            fontWeight = FontWeight.Bold
-//                        ),
-//                        modifier = GlanceModifier
-//
-//                    )
-//
-//                    Spacer(modifier = GlanceModifier
-//                        .width(14.dp)
-//                    )
-
                     Text(
                         text = if (isPrivateMode) "* * * *" else "\$ ${totalBalance.toFormattedString()}",
                         maxLines = 1,
                         style = TextDefaults.defaultTextStyle.copy(
                             color = ColorProvider(onBackgroundColor),
-                            fontSize = 16.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = GlanceModifier
@@ -133,21 +125,14 @@ object WalletWidget: GlanceAppWidget() {
 
 
                 Spacer(modifier = GlanceModifier
-                    .height(10.dp)
+                    .width(40.dp)
                 )
 
                 Row(
-                    modifier = GlanceModifier
-                        .fillMaxWidth(),
+                    modifier = GlanceModifier,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalAlignment = Alignment.Bottom
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    Spacer(modifier = GlanceModifier
-                        .width(14.dp)
-                        .defaultWeight()
-                    )
-
                     CircleIconButton(
                         imageProvider = ImageProvider(R.drawable.ic_widget_add),
                         contentDescription = "Income",
@@ -165,8 +150,7 @@ object WalletWidget: GlanceAppWidget() {
                     )
 
                     Spacer(modifier = GlanceModifier
-                        .width(14.dp)
-                        .defaultWeight()
+                        .width(20.dp)
                     )
 
                     CircleIconButton(
@@ -193,6 +177,6 @@ object WalletWidget: GlanceAppWidget() {
             }
         }
     }
+
+
 }
-
-

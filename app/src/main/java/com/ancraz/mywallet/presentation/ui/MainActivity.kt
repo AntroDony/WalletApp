@@ -229,7 +229,6 @@ private fun MainActivityScreen(startDestinationRoute: String) {
                         else -> TransactionType.INCOME
                     }
                 } catch (e: Exception) {
-                    debugLog("getCurrentBalance argument exception: ${e.message}")
                     TransactionType.INCOME
                 }
 
@@ -241,6 +240,11 @@ private fun MainActivityScreen(startDestinationRoute: String) {
                         when (event) {
                             is CreateTransactionUiEvent.AddTransaction -> {
                                 transactionViewModel.addNewTransaction(event.transaction)
+                                navController.navigate(NavigationScreen.HomeScreen.route){
+                                    popUpTo(NavigationScreen.TransactionInputScreen.route + "/{transaction}"){
+                                        inclusive = true
+                                    }
+                                }
                             }
 
                             is CreateTransactionUiEvent.CreateWallet -> {

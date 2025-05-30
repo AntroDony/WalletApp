@@ -46,7 +46,6 @@ class GetTransactionCategoriesUseCase @Inject constructor(
                         }
                     }
                 }
-
             }
             catch (e: Exception){
                 debugLog("getTransactionCategories exception: ${e.message}")

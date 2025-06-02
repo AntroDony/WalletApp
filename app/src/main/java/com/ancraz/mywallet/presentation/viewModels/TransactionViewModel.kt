@@ -60,13 +60,13 @@ class TransactionViewModel @Inject constructor(
     private val totalBalanceFlow: Flow<Float> = dataStoreManager.getTotalBalance()
     private val recentWalletIdFlow: Flow<Long> = dataStoreManager.getRecentWalletId()
     private val recentCurrencyFlow: Flow<CurrencyCode> = dataStoreManager.getRecentCurrency()
-    private val incomeTransactionCategoriesFlow: Flow<List<TransactionCategory>>
-        = transactionCategoryManager.getCategories(TransactionType.INCOME)
-    private val expenseTransactionCategoriesFlow: Flow<List<TransactionCategory>>
-        = transactionCategoryManager.getCategories(TransactionType.EXPENSE)
+    private val incomeTransactionCategoriesFlow: Flow<List<TransactionCategory>> =
+        transactionCategoryManager.getCategories(TransactionType.INCOME)
+    private val expenseTransactionCategoriesFlow: Flow<List<TransactionCategory>> =
+        transactionCategoryManager.getCategories(TransactionType.EXPENSE)
     private val transactionListFlow: Flow<List<Transaction>> = transactionManager.getTransactions()
     private val walletListFlow: Flow<List<Wallet>> = walletManager.getWallets()
-    private val currencyRatesFlow: Flow<List<CurrencyRate>>  = getCurrencyRatesUseCase()
+    private val currencyRatesFlow: Flow<List<CurrencyRate>> = getCurrencyRatesUseCase()
 
 
     private var transactionList: List<TransactionUi> = emptyList()
@@ -88,10 +88,10 @@ class TransactionViewModel @Inject constructor(
         }
     }
 
-    fun getTransactionById(id: Long){
+    fun getTransactionById(id: Long) {
         viewModelScope.launch(ioDispatcher) {
             transactionManager.getTransactionById(id).let { result ->
-                when(result){
+                when (result) {
                     is DataResult.Success -> {
                         _transactionInfoUiState.value = _transactionInfoUiState.value.copy(
                             isLoading = false,
@@ -99,11 +99,13 @@ class TransactionViewModel @Inject constructor(
                         )
                         cancel()
                     }
+
                     is DataResult.Loading -> {
                         _transactionInfoUiState.value = _transactionInfoUiState.value.copy(
                             isLoading = true
                         )
                     }
+
                     is DataResult.Error -> {
                         _transactionInfoUiState.value = _transactionInfoUiState.value.copy(
                             error = result.errorMessage
@@ -115,14 +117,29 @@ class TransactionViewModel @Inject constructor(
     }
 
 
-    fun deleteTransactionById(id: Long){
+    fun deleteTransactionById(id: Long) {
         viewModelScope.launch(ioDispatcher) {
             transactionManager.deleteTransaction(id)
         }
     }
 
 
-    private fun fetchData(){
+    fun getTransactionsByType(type: TransactionType?) {
+        viewModelScope.launch(Dispatchers.Default) {
+
+            _transactionListUiState.value = _transactionListUiState.value.copy(
+                transactionList = type?.let {
+                    transactionList.filter { it.type == type }
+                } ?: run {
+                    transactionList
+                }
+            )
+        }
+
+    }
+
+
+    private fun fetchData() {
         viewModelScope.launch(ioDispatcher) {
             try {
                 combine(
@@ -134,7 +151,7 @@ class TransactionViewModel @Inject constructor(
                     transactionListFlow,
                     walletListFlow,
                     currencyRatesFlow
-                ){ values: Array<Any?> ->
+                ) { values: Array<Any?> ->
                     val totalBalance = values[0] as Float
                     val recentWalletId = values[1] as Long
                     val recentCurrency = values[2] as CurrencyCode
@@ -158,7 +175,7 @@ class TransactionViewModel @Inject constructor(
                             recentCurrency = recentCurrency
                         )
                     )
-                }.collect{
+                }.collect {
                     _createTransactionUiState.value = it
 
                     _transactionListUiState.value = TransactionListUiState(
@@ -166,8 +183,7 @@ class TransactionViewModel @Inject constructor(
                         transactionList = transactionList
                     )
                 }
-            }
-            catch (e: Exception){
+            } catch (e: Exception) {
                 debugLog("fetchData exception: ${e.message}")
 
                 _createTransactionUiState.value = _createTransactionUiState.value.copy(

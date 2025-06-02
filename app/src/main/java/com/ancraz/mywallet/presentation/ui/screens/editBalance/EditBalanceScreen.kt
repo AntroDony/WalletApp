@@ -18,7 +18,6 @@ import com.ancraz.mywallet.presentation.ui.components.InputNumberKeyboard
 import com.ancraz.mywallet.presentation.ui.components.TransactionConfigContainer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
-import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
@@ -28,7 +27,7 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 fun EditBalanceScreen(
     uiState: EditBalanceUiState,
     modifier: Modifier,
-    onEvent: (UiEvent) -> Unit
+    onEvent: (EditBalanceUiEvent) -> Unit
 ) {
     val valueState = remember { mutableStateOf(uiState.data.currentTotalBalance.toFormattedString()) }
     val currencyState = remember { mutableStateOf(uiState.data.currency) }
@@ -44,7 +43,7 @@ fun EditBalanceScreen(
         NavigationToolbar(
             title = stringResource(R.string.edit_balance_screen_title),
             onClickBack = {
-                onEvent(UiEvent.GoBack)
+                onEvent(EditBalanceUiEvent.GoBack)
             }
         )
 
@@ -73,7 +72,7 @@ fun EditBalanceScreen(
             onClick = {
                 val newBalanceValue = valueState.value.toFloatValue()
                 onEvent(EditBalanceUiEvent.UpdateBalanceValue(newBalanceValue))
-                onEvent(UiEvent.GoBack)
+                onEvent(EditBalanceUiEvent.GoBack)
             }
         )
     }

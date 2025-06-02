@@ -30,7 +30,6 @@ import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.components.TransactionTypeSelector
 import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
-import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
@@ -41,7 +40,7 @@ import java.util.Calendar
 fun TransactionListScreen(
     uiState: TransactionListUiState,
     modifier: Modifier = Modifier,
-    onEvent: (UiEvent) -> Unit
+    onEvent: (TransactionListUiEvent) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -54,7 +53,7 @@ fun TransactionListScreen(
         NavigationToolbar(
             title = stringResource(R.string.transaction_list_screen_title),
             onClickBack = {
-                onEvent(UiEvent.GoBack)
+                onEvent(TransactionListUiEvent.GoBack)
             }
         )
 

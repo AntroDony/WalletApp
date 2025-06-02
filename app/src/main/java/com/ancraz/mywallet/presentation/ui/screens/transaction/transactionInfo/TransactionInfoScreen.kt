@@ -39,7 +39,6 @@ import com.ancraz.mywallet.presentation.ui.components.LoadingIndicator
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.events.TransactionInfoUiEvent
-import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.errorColor
@@ -54,7 +53,7 @@ import java.util.Calendar
 fun TransactionInfoScreen(
     uiState: TransactionInfoUiState,
     modifier: Modifier = Modifier,
-    onEvent: (UiEvent) -> Unit
+    onEvent: (TransactionInfoUiEvent) -> Unit
 ) {
 
     val isDeleteDialogOpened = remember { mutableStateOf(false) }
@@ -70,7 +69,7 @@ fun TransactionInfoScreen(
         NavigationToolbar(
             title = stringResource(R.string.transaction_info_screen_title),
             onClickBack = {
-                onEvent(UiEvent.GoBack)
+                onEvent(TransactionInfoUiEvent.GoBack)
             }
         )
 

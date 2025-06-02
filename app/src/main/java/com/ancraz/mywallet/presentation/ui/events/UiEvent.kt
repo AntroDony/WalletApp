@@ -6,11 +6,7 @@ import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 
-sealed interface UiEvent {
-    data object GoBack: UiEvent
-}
-
-sealed class HomeUiEvent: UiEvent{
+sealed class HomeUiEvent{
     data class CreateTransaction(val transactionType: TransactionType): HomeUiEvent()
     data class EditTotalBalance(val currentBalance: Float): HomeUiEvent()
 
@@ -27,46 +23,63 @@ sealed class HomeUiEvent: UiEvent{
     data object ShowAnalytics: HomeUiEvent()
 }
 
-sealed class EditBalanceUiEvent: UiEvent{
+sealed class EditBalanceUiEvent{
     data class UpdateBalanceValue(val newBalance: Float): EditBalanceUiEvent()
+
+    data object GoBack: EditBalanceUiEvent()
 }
 
-sealed class CreateWalletUiEvent: UiEvent{
+sealed class CreateWalletUiEvent{
     data class AddWallet(val wallet: WalletUi): CreateWalletUiEvent()
     data class UpdateWallet(val wallet: WalletUi): CreateWalletUiEvent()
+
+    data object GoBack: CreateWalletUiEvent()
 }
 
-sealed class CreateTransactionUiEvent: UiEvent{
+sealed class CreateTransactionUiEvent{
     data class AddTransaction(val transaction: TransactionUi): CreateTransactionUiEvent()
     data object CreateWallet: CreateTransactionUiEvent()
+
+    data object GoBack: CreateTransactionUiEvent()
 }
 
-sealed class TransactionListUiEvent: UiEvent {
+sealed class TransactionListUiEvent {
     data class ShowTransactionInfo(val transaction: TransactionUi): TransactionListUiEvent()
     data class GetTransactionsByType(val transactionType: TransactionType?): TransactionListUiEvent()
+
+    data object GoBack: TransactionListUiEvent()
 }
 
-sealed class TransactionInfoUiEvent: UiEvent {
+sealed class TransactionInfoUiEvent {
     data class DeleteTransaction(val transaction: TransactionUi): TransactionInfoUiEvent()
+
+    data object GoBack: TransactionInfoUiEvent()
 }
 
-sealed class WalletListUiEvent: UiEvent{
+sealed class WalletListUiEvent{
     data object CreateWallet: WalletListUiEvent()
     data class ShowWalletInfo(val wallet: WalletUi): WalletListUiEvent()
+
+    data object GoBack: WalletListUiEvent()
 }
 
-sealed class WalletInfoUiEvent: UiEvent {
+sealed class WalletInfoUiEvent {
     data class EditWallet(val wallet: WalletUi): WalletInfoUiEvent()
     data class DeleteWallet(val wallet: WalletUi): WalletInfoUiEvent()
+
+    data object GoBack: WalletInfoUiEvent()
 }
 
-sealed class AnalyticsUiEvent: UiEvent{
+sealed class AnalyticsUiEvent{
     data class FilterAnalyticsData(
         val type: TransactionType?,
         val category: TransactionCategoryUi?,
         val period: AnalyticsPeriod,
         val periodOffset: Int
     ): AnalyticsUiEvent()
+
     data class ShowTransactionInfo(val transaction: TransactionUi): AnalyticsUiEvent()
+
+    data object GoBack: AnalyticsUiEvent()
 }
 

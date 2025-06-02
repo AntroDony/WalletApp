@@ -73,7 +73,6 @@ import com.ancraz.mywallet.presentation.ui.components.HorizontalSpacer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
-import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletUiState
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
@@ -91,7 +90,7 @@ import kotlinx.coroutines.delay
 fun CreateWalletScreen(
     uiState: WalletUiState,
     modifier: Modifier,
-    onEvent: (UiEvent) -> Unit
+    onEvent: (CreateWalletUiEvent) -> Unit
 ) {
     LaunchedEffect(Unit) {
         debugLog("composable CreateWalletScreen")
@@ -126,7 +125,7 @@ fun CreateWalletScreen(
         NavigationToolbar(
             title = if (isWalletEdit.value) stringResource(R.string.edit_wallet_screen_title) else stringResource(R.string.create_wallet_screen_title),
             onClickBack = {
-                onEvent(UiEvent.GoBack)
+                onEvent(CreateWalletUiEvent.GoBack)
             }
         )
 
@@ -210,7 +209,7 @@ fun CreateWalletScreen(
                         onEvent(CreateWalletUiEvent.AddWallet(it))
                     }
 
-                    onEvent(UiEvent.GoBack)
+                    onEvent(CreateWalletUiEvent.GoBack)
                 }
             }
         )

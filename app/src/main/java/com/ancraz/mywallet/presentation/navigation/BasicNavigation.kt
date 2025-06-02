@@ -18,7 +18,6 @@ import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.events.TransactionInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
-import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
 import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsScreen
@@ -129,17 +128,15 @@ fun BasicNavigation(
                         )
                     ),
                     modifier = Modifier.padding(innerPadding),
-                    onEvent = { event: UiEvent ->
+                    onEvent = { event: EditBalanceUiEvent ->
                         when (event) {
                             is EditBalanceUiEvent.UpdateBalanceValue -> {
                                 homeViewModel.editTotalBalance(event.newBalance)
                             }
 
-                            is UiEvent.GoBack -> {
+                            is EditBalanceUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
-
-                            else -> {}
                         }
                     }
                 )
@@ -154,7 +151,7 @@ fun BasicNavigation(
                     uiState = transactionViewModel.createTransactionUiState.value,
                     transactionType = transactionType,
                     modifier = Modifier.padding(innerPadding),
-                    onEvent = { event: UiEvent ->
+                    onEvent = { event: CreateTransactionUiEvent ->
                         when (event) {
                             is CreateTransactionUiEvent.AddTransaction -> {
                                 transactionViewModel.addNewTransaction(event.transaction)
@@ -172,7 +169,7 @@ fun BasicNavigation(
                                 )
                             }
 
-                            is UiEvent.GoBack -> {
+                            is CreateTransactionUiEvent.GoBack -> {
                                 backStack.apply {
                                     add(
                                         NavigationRoute.HomeScreen
@@ -180,8 +177,6 @@ fun BasicNavigation(
                                     removeAt(0)
                                 }
                             }
-
-                            else -> {}
                         }
                     },
                 )
@@ -194,7 +189,7 @@ fun BasicNavigation(
                     modifier = Modifier
                         .padding(innerPadding),
                     uiState = walletViewModel.walletListUiState.value,
-                    onEvent = { event: UiEvent ->
+                    onEvent = { event: WalletListUiEvent ->
                         when(event){
                             is WalletListUiEvent.ShowWalletInfo -> {
                                 backStack.add(
@@ -206,11 +201,9 @@ fun BasicNavigation(
                                     NavigationRoute.CreateWalletScreen
                                 )
                             }
-                            is UiEvent.GoBack -> {
+                            is WalletListUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
-
-                            else -> {}
                         }
                     }
                 )
@@ -223,7 +216,7 @@ fun BasicNavigation(
                     uiState = walletViewModel.walletUiState.value,
                     modifier = Modifier
                         .padding(innerPadding),
-                    onEvent = { event: UiEvent ->
+                    onEvent = { event: CreateWalletUiEvent ->
                         when (event) {
                             is CreateWalletUiEvent.AddWallet -> {
                                 walletViewModel.addWallet(event.wallet)
@@ -233,11 +226,9 @@ fun BasicNavigation(
                                 walletViewModel.updateWallet(event.wallet)
                             }
 
-                            is UiEvent.GoBack -> {
+                            is CreateWalletUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
-
-                            else -> {}
                         }
                     }
                 )
@@ -251,7 +242,7 @@ fun BasicNavigation(
                     uiState = walletViewModel.walletUiState.value,
                     modifier = Modifier
                         .padding(innerPadding),
-                    onEvent = { event: UiEvent ->
+                    onEvent = { event: WalletInfoUiEvent ->
                         when(event){
                             is WalletInfoUiEvent.EditWallet -> {
                                 backStack.add(
@@ -264,11 +255,9 @@ fun BasicNavigation(
                                 backStack.removeLastOrNull()
                             }
 
-                            is UiEvent.GoBack -> {
+                            is WalletInfoUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
-
-                            else -> {}
                         }
                     }
                 )
@@ -281,18 +270,19 @@ fun BasicNavigation(
                     modifier = Modifier
                         .padding(innerPadding),
                     uiState = transactionViewModel.transactionListUiState.value,
-                    onEvent = { event: UiEvent ->
+                    onEvent = { event: TransactionListUiEvent ->
                         when(event) {
                             is TransactionListUiEvent.ShowTransactionInfo -> {
                                 backStack.add(
                                     NavigationRoute.TransactionInfoScreen(event.transaction.id)
                                 )
                             }
-                            is UiEvent.GoBack -> {
+                            is TransactionListUiEvent.GetTransactionsByType -> {
+                                transactionViewModel.getTransactionsByType(event.transactionType)
+                            }
+                            is TransactionListUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
-
-                            else -> {}
                         }
                     }
                 )
@@ -306,17 +296,15 @@ fun BasicNavigation(
                     uiState = transactionViewModel.transactionInfoUiState.value,
                     modifier = Modifier
                         .padding(innerPadding),
-                    onEvent = { event: UiEvent ->
+                    onEvent = { event: TransactionInfoUiEvent ->
                         when(event){
                             is TransactionInfoUiEvent.DeleteTransaction -> {
                                 transactionViewModel.deleteTransactionById(event.transaction.id)
                                 backStack.removeLastOrNull()
                             }
-                            is UiEvent.GoBack -> {
+                            is TransactionInfoUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
-
-                            else -> {}
                         }
                     }
                 )
@@ -329,7 +317,7 @@ fun BasicNavigation(
                     uiState = analyticsViewModel.analyticsUiState.value,
                     modifier = Modifier
                         .padding(innerPadding),
-                    onEvent = { event: UiEvent ->
+                    onEvent = { event: AnalyticsUiEvent ->
                         when(event){
                             is AnalyticsUiEvent.ShowTransactionInfo -> {
                                 backStack.add(
@@ -345,11 +333,9 @@ fun BasicNavigation(
                                 )
                             }
 
-                            is UiEvent.GoBack -> {
+                            is AnalyticsUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
-
-                            else -> {}
                         }
                     }
                 )

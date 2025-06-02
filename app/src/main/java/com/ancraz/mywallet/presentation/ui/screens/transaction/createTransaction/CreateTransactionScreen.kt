@@ -53,7 +53,6 @@ import com.ancraz.mywallet.presentation.ui.components.TransactionConfigContainer
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
-import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.components.CategoryListMenu
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.components.WalletListMenu
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
@@ -71,7 +70,7 @@ fun CreateTransactionScreen(
     uiState: CreateTransactionUiState,
     transactionType: TransactionType,
     modifier: Modifier,
-    onEvent: (UiEvent) -> Unit
+    onEvent: (CreateTransactionUiEvent) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -112,7 +111,7 @@ fun CreateTransactionScreen(
         NavigationToolbar(
             title = transactionType.name.lowercase().replaceFirstChar { it.uppercase() },
             onClickBack = {
-                onEvent(UiEvent.GoBack)
+                onEvent(CreateTransactionUiEvent.GoBack)
             }
         )
 

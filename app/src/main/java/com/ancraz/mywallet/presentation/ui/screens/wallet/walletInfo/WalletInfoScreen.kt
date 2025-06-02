@@ -37,7 +37,6 @@ import com.ancraz.mywallet.presentation.ui.components.InfoRow
 import com.ancraz.mywallet.presentation.ui.components.LoadingIndicator
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
-import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.utils.getWalletCurrenciesString
 import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletUiState
@@ -54,7 +53,7 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 fun WalletInfoScreen(
     uiState: WalletUiState,
     modifier: Modifier = Modifier,
-    onEvent: (UiEvent) -> Unit
+    onEvent: (WalletInfoUiEvent) -> Unit
 ) {
     val isDeleteDialogOpened = remember { mutableStateOf(false) }
 
@@ -69,7 +68,7 @@ fun WalletInfoScreen(
         NavigationToolbar(
             title = stringResource(R.string.wallet_info_screen_title),
             onClickBack = {
-                onEvent(UiEvent.GoBack)
+                onEvent(WalletInfoUiEvent.GoBack)
             }
         )
 

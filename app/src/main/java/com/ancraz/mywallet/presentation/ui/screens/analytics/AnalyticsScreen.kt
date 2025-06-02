@@ -60,7 +60,6 @@ import com.ancraz.mywallet.presentation.ui.components.TransactionCard
 import com.ancraz.mywallet.presentation.ui.components.TransactionTypeSelector
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.events.AnalyticsUiEvent
-import com.ancraz.mywallet.presentation.ui.events.UiEvent
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.components.CategoryListMenu
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
@@ -80,7 +79,7 @@ import java.util.Calendar
 fun AnalyticsScreen(
     uiState: AnalyticsUiState,
     modifier: Modifier,
-    onEvent: (UiEvent) -> Unit
+    onEvent: (AnalyticsUiEvent) -> Unit
 ) {
     val screenJustStarted = remember { mutableStateOf(true) }
 
@@ -129,7 +128,7 @@ fun AnalyticsScreen(
         NavigationToolbar(
             title = stringResource(R.string.analytics_screen_title),
             onClickBack = {
-                onEvent(UiEvent.GoBack)
+                onEvent(AnalyticsUiEvent.GoBack)
             }
         )
 

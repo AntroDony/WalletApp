@@ -116,7 +116,7 @@ object WalletWidget: GlanceAppWidget() {
                         maxLines = 1,
                         style = TextDefaults.defaultTextStyle.copy(
                             color = ColorProvider(onBackgroundColor),
-                            fontSize = 20.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = GlanceModifier
@@ -125,7 +125,7 @@ object WalletWidget: GlanceAppWidget() {
 
 
                 Spacer(modifier = GlanceModifier
-                    .width(40.dp)
+                    .width(60.dp)
                 )
 
                 Row(
@@ -143,7 +143,7 @@ object WalletWidget: GlanceAppWidget() {
                             onPrimaryColor
                         ),
                         modifier = GlanceModifier
-                            .size(34.dp),
+                            .size(40.dp),
                         onClick = actionStartActivity<MainActivity>(
                             actionParametersOf(destinationKey to Constants.Widget.INCOME_SCREEN_PATH_VALUE)
                         )
@@ -163,7 +163,7 @@ object WalletWidget: GlanceAppWidget() {
                             onPrimaryColor
                         ),
                         modifier = GlanceModifier
-                            .size(34.dp),
+                            .size(40.dp),
                         onClick = actionStartActivity<MainActivity>(
                             actionParametersOf(destinationKey to Constants.Widget.EXPENSE_SCREEN_PATH_VALUE)
                         )

@@ -5,9 +5,10 @@ import com.ancraz.mywallet.core.utils.error.NetworkError
 import com.ancraz.mywallet.domain.models.CurrencyData
 import com.ancraz.mywallet.domain.network.CurrencyDataSource
 import com.ancraz.mywallet.domain.repository.CurrencyRepository
+import javax.inject.Inject
 
-class CurrencyRepositoryImpl(
-    private val networkDataSource: CurrencyDataSource,
+class CurrencyRepositoryImpl @Inject constructor(
+    private val networkDataSource: CurrencyDataSource
 ): CurrencyRepository {
 
     override suspend fun getCurrenciesRate(

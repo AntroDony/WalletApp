@@ -63,7 +63,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCurrencyRateDataSource(): CurrencyDataSource {
+    fun provideCurrencyDataSource(): CurrencyDataSource {
         return CurrencyRateDataSource(
             HttpClient(CIO) {
                 install(ContentNegotiation) {
@@ -80,34 +80,6 @@ object AppModule {
     fun provideDataStore(@ApplicationContext context: Context): DataStoreRepository {
         return DataStoreRepository(context)
     }
-
-
-    @Provides
-    @Singleton
-    fun provideCurrencyRepository(dataSource: CurrencyDataSource): CurrencyRepository {
-        return CurrencyRepositoryImpl(dataSource)
-    }
-
-
-    @Provides
-    @Singleton
-    fun provideTransactionRepository(walletDatabase: WalletDatabase): TransactionRepository {
-        return TransactionRepositoryImpl(
-            walletDatabase.transactionDao(),
-            walletDatabase.categoryDao(),
-            walletDatabase.walletDao()
-        )
-    }
-
-
-    @Provides
-    @Singleton
-    fun provideWalletRepository(walletDatabase: WalletDatabase): WalletRepository {
-        return WalletRepositoryImpl(
-            walletDatabase.walletDao()
-        )
-    }
-
 
     @Provides
     @Singleton

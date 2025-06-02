@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.ancraz.mywallet"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ancraz.mywallet"
@@ -39,11 +39,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.ui.text.google.fonts)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
     //Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -85,11 +86,7 @@ dependencies {
 
 
     //Test and debug
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -98,7 +95,8 @@ dependencies {
     implementation(libs.gson)
 
     //Navigation
-    implementation(libs.navigation.compose)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
 
     //ktor
     implementation(libs.bundles.ktor)

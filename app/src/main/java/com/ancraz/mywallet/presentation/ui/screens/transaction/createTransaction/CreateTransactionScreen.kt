@@ -92,6 +92,8 @@ fun CreateTransactionScreen(
     }
 
     LaunchedEffect(uiState.data.recentWalletId) {
+        currencyState.value = uiState.data.recentCurrency
+
         selectedWallet.value = uiState.data.recentWalletId?.let { walletId ->
             uiState.data.walletList.find { wallet ->
                 wallet.id == walletId
@@ -101,8 +103,6 @@ fun CreateTransactionScreen(
         selectedWalletCurrencyAccount.value = selectedWallet.value?.accounts?.find { account ->
             account.currency == currencyState.value
         } ?: selectedWallet.value?.accounts?.getOrNull(0)
-
-        currencyState.value = uiState.data.recentCurrency
     }
 
 
@@ -170,8 +170,7 @@ fun CreateTransactionScreen(
                             getSelectedWalletInfoString(
                                 selectedWallet.value,
                                 selectedWalletCurrencyAccount.value
-                            )
-                                ?: stringResource(R.string.edit_transaction_no_wallet_title)
+                            ) ?: stringResource(R.string.edit_transaction_no_wallet_title)
                             ).uppercase(),
                     color = primaryColor,
                     fontSize = 18.sp,

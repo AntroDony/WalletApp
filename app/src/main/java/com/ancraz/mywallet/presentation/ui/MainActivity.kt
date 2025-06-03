@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.utils.Constants
-import com.ancraz.mywallet.presentation.navigation.BasicNavigation
+import com.ancraz.mywallet.presentation.navigation.AppNavigation
 import com.ancraz.mywallet.presentation.navigation.NavigationRoute
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,7 +54,7 @@ private fun MainActivityScreen(startDestinationRoute: NavigationRoute) {
             .fillMaxSize()
     ) { innerPadding ->
 
-        BasicNavigation(
+        AppNavigation(
             startDestination = startDestinationRoute,
             innerPadding = innerPadding
         )

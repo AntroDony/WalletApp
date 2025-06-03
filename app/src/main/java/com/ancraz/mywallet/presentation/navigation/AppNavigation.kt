@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -36,7 +35,7 @@ import com.ancraz.mywallet.presentation.viewModels.TransactionViewModel
 import com.ancraz.mywallet.presentation.viewModels.WalletViewModel
 
 @Composable
-fun BasicNavigation(
+fun AppNavigation(
     startDestination: NavigationRoute,
     innerPadding: PaddingValues
 ) {
@@ -49,7 +48,7 @@ fun BasicNavigation(
             backStack.removeLastOrNull()
         },
         entryProvider = entryProvider {
-            entry<NavigationRoute.HomeScreen>{
+            entry<NavigationRoute.HomeScreen> {
                 val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
 
                 HomeScreen(
@@ -117,7 +116,7 @@ fun BasicNavigation(
                 )
             }
 
-            entry<NavigationRoute.EditBalanceScreen>{ key ->
+            entry<NavigationRoute.EditBalanceScreen> { key ->
                 val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
                 val currentBalance = key.totalBalance
 
@@ -142,8 +141,9 @@ fun BasicNavigation(
                 )
             }
 
-            entry<NavigationRoute.TransactionInputScreen>{ key ->
-                val transactionViewModel: TransactionViewModel = hiltViewModel<TransactionViewModel>()
+            entry<NavigationRoute.TransactionInputScreen> { key ->
+                val transactionViewModel: TransactionViewModel =
+                    hiltViewModel<TransactionViewModel>()
 
                 val transactionType = key.transactionType
 
@@ -156,10 +156,15 @@ fun BasicNavigation(
                             is CreateTransactionUiEvent.AddTransaction -> {
                                 transactionViewModel.addNewTransaction(event.transaction)
                                 backStack.apply {
-                                    add(
-                                        NavigationRoute.HomeScreen
-                                    )
-                                    removeAt(0)
+                                    if (this.toList().size == 1) {
+                                        add(
+                                            NavigationRoute.HomeScreen
+                                        )
+                                        remove(key)
+                                    } else {
+                                        removeLastOrNull()
+                                    }
+
                                 }
                             }
 
@@ -171,10 +176,14 @@ fun BasicNavigation(
 
                             is CreateTransactionUiEvent.GoBack -> {
                                 backStack.apply {
-                                    add(
-                                        NavigationRoute.HomeScreen
-                                    )
-                                    removeAt(0)
+                                    if (this.toList().size == 1) {
+                                        add(
+                                            NavigationRoute.HomeScreen
+                                        )
+                                        remove(key)
+                                    } else {
+                                        removeLastOrNull()
+                                    }
                                 }
                             }
                         }
@@ -182,7 +191,7 @@ fun BasicNavigation(
                 )
             }
 
-            entry<NavigationRoute.WalletListScreen>{
+            entry<NavigationRoute.WalletListScreen> {
                 val walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>()
 
                 WalletListScreen(
@@ -190,17 +199,19 @@ fun BasicNavigation(
                         .padding(innerPadding),
                     uiState = walletViewModel.walletListUiState.value,
                     onEvent = { event: WalletListUiEvent ->
-                        when(event){
+                        when (event) {
                             is WalletListUiEvent.ShowWalletInfo -> {
                                 backStack.add(
                                     NavigationRoute.WalletInfoScreen(event.wallet.id)
                                 )
                             }
+
                             is WalletListUiEvent.CreateWallet -> {
                                 backStack.add(
                                     NavigationRoute.CreateWalletScreen
                                 )
                             }
+
                             is WalletListUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
@@ -209,7 +220,7 @@ fun BasicNavigation(
                 )
             }
 
-            entry<NavigationRoute.CreateWalletScreen>{
+            entry<NavigationRoute.CreateWalletScreen> {
                 val walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>()
 
                 CreateWalletScreen(
@@ -234,7 +245,7 @@ fun BasicNavigation(
                 )
             }
 
-            entry<NavigationRoute.WalletInfoScreen>{ key ->
+            entry<NavigationRoute.WalletInfoScreen> { key ->
                 val walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>()
                 walletViewModel.getWalletById(key.walletId)
 
@@ -243,7 +254,7 @@ fun BasicNavigation(
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: WalletInfoUiEvent ->
-                        when(event){
+                        when (event) {
                             is WalletInfoUiEvent.EditWallet -> {
                                 backStack.add(
                                     NavigationRoute.CreateWalletScreen
@@ -263,23 +274,26 @@ fun BasicNavigation(
                 )
             }
 
-            entry<NavigationRoute.TransactionListScreen>{
-                val transactionViewModel: TransactionViewModel = hiltViewModel<TransactionViewModel>()
+            entry<NavigationRoute.TransactionListScreen> {
+                val transactionViewModel: TransactionViewModel =
+                    hiltViewModel<TransactionViewModel>()
 
                 TransactionListScreen(
                     modifier = Modifier
                         .padding(innerPadding),
                     uiState = transactionViewModel.transactionListUiState.value,
                     onEvent = { event: TransactionListUiEvent ->
-                        when(event) {
+                        when (event) {
                             is TransactionListUiEvent.ShowTransactionInfo -> {
                                 backStack.add(
                                     NavigationRoute.TransactionInfoScreen(event.transaction.id)
                                 )
                             }
+
                             is TransactionListUiEvent.GetTransactionsByType -> {
                                 transactionViewModel.getTransactionsByType(event.transactionType)
                             }
+
                             is TransactionListUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
@@ -288,8 +302,9 @@ fun BasicNavigation(
                 )
             }
 
-            entry<NavigationRoute.TransactionInfoScreen>{ key ->
-                val transactionViewModel: TransactionViewModel = hiltViewModel<TransactionViewModel>()
+            entry<NavigationRoute.TransactionInfoScreen> { key ->
+                val transactionViewModel: TransactionViewModel =
+                    hiltViewModel<TransactionViewModel>()
                 transactionViewModel.getTransactionById(key.transactionId)
 
                 TransactionInfoScreen(
@@ -297,11 +312,12 @@ fun BasicNavigation(
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: TransactionInfoUiEvent ->
-                        when(event){
+                        when (event) {
                             is TransactionInfoUiEvent.DeleteTransaction -> {
                                 transactionViewModel.deleteTransactionById(event.transaction.id)
                                 backStack.removeLastOrNull()
                             }
+
                             is TransactionInfoUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
@@ -310,7 +326,7 @@ fun BasicNavigation(
                 )
             }
 
-            entry<NavigationRoute.AnalyticsScreen>{
+            entry<NavigationRoute.AnalyticsScreen> {
                 val analyticsViewModel = hiltViewModel<AnalyticsViewModel>()
 
                 AnalyticsScreen(
@@ -318,12 +334,13 @@ fun BasicNavigation(
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: AnalyticsUiEvent ->
-                        when(event){
+                        when (event) {
                             is AnalyticsUiEvent.ShowTransactionInfo -> {
                                 backStack.add(
                                     NavigationRoute.TransactionInfoScreen(event.transaction.id)
                                 )
                             }
+
                             is AnalyticsUiEvent.FilterAnalyticsData -> {
                                 analyticsViewModel.filterAnalyticsData(
                                     transactionType = event.type,

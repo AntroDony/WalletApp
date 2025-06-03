@@ -152,6 +152,8 @@ class TransactionViewModel @Inject constructor(
                     walletListFlow,
                     currencyRatesFlow
                 ) { values: Array<Any?> ->
+                    debugLog("combine values")
+
                     val totalBalance = values[0] as Float
                     val recentWalletId = values[1] as Long
                     val recentCurrency = values[2] as CurrencyCode
@@ -176,12 +178,16 @@ class TransactionViewModel @Inject constructor(
                         )
                     )
                 }.collect {
+                    debugLog("collect combine values")
+
                     _createTransactionUiState.value = it
 
                     _transactionListUiState.value = TransactionListUiState(
                         isLoading = false,
                         transactionList = transactionList
                     )
+
+                    debugLog("_createTransactionUiState: ${_createTransactionUiState.value.data}")
                 }
             } catch (e: Exception) {
                 debugLog("fetchData exception: ${e.message}")

@@ -1,7 +1,5 @@
 package com.ancraz.mywallet.presentation.viewModels
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.CurrencyCode
@@ -28,11 +26,14 @@ import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionInfo.T
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.TransactionListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,14 +48,19 @@ class TransactionViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private var _createTransactionUiState = mutableStateOf(CreateTransactionUiState())
-    val createTransactionUiState: State<CreateTransactionUiState> = _createTransactionUiState
+    private var _createTransactionUiState = MutableStateFlow(CreateTransactionUiState())
+    val createTransactionUiState: StateFlow<CreateTransactionUiState> = _createTransactionUiState
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = CreateTransactionUiState()
+        )
 
-    private var _transactionListUiState = mutableStateOf(TransactionListUiState())
-    val transactionListUiState: State<TransactionListUiState> = _transactionListUiState
+    private var _transactionListUiState = MutableStateFlow(TransactionListUiState())
+    val transactionListUiState = _transactionListUiState.asStateFlow()
 
-    private var _transactionInfoUiState = mutableStateOf(TransactionInfoUiState())
-    val transactionInfoUiState: State<TransactionInfoUiState> = _transactionInfoUiState
+    private var _transactionInfoUiState = MutableStateFlow(TransactionInfoUiState())
+    val transactionInfoUiState = _transactionInfoUiState.asStateFlow()
 
 
     private val totalBalanceFlow: Flow<Float> = dataStoreManager.getTotalBalance()
@@ -93,23 +99,28 @@ class TransactionViewModel @Inject constructor(
             transactionManager.getTransactionById(id).let { result ->
                 when (result) {
                     is DataResult.Success -> {
-                        _transactionInfoUiState.value = _transactionInfoUiState.value.copy(
-                            isLoading = false,
-                            transaction = result.data?.toTransactionUi()
-                        )
-                        cancel()
+                        _transactionInfoUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                transaction = result.data?.toTransactionUi()
+                            )
+                        }
                     }
 
                     is DataResult.Loading -> {
-                        _transactionInfoUiState.value = _transactionInfoUiState.value.copy(
-                            isLoading = true
-                        )
+                        _transactionInfoUiState.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
                     }
 
                     is DataResult.Error -> {
-                        _transactionInfoUiState.value = _transactionInfoUiState.value.copy(
-                            error = result.errorMessage
-                        )
+                        _transactionInfoUiState.update {
+                            it.copy(
+                                error = result.errorMessage
+                            )
+                        }
                     }
                 }
             }
@@ -152,8 +163,6 @@ class TransactionViewModel @Inject constructor(
                     walletListFlow,
                     currencyRatesFlow
                 ) { values: Array<Any?> ->
-                    debugLog("combine values")
-
                     val totalBalance = values[0] as Float
                     val recentWalletId = values[1] as Long
                     val recentCurrency = values[2] as CurrencyCode
@@ -178,16 +187,12 @@ class TransactionViewModel @Inject constructor(
                         )
                     )
                 }.collect {
-                    debugLog("collect combine values")
-
                     _createTransactionUiState.value = it
 
                     _transactionListUiState.value = TransactionListUiState(
                         isLoading = false,
                         transactionList = transactionList
                     )
-
-                    debugLog("_createTransactionUiState: ${_createTransactionUiState.value.data}")
                 }
             } catch (e: Exception) {
                 debugLog("fetchData exception: ${e.message}")

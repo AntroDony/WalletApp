@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -148,7 +149,7 @@ fun AppNavigation(
                 val transactionType = key.transactionType
 
                 CreateTransactionScreen(
-                    uiState = transactionViewModel.createTransactionUiState.value,
+                    uiState = transactionViewModel.createTransactionUiState.collectAsStateWithLifecycle().value,
                     transactionType = transactionType,
                     modifier = Modifier.padding(innerPadding),
                     onEvent = { event: CreateTransactionUiEvent ->

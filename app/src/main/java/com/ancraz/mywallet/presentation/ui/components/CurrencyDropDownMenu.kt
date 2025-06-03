@@ -15,7 +15,9 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,7 +40,11 @@ fun CurrencyDropDownMenu(
     val items = CurrencyCode.entries.toList()
 
     val isDropDownExpanded = remember { mutableStateOf(false) }
-    val itemPosition = remember { mutableStateOf(items.indexOf(currentCurrencyState.value)) }
+    val itemPosition = remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(currentCurrencyState.value) {
+        itemPosition.value = items.indexOf(currentCurrencyState.value)
+    }
 
     Box(
         modifier = modifier

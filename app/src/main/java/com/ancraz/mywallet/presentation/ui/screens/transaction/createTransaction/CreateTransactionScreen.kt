@@ -73,42 +73,38 @@ fun CreateTransactionScreen(
     modifier: Modifier,
     onEvent: (CreateTransactionUiEvent) -> Unit
 ) {
-    debugLog("State: ${uiState.data.totalBalance} | ${uiState.isLoading}")
     val context = LocalContext.current
 
     val inputValueState = remember { mutableStateOf(0f.toFormattedString()) }
-    val currencyState = remember { mutableStateOf(uiState.data.recentCurrency) }
-
     val descriptionState = remember { mutableStateOf<String?>(null) }
 
     val isCategoryListOpen = remember { mutableStateOf(false) }
     val isWalletListOpen = remember { mutableStateOf(false) }
     val isWalletAccountsDialogOpen = remember { mutableStateOf(false) }
 
-    val selectedWalletState = remember {
-        mutableStateOf(
-            uiState.data.recentWalletId?.let { walletId ->
-                uiState.data.walletList.find { wallet ->
-                    wallet.id == walletId
-                }
+    val currencyState = remember { mutableStateOf(CurrencyCode.USD) }
+    val selectedWallet = remember {
+        mutableStateOf<WalletUi?>(null)
+    }
+
+    val selectedWalletCurrencyAccount = remember {
+        mutableStateOf<WalletUi.CurrencyAccountUi?>(null)
+    }
+
+    LaunchedEffect(uiState.data.recentWalletId) {
+        selectedWallet.value = uiState.data.recentWalletId?.let { walletId ->
+            uiState.data.walletList.find { wallet ->
+                wallet.id == walletId
             }
-        )
-    }
+        }
 
-    val selectedWalletCurrencyAccountState = remember {
-        mutableStateOf(
-            selectedWalletState.value?.accounts?.find { account ->
-                account.currency == currencyState.value
-            } ?: selectedWalletState.value?.accounts?.getOrNull(0)
-        )
-    }
-
-
-    LaunchedEffect(selectedWalletCurrencyAccountState) {
-        selectedWalletCurrencyAccountState.value = selectedWalletState.value?.accounts?.find { account ->
+        selectedWalletCurrencyAccount.value = selectedWallet.value?.accounts?.find { account ->
             account.currency == currencyState.value
-        } ?: selectedWalletState.value?.accounts?.getOrNull(0)
+        } ?: selectedWallet.value?.accounts?.getOrNull(0)
+
+        currencyState.value = uiState.data.recentCurrency
     }
+
 
     Column(
         modifier = modifier
@@ -127,13 +123,13 @@ fun CreateTransactionScreen(
         HorizontalSpacer()
 
         if (isWalletAccountsDialogOpen.value) {
-            selectedWalletState.value?.let { selectedWallet ->
-                selectedWalletCurrencyAccountState.value?.let { selectedAccount ->
+            selectedWallet.value?.let { selectedWallet ->
+                selectedWalletCurrencyAccount.value?.let { selectedAccount ->
                     SelectWalletAccountDialog(
                         accounts = selectedWallet.accounts,
                         currentAccount = selectedAccount,
                         onSelect = { account ->
-                            selectedWalletCurrencyAccountState.value = account
+                            selectedWalletCurrencyAccount.value = account
 
                             isWalletAccountsDialogOpen.value = false
                             isWalletListOpen.value = false
@@ -156,8 +152,6 @@ fun CreateTransactionScreen(
                     .align(Alignment.CenterHorizontally),
             )
 
-            HorizontalSpacer()
-
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -174,8 +168,8 @@ fun CreateTransactionScreen(
                 Text(
                     text = (
                             getSelectedWalletInfoString(
-                                selectedWalletState.value,
-                                selectedWalletCurrencyAccountState.value
+                                selectedWallet.value,
+                                selectedWalletCurrencyAccount.value
                             )
                                 ?: stringResource(R.string.edit_transaction_no_wallet_title)
                             ).uppercase(),
@@ -241,8 +235,8 @@ fun CreateTransactionScreen(
                             type = transactionType,
                             description = descriptionState.value ?: category.name,
                             category = category,
-                            wallet = selectedWalletState.value,
-                            selectedAccount = selectedWalletCurrencyAccountState.value,
+                            wallet = selectedWallet.value,
+                            selectedAccount = selectedWalletCurrencyAccount.value,
                             onSuccess = { transactionObject ->
                                 onEvent(
                                     CreateTransactionUiEvent.AddTransaction(transactionObject)
@@ -269,9 +263,9 @@ fun CreateTransactionScreen(
                 WalletListMenu(
                     wallets = uiState.data.walletList,
                     onSelect = { wallet ->
-                        selectedWalletState.value = wallet
-
+                        selectedWallet.value = wallet
                         isWalletAccountsDialogOpen.value = true
+
                     },
                     onClose = {
                         isWalletListOpen.value = false
@@ -292,7 +286,7 @@ private fun RateInfoText(
     rates: List<CurrencyRateUi>,
     modifier: Modifier = Modifier
 ) {
-    if (rates.isEmpty()){
+    if (rates.isEmpty()) {
         return
     }
 

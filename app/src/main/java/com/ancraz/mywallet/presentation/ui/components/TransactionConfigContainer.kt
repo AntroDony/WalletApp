@@ -53,8 +53,6 @@ fun TransactionConfigContainer(
             modifier = Modifier
         )
 
-        //HorizontalSpacer(height = 10.dp)
-
         CurrencyDropDownMenu(
             currentCurrencyState = currencyState
         )

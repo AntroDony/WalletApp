@@ -4,7 +4,7 @@ import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 
 data class HomeUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val data: HomeScreenData = HomeScreenData(),
     val error: String? = null
 ){

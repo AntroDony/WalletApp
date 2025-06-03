@@ -53,7 +53,7 @@ fun AppNavigation(
                 val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
 
                 HomeScreen(
-                    uiState = homeViewModel.homeUiState.value,
+                    uiState = homeViewModel.homeUiState.collectAsStateWithLifecycle().value,
                     modifier = Modifier.padding(innerPadding),
                     onEvent = { event ->
                         when (event) {
@@ -198,7 +198,7 @@ fun AppNavigation(
                 WalletListScreen(
                     modifier = Modifier
                         .padding(innerPadding),
-                    uiState = walletViewModel.walletListUiState.value,
+                    uiState = walletViewModel.walletListUiState.collectAsStateWithLifecycle().value,
                     onEvent = { event: WalletListUiEvent ->
                         when (event) {
                             is WalletListUiEvent.ShowWalletInfo -> {
@@ -225,7 +225,7 @@ fun AppNavigation(
                 val walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>()
 
                 CreateWalletScreen(
-                    uiState = walletViewModel.walletUiState.value,
+                    uiState = walletViewModel.walletUiState.collectAsStateWithLifecycle().value,
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: CreateWalletUiEvent ->
@@ -251,7 +251,7 @@ fun AppNavigation(
                 walletViewModel.getWalletById(key.walletId)
 
                 WalletInfoScreen(
-                    uiState = walletViewModel.walletUiState.value,
+                    uiState = walletViewModel.walletUiState.collectAsStateWithLifecycle().value,
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: WalletInfoUiEvent ->
@@ -282,7 +282,7 @@ fun AppNavigation(
                 TransactionListScreen(
                     modifier = Modifier
                         .padding(innerPadding),
-                    uiState = transactionViewModel.transactionListUiState.value,
+                    uiState = transactionViewModel.transactionListUiState.collectAsStateWithLifecycle().value,
                     onEvent = { event: TransactionListUiEvent ->
                         when (event) {
                             is TransactionListUiEvent.ShowTransactionInfo -> {
@@ -309,7 +309,7 @@ fun AppNavigation(
                 transactionViewModel.getTransactionById(key.transactionId)
 
                 TransactionInfoScreen(
-                    uiState = transactionViewModel.transactionInfoUiState.value,
+                    uiState = transactionViewModel.transactionInfoUiState.collectAsStateWithLifecycle().value,
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: TransactionInfoUiEvent ->
@@ -331,7 +331,7 @@ fun AppNavigation(
                 val analyticsViewModel = hiltViewModel<AnalyticsViewModel>()
 
                 AnalyticsScreen(
-                    uiState = analyticsViewModel.analyticsUiState.value,
+                    uiState = analyticsViewModel.analyticsUiState.collectAsStateWithLifecycle().value,
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: AnalyticsUiEvent ->

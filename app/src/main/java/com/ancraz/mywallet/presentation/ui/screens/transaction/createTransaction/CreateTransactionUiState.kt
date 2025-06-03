@@ -7,7 +7,7 @@ import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 
 data class CreateTransactionUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val data: TransactionScreenData = TransactionScreenData(),
     val error: String? = null
 ){

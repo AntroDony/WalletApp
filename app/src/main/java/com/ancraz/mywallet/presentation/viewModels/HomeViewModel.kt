@@ -22,9 +22,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,8 +41,12 @@ class HomeViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private var _homeUiState = mutableStateOf(HomeUiState())
-    val homeUiState: State<HomeUiState> = _homeUiState
+    private var _homeUiState = MutableStateFlow(HomeUiState())
+    val homeUiState = _homeUiState.stateIn(
+        viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = HomeUiState()
+    )
 
     private val privateModeStatusFlow = dataStoreManager.getPrivateModeStatus()
     private val totalBalanceFlow = dataStoreManager.getTotalBalance()

@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -49,18 +48,26 @@ class TransactionViewModel @Inject constructor(
     private val ioDispatcher = Dispatchers.IO
 
     private var _createTransactionUiState = MutableStateFlow(CreateTransactionUiState())
-    val createTransactionUiState: StateFlow<CreateTransactionUiState> = _createTransactionUiState
-        .stateIn(
+    val createTransactionUiState: StateFlow<CreateTransactionUiState> =
+        _createTransactionUiState.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = CreateTransactionUiState()
         )
 
     private var _transactionListUiState = MutableStateFlow(TransactionListUiState())
-    val transactionListUiState = _transactionListUiState.asStateFlow()
+    val transactionListUiState = _transactionListUiState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = TransactionListUiState()
+    )
 
     private var _transactionInfoUiState = MutableStateFlow(TransactionInfoUiState())
-    val transactionInfoUiState = _transactionInfoUiState.asStateFlow()
+    val transactionInfoUiState = _transactionInfoUiState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = TransactionInfoUiState()
+    )
 
 
     private val totalBalanceFlow: Flow<Float> = dataStoreManager.getTotalBalance()

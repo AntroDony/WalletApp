@@ -24,9 +24,12 @@ import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,8 +44,12 @@ class AnalyticsViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private val _analyticsUiState = mutableStateOf(AnalyticsUiState())
-    val analyticsUiState: State<AnalyticsUiState> = _analyticsUiState
+    private val _analyticsUiState = MutableStateFlow(AnalyticsUiState())
+    val analyticsUiState = _analyticsUiState.stateIn(
+        viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = AnalyticsUiState()
+    )
 
     private val transactionCategoryListFlow: Flow<List<TransactionCategory>> = getTransactionCategoriesUseCase()
     private val allTransactionsListFlow: Flow<List<Transaction>> = getAllTransactionsUseCase()

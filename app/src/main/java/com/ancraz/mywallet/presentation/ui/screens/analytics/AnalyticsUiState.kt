@@ -5,7 +5,7 @@ import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
 
 data class AnalyticsUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val data: AnalyticsScreenData = AnalyticsScreenData(),
     val error: String? = null
 ) {

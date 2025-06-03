@@ -4,7 +4,7 @@ import com.ancraz.mywallet.core.models.CurrencyCode
 
 
 data class EditBalanceUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val data: EditBalanceScreenData = EditBalanceScreenData(),
     val error: String? = null
 ){

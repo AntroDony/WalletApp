@@ -1,7 +1,5 @@
 package com.ancraz.mywallet.presentation.viewModels
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.result.DataResult
@@ -14,9 +12,10 @@ import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletUiState
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,11 +26,19 @@ class WalletViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private val _walletListUiState = mutableStateOf(WalletListUiState(isLoading = true))
-    val walletListUiState: State<WalletListUiState> = _walletListUiState
+    private val _walletListUiState = MutableStateFlow(WalletListUiState())
+    val walletListUiState = _walletListUiState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = WalletListUiState()
+    )
 
-    private val _walletUiState = mutableStateOf(WalletUiState(isLoading = true))
-    val walletUiState: State<WalletUiState> = _walletUiState
+    private val _walletUiState = MutableStateFlow(WalletUiState())
+    val walletUiState = _walletUiState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = WalletUiState()
+    )
 
     init {
         fetchData()
@@ -65,11 +72,12 @@ class WalletViewModel @Inject constructor(
             walletManager.getWalletById(id).let{ result ->
                 when(result){
                     is DataResult.Success -> {
-                        _walletUiState.value = _walletUiState.value.copy(
-                            isLoading = false,
-                            wallet = result.data?.toWalletUi()
-                        )
-                        cancel()
+                        _walletUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                wallet = result.data?.toWalletUi()
+                            )
+                        }
                     }
                     is DataResult.Loading -> {
                         _walletUiState.value = _walletUiState.value.copy(
@@ -90,12 +98,14 @@ class WalletViewModel @Inject constructor(
     private fun fetchData(){
         viewModelScope.launch(ioDispatcher) {
             walletManager.getWallets().collect { wallets ->
-                _walletListUiState.value = _walletListUiState.value.copy(
-                    isLoading = false,
-                    walletList = wallets.map { wallet ->
-                        wallet.toWalletUi()
-                    }
-                )
+                _walletListUiState.update {
+                    it.copy(
+                        isLoading = false,
+                        walletList = wallets.map { wallet ->
+                            wallet.toWalletUi()
+                        }
+                    )
+                }
             }
         }
     }

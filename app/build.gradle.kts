@@ -111,4 +111,7 @@ dependencies {
     //Glance
     implementation(libs.glance.widget)
     implementation(libs.glance.material3)
+
+    //Splash Screen
+    implementation(libs.androidx.splash.screen)
 }

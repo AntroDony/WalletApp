@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MyWallet" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MyWallet" parent="android:Theme.Material.Light.NoActionBar" >
+    </style>
+
+    <style name="SplashScreenTheme" parent="Theme.SplashScreen.IconBackground">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/app_icon</item>
+        <item name="windowSplashScreenBackground">@color/splash_background_color</item>
+        <item name="postSplashScreenTheme">@style/Theme.MyWallet</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_background_color</item>
+    </style>
 </resources>

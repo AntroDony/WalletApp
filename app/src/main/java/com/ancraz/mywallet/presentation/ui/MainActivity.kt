@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.utils.Constants
 import com.ancraz.mywallet.presentation.navigation.AppNavigation
@@ -26,6 +27,8 @@ class MainActivity : ComponentActivity() {
         val startScreenRoute = getStartScreenRoute(startDestinationValue)
 
         enableEdgeToEdge()
+        installSplashScreen()
+
         setContent {
             MyWalletTheme {
                 MainActivityScreen(startScreenRoute)

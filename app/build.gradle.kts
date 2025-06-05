@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.android.material)
 
     //Compose
     implementation(platform(libs.androidx.compose.bom))

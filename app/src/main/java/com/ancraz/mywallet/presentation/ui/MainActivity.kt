@@ -17,6 +17,7 @@ import com.ancraz.mywallet.presentation.navigation.NavigationRoute
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -26,8 +27,8 @@ class MainActivity : ComponentActivity() {
         val startDestinationValue = intent.extras?.getString(Constants.Widget.START_SCREEN_PATH_KEY)
         val startScreenRoute = getStartScreenRoute(startDestinationValue)
 
-        enableEdgeToEdge()
         installSplashScreen()
+        enableEdgeToEdge()
 
         setContent {
             MyWalletTheme {

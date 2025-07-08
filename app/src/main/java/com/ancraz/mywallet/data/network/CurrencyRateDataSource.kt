@@ -32,8 +32,6 @@ class CurrencyRateDataSource(
                 parameter("symbols", desiredCurrenciesString)
             }
 
-            debugLog("CurrencyApiResponse: ${response.body<String>()}")
-
             return safeCall<String> {
                 response
             }.map { responseStr ->

@@ -641,9 +641,8 @@ private fun buildTransactionObject(
         return
     }
     selectedAccount?.let { account ->
-        if (account.moneyValue < value) {
+        if (account.moneyValue < value && type == TransactionType.EXPENSE) {
             onError(" You are in a minus. Not enough money on selected account")
-            // return
         } else if (selectedAccount.currency != currency) {
             onError("Selected currency is incompatible with selected account")
             return

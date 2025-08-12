@@ -8,7 +8,6 @@ import com.ancraz.mywallet.core.utils.onSuccess
 import com.ancraz.mywallet.data.storage.dataStore.DataStoreRepository
 import com.ancraz.mywallet.domain.models.CurrencyRate
 import com.ancraz.mywallet.domain.repository.CurrencyRepository
-import com.ancraz.mywallet.domain.utils.desiredCurrencies
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.Calendar
@@ -51,7 +50,7 @@ class GetCurrencyRatesUseCase @Inject constructor(
 
     private suspend fun <T> getCurrencyRatesFromApi(onResponseError: suspend (DataResult<T>) -> Unit) {
         debugLog("getCurrencyRatesFromApi()")
-        remoteRepository.getCurrenciesRate(desiredCurrencies)
+        remoteRepository.getCurrenciesRate(CurrencyCode.entries.map { it.name })
             .onSuccess { currencyData ->
                 debugLog("update data in dataStore")
                 dataStoreRepository.setLastCurrencyUpdatedTime(

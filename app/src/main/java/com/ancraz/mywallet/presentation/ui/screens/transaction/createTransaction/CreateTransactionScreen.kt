@@ -99,7 +99,9 @@ fun CreateTransactionScreen(
                 wallet.id == walletId
             }
         }
+    }
 
+    LaunchedEffect(selectedWallet.value) {
         selectedWalletCurrencyAccount.value = selectedWallet.value?.accounts?.find { account ->
             account.currency == currencyState.value
         } ?: selectedWallet.value?.accounts?.getOrNull(0)
@@ -264,6 +266,8 @@ fun CreateTransactionScreen(
                     onSelect = { wallet ->
                         selectedWallet.value = wallet
                         isWalletAccountsDialogOpen.value = true
+
+                        debugLog("isWalletAccountsDialogOpen.value = true")
 
                     },
                     onClose = {

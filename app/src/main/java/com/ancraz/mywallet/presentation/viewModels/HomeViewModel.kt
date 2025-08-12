@@ -84,6 +84,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun fetchData() {
+        syncDataAfterWalletListUpdated()
         viewModelScope.launch(ioDispatcher) {
             try {
                 combine(
@@ -114,6 +115,15 @@ class HomeViewModel @Inject constructor(
                 _homeUiState.value = _homeUiState.value.copy(
                     error = e.message
                 )
+            }
+        }
+    }
+
+
+    private fun syncDataAfterWalletListUpdated(){
+        viewModelScope.launch(Dispatchers.IO) {
+            walletListFlow.collect {
+                syncData()
             }
         }
     }

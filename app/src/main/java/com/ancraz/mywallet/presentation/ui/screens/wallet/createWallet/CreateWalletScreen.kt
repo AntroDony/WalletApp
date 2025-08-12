@@ -92,11 +92,6 @@ fun CreateWalletScreen(
     modifier: Modifier,
     onEvent: (CreateWalletUiEvent) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        debugLog("composable CreateWalletScreen")
-    }
-
-
     val context = LocalContext.current
     val isWalletEdit = remember { mutableStateOf(uiState.wallet != null) }
 
@@ -407,7 +402,7 @@ private fun CurrencyAccountItem(
 
     if (isEditValueDialogOpen.value) {
         EditAccountValueDialog(
-            value = account.moneyValue.toFormattedString(),
+            value = if (account.moneyValue == 0f) "" else account.moneyValue.toFormattedString(),
             onResult = { newValueString ->
                 onEditAccount(
                     account.copy(

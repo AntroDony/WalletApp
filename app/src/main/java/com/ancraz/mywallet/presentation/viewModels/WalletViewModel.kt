@@ -44,6 +44,10 @@ class WalletViewModel @Inject constructor(
         fetchData()
     }
 
+    fun resetWalletState(){
+        _walletUiState.value = WalletUiState()
+    }
+
     fun addWallet(walletUi: WalletUi){
         viewModelScope.launch(ioDispatcher) {
             walletManager.addWallet(walletUi.toWallet())

@@ -208,6 +208,7 @@ fun AppNavigation(
                             }
 
                             is WalletListUiEvent.CreateWallet -> {
+                                walletViewModel.resetWalletState()
                                 backStack.add(
                                     NavigationRoute.CreateWalletScreen
                                 )

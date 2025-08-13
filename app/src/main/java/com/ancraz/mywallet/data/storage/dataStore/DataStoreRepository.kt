@@ -118,9 +118,7 @@ class DataStoreRepository(
                     preferences[KZT_RATE_TO_USD] = rate.rateValue
                 }
 
-                CurrencyCode.USD -> {
-                    debugLog("cannot update UNKNOWN or USD currency code")
-                }
+                CurrencyCode.USD -> {}
             }
         }
     }

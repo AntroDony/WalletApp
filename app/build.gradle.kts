@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -15,17 +17,20 @@ android {
         applicationId = "com.ancraz.mywallet"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
 
+        val localProperties = gradleLocalProperties(rootDir, providers)
+        val apiKey: String = localProperties.getProperty("API_KEY") ?: ""
+
 
         buildConfigField("String", "API_BASE_URL", "\"https://api.currencyfreaks.com/v2.0/\"")
-        buildConfigField("String", "API_KEY", "\"cb39cf0a8847420092ebcc1624c48786\"")
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {

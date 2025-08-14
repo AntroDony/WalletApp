@@ -61,3 +61,5 @@ MyWallet is a personal finance tracking Android app that helps to manage all you
 
   2. Open in Android Studio
   3. Build and run the project on your device or emulator 
+
+## 📥 Download APK (./github_resources/apk_file/MyWallet.apk)

@@ -2,35 +2,38 @@
 
 MyWallet is a personal finance tracking Android app that helps to manage all your wallets in one place: cards, cash, bank accounts, crypto wallets, investments. The application helps to track transactions, monitor balances and get analytics about spending and incomes. 
 
+| <img src="github_resources/main_screenshots/main_screen.png"> | <img src="github_resources/main_screenshots/main_private_screen.png"> | <img src="github_resources/main_screenshots/wallet_list.png"> |
+| <img src="github_resources/main_screenshots/analytics_screen.png"> | <img src="github_resources/main_screenshots/edit_wallet_screen.png"> | <img src="github_resources/main_screenshots/edit_balance_screen.png"> |
+
 
 ## Features
 
-- Multiple Wallet Types
+- ### Multiple Wallet Types
     - Cards
     - Cash
     - Bank Accounts
     - Crypto Accounts
     - Investments
  
-- Multi-Currency Support
+- ### Multi-Currency Support
     - USD 
     - EUR 
     - RUB (Russian ruble) 
     - GEL (Georgian lari) 
     - KZT (Kazakhstani tenge) 
 
-- Transactions
+- ### Transactions
     - Add income and expense transactions.
     - Assign transactions to specific wallets and currency accounts.
     - Automatic balance calculation for each wallet and the total across all wallets.
 
-- Analytics
+- ### Analytics
     - View breakdowns of your finances for day/week/month/year
     - View breakdowns of your transactions for specific types and dates
     - Filter transactions for specific categories
 
 
-- Tech Stack
+## Tech Stack
     - Platform: Android
     - Language: Kotlin
     - UI: Jetpack Compose

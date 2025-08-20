@@ -10,7 +10,6 @@ import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.ui.events.AnalyticsUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
@@ -34,6 +33,7 @@ import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsViewModel
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeViewModel
 import com.ancraz.mywallet.presentation.ui.screens.transaction.TransactionViewModel
 import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletViewModel
+import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoViewModel
 
 @Composable
 fun AppNavigation(
@@ -248,11 +248,12 @@ fun AppNavigation(
             }
 
             entry<NavigationRoute.WalletInfoScreen> { key ->
-                val walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>()
-                walletViewModel.getWalletById(key.walletId)
+                //TODO move key.walletId to viewModel factory
+                val walletInfoViewModel: WalletInfoViewModel = hiltViewModel<WalletInfoViewModel>()
+                walletInfoViewModel.getWalletById(key.walletId)
 
                 WalletInfoScreen(
-                    uiState = walletViewModel.walletUiState.collectAsStateWithLifecycle().value,
+                    uiState = walletInfoViewModel.walletUiState.collectAsStateWithLifecycle().value,
                     modifier = Modifier
                         .padding(innerPadding),
                     onEvent = { event: WalletInfoUiEvent ->
@@ -263,12 +264,12 @@ fun AppNavigation(
                                 )
                             }
 
-                            is WalletInfoUiEvent.DeleteWallet -> {
-                                walletViewModel.deleteWallet(event.wallet)
+                            is WalletInfoUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
 
-                            is WalletInfoUiEvent.GoBack -> {
+                            is WalletInfoUiEvent.DeleteWallet -> {
+                                walletInfoViewModel.deleteWallet(event.wallet)
                                 backStack.removeLastOrNull()
                             }
                         }

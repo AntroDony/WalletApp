@@ -34,6 +34,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,13 +85,13 @@ fun AnalyticsScreen(
     val screenJustStarted = remember { mutableStateOf(true) }
 
     val selectedPeriodState = remember { mutableStateOf(uiState.data.period) }
-    val selectedTypeState = remember { mutableStateOf<TransactionType?>(null) }
+    val selectedTypeState = remember { mutableStateOf(uiState.data.transactionType) }
 
-    val isCategoryListOpen = remember { mutableStateOf(false) }
+    val isCategoryListOpen = rememberSaveable { mutableStateOf(false) }
     val categoryList = uiState.data.transactionCategoryList
-    val selectedFilterCategoryState = remember { mutableStateOf<TransactionCategoryUi?>(null) }
+    val selectedFilterCategoryState = remember { mutableStateOf(uiState.data.transactionCategory) }
 
-    val datePageNumber = remember { mutableIntStateOf(0) }
+    val datePageNumber = remember { mutableIntStateOf(uiState.data.periodOffset) }
 
     LaunchedEffect(selectedPeriodState.value) {
         datePageNumber.value = 0

@@ -1,11 +1,9 @@
 package com.ancraz.mywallet.presentation.viewModels
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.models.Transaction
 import com.ancraz.mywallet.domain.models.TransactionCategory
@@ -27,14 +25,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AnalyticsViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val getAllTransactionsUseCase: GetAllTransactionsUseCase,
     private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
     private val getIncomeSumUseCase: GetIncomeSumUseCase,
@@ -44,11 +42,11 @@ class AnalyticsViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private val _analyticsUiState = MutableStateFlow(AnalyticsUiState())
+    private val _analyticsUiState = MutableStateFlow(savedStateHandle[UI_SAVED_STATE_KEY] ?: AnalyticsUiState())
     val analyticsUiState = _analyticsUiState.stateIn(
         viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = AnalyticsUiState()
+        initialValue = savedStateHandle[UI_SAVED_STATE_KEY] ?: AnalyticsUiState()
     )
 
     private val transactionCategoryListFlow: Flow<List<TransactionCategory>> = getTransactionCategoriesUseCase()
@@ -60,7 +58,6 @@ class AnalyticsViewModel @Inject constructor(
         fetchData()
     }
 
-
     fun filterAnalyticsData(
         transactionType: TransactionType?,
         transactionCategory: TransactionCategoryUi?,
@@ -68,12 +65,6 @@ class AnalyticsViewModel @Inject constructor(
         periodOffset: Int
     ){
         viewModelScope.launch(ioDispatcher) {
-
-            debugLog("filterAnalytics: \n" +
-                    "type: $transactionType\n" +
-                    "category: $transactionCategory\n" +
-                    "period: $period\n" +
-                    "offset: $periodOffset")
 
             val filteredByCategoryTransactionList = transactionCategory?.let { category ->
                 transactionList.filter { it.category == category }
@@ -96,14 +87,21 @@ class AnalyticsViewModel @Inject constructor(
                     }
                 }
 
-                _analyticsUiState.value = _analyticsUiState.value.copy(
-                    data = _analyticsUiState.value.data.copy(
-                        totalBalanceInUsd = incomeSum - expenseSum,
-                        incomeValueInUsd = incomeSum,
-                        expenseValueInUsd = expenseSum,
-                        filteredTransactionList = resultTransactionList
+                _analyticsUiState.update {
+                    savedStateHandle[UI_SAVED_STATE_KEY]  = _analyticsUiState.value
+                    it.copy(
+                        data = _analyticsUiState.value.data.copy(
+                            totalBalanceInUsd = incomeSum - expenseSum,
+                            incomeValueInUsd = incomeSum,
+                            expenseValueInUsd = expenseSum,
+                            filteredTransactionList = resultTransactionList,
+                            period = period,
+                            transactionCategory = transactionCategory,
+                            transactionType = transactionType,
+                            periodOffset = periodOffset
+                        )
                     )
-                )
+                }
             }
         }
     }
@@ -116,13 +114,15 @@ class AnalyticsViewModel @Inject constructor(
                     transactionCategoryListFlow
                 ) { allTransactionsList, categoryList ->
                     transactionList = allTransactionsList.map { it.toTransactionUi() }
-                    filterAnalyticsData(
-                        transactionType = null,
-                        transactionCategory = null,
-                        period = AnalyticsPeriod.Day,
-                        periodOffset = 0
-                    )
 
+                    _analyticsUiState.value.data.apply {
+                        filterAnalyticsData(
+                            transactionType = transactionType,
+                            transactionCategory = transactionCategory,
+                            period = period,
+                            periodOffset = periodOffset
+                        )
+                    }
 
                     AnalyticsUiState(
                         isLoading = false,
@@ -132,13 +132,27 @@ class AnalyticsViewModel @Inject constructor(
                         )
                     )
                 }.collect { uiState ->
-                    _analyticsUiState.value = uiState
+                    _analyticsUiState.update {
+                        savedStateHandle[UI_SAVED_STATE_KEY] = _analyticsUiState.value
+                        it.copy(
+                            isLoading = uiState.isLoading,
+                            data = uiState.data
+                        )
+                    }
                 }
             } catch (e: Exception) {
-                _analyticsUiState.value = _analyticsUiState.value.copy(
-                    error = e.message
-                )
+                _analyticsUiState.update {
+                    savedStateHandle[UI_SAVED_STATE_KEY] = _analyticsUiState.value
+                    it.copy(
+                        error = e.message
+                    )
+                }
             }
         }
+    }
+
+    companion object {
+
+        private val UI_SAVED_STATE_KEY = "uiState"
     }
 }

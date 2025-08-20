@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,9 +79,9 @@ fun CreateTransactionScreen(
     val inputValueState = remember { mutableStateOf(0f.toFormattedString()) }
     val descriptionState = remember { mutableStateOf<String?>(null) }
 
-    val isCategoryListOpen = remember { mutableStateOf(false) }
-    val isWalletListOpen = remember { mutableStateOf(false) }
-    val isWalletAccountsDialogOpen = remember { mutableStateOf(false) }
+    val isCategoryListOpen = rememberSaveable { mutableStateOf(false) }
+    val isWalletListOpen = rememberSaveable { mutableStateOf(false) }
+    val isWalletAccountsDialogOpen = rememberSaveable { mutableStateOf(false) }
 
     val currencyState = remember { mutableStateOf(CurrencyCode.USD) }
     val selectedWallet = remember {

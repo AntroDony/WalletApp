@@ -1,6 +1,10 @@
 package com.ancraz.mywallet.presentation.models
 
-sealed class AnalyticsPeriod(val name: String) {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+sealed class AnalyticsPeriod(val name: String): Parcelable {
     data object Day: AnalyticsPeriod("Day")
     data object Week: AnalyticsPeriod("Week")
     data object Month: AnalyticsPeriod("Month")

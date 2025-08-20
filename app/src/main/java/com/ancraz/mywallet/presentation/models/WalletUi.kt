@@ -1,8 +1,11 @@
 package com.ancraz.mywallet.presentation.models
 
+import android.os.Parcelable
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class WalletUi(
     val id: Long = 0L,
     val name: String,
@@ -10,9 +13,11 @@ data class WalletUi(
     val accounts: List<CurrencyAccountUi>,
     val totalBalance: Float,
     val walletType: WalletType
-) {
+): Parcelable {
+
+    @Parcelize
     data class CurrencyAccountUi(
         val currency: CurrencyCode = CurrencyCode.USD,
         val moneyValue: Float = 0f
-    )
+    ): Parcelable
 }

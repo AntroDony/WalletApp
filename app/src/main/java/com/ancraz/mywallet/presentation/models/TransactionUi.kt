@@ -1,9 +1,12 @@
 package com.ancraz.mywallet.presentation.models
 
+import android.os.Parcelable
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
+import kotlinx.parcelize.Parcelize
 import java.util.Calendar
 
+@Parcelize
 data class TransactionUi(
     val id: Long = 0L,
 
@@ -22,4 +25,4 @@ data class TransactionUi(
     val wallet: WalletUi? = null,
 
     val selectedWalletAccount: WalletUi.CurrencyAccountUi? = null
-)
+): Parcelable

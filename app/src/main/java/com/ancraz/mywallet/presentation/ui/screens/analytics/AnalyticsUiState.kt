@@ -16,9 +16,9 @@ data class AnalyticsUiState(
 
     @Parcelize
     data class AnalyticsScreenData(
-        val totalBalanceInUsd: Float = 0f,
-        val incomeValueInUsd: Float = 0f,
-        val expenseValueInUsd: Float = 0f,
+        val totalBalanceInUsd: String = "$ 0.00",
+        val incomeValueInUsd: String = "$ 0.00",
+        val expenseValueInUsd: String = "$ 0.00",
         val period: AnalyticsPeriod = AnalyticsPeriod.Day,
         val periodOffset: Int = 0,
         val transactionType: TransactionType? = null,
@@ -26,4 +26,6 @@ data class AnalyticsUiState(
         val filteredTransactionList: List<TransactionUi> = emptyList(),
         val transactionCategoryList: List<TransactionCategoryUi> = emptyList()
     ): Parcelable
+
+
 }

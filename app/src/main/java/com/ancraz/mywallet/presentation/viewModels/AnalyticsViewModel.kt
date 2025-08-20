@@ -17,6 +17,7 @@ import com.ancraz.mywallet.presentation.models.AnalyticsPeriod
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsUiState
+import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -126,9 +127,9 @@ class AnalyticsViewModel @Inject constructor(
                     savedStateHandle[UI_SAVED_STATE_KEY] = _analyticsUiState.value
                     it.copy(
                         data = _analyticsUiState.value.data.copy(
-                            totalBalanceInUsd = incomeSum - expenseSum,
-                            incomeValueInUsd = incomeSum,
-                            expenseValueInUsd = expenseSum,
+                            totalBalanceInUsd = (incomeSum - expenseSum).toFormattedUsdString(),
+                            incomeValueInUsd = incomeSum.toFormattedUsdString(),
+                            expenseValueInUsd = expenseSum.toFormattedUsdString(),
                             filteredTransactionList = resultTransactionList,
                             period = period,
                             transactionCategory = transactionCategory,
@@ -184,6 +185,10 @@ class AnalyticsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun Float.toFormattedUsdString(): String {
+        return "$ ${this.toFormattedString()}"
     }
 
     companion object {

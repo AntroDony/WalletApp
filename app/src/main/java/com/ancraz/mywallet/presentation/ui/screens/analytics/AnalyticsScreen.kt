@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.AnalyticsPeriod
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
@@ -69,7 +68,6 @@ import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
 import com.ancraz.mywallet.presentation.ui.utils.getFormattedPeriodLabel
-import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 import java.util.Calendar
 
 @Composable
@@ -191,7 +189,6 @@ fun AnalyticsScreen(
                             selectedTransactionType
                         )
                     )
-                    //selectedTypeState.value = selectedTransactionType
                 },
                 onClickTransaction = { transaction ->
                     onEvent(AnalyticsUiEvent.ShowTransactionInfo(transaction))
@@ -239,7 +236,7 @@ private fun TotalBalanceView(
             )
         } else {
             Text(
-                text = "\$ ${uiState.data.totalBalanceInUsd.toFormattedString()}",
+                text = uiState.data.totalBalanceInUsd,
                 color = onBackgroundColor,
                 fontSize = 36.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -387,7 +384,7 @@ private fun AnalyticsDataView(
 @Composable
 private fun AnalyticsView(
     title: String,
-    value: Float,
+    value: String,
     icon: ImageVector,
     contentColor: Color,
     modifier: Modifier = Modifier
@@ -417,7 +414,7 @@ private fun AnalyticsView(
         HorizontalSpacer(height = 8.dp)
 
         Text(
-            text = "\$ ${value.toFormattedString()}",
+            text = value,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = contentColor
@@ -477,7 +474,9 @@ private fun FilterAnalyticsView(
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(onBackgroundColor),
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .padding(2.dp)
                         .clickable{
                             onClickToSelectCategory()
                         }
@@ -490,8 +489,9 @@ private fun FilterAnalyticsView(
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(onBackgroundColor),
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(28.dp)
                         .clip(CircleShape)
+                        .padding(2.dp)
                         .clickable {
                             onClickToDeleteCategory
                         }
@@ -577,9 +577,9 @@ private fun AnalyticsScreenPreview() {
             uiState = AnalyticsUiState(
                 isLoading = false,
                 data = AnalyticsUiState.AnalyticsScreenData(
-                    totalBalanceInUsd = 10000f,
-                    incomeValueInUsd = 2500f,
-                    expenseValueInUsd = 300f,
+                    totalBalanceInUsd = "$ 10000",
+                    incomeValueInUsd = "$ 50000",
+                    expenseValueInUsd = "$ 40000",
                     filteredTransactionList = listOf(
                         TransactionUi(
                             time = Calendar.getInstance().timeInMillis,

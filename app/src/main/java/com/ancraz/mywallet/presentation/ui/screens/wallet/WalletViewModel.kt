@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.viewModels
+package com.ancraz.mywallet.presentation.ui.screens.wallet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +8,6 @@ import com.ancraz.mywallet.domain.manager.WalletManager
 import com.ancraz.mywallet.presentation.mapper.toWallet
 import com.ancraz.mywallet.presentation.mapper.toWalletUi
 import com.ancraz.mywallet.presentation.models.WalletUi
-import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletUiState
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,14 +28,14 @@ class WalletViewModel @Inject constructor(
     private val _walletListUiState = MutableStateFlow(WalletListUiState())
     val walletListUiState = _walletListUiState.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
+        started = SharingStarted.Companion.WhileSubscribed(5000L),
         initialValue = WalletListUiState()
     )
 
     private val _walletUiState = MutableStateFlow(WalletUiState())
     val walletUiState = _walletUiState.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
+        started = SharingStarted.Companion.WhileSubscribed(5000L),
         initialValue = WalletUiState()
     )
 

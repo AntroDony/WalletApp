@@ -1,10 +1,9 @@
-package com.ancraz.mywallet.presentation.viewModels
+package com.ancraz.mywallet.presentation.ui.screens.home
 
 import android.content.Context
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.CurrencyCode
@@ -16,7 +15,6 @@ import com.ancraz.mywallet.domain.useCases.transaction.GetAllTransactionsUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
 import com.ancraz.mywallet.presentation.mapper.toWalletUi
-import com.ancraz.mywallet.presentation.ui.screens.home.HomeUiState
 import com.ancraz.mywallet.presentation.ui.widget.WalletWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,8 +23,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,6 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val savedStateHandle: SavedStateHandle,
     private val getAllTransactionsUseCase: GetAllTransactionsUseCase,
     private val getAllWalletsUseCase: GetAllWalletsUseCase,
     private val dataStoreManager: DataStoreManager
@@ -41,11 +38,11 @@ class HomeViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private var _homeUiState = MutableStateFlow(HomeUiState())
+    private var _homeUiState = MutableStateFlow(savedStateHandle[UI_SAVED_STATE_KEY] ?: HomeUiState())
     val homeUiState = _homeUiState.stateIn(
         viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = HomeUiState()
+        started = SharingStarted.Companion.WhileSubscribed(5000),
+        initialValue = savedStateHandle[UI_SAVED_STATE_KEY] ?: HomeUiState()
     )
 
     private val privateModeStatusFlow = dataStoreManager.getPrivateModeStatus()
@@ -104,6 +101,7 @@ class HomeViewModel @Inject constructor(
                     )
                 }.collect { uiState ->
                     _homeUiState.value = uiState
+                    updateSavedStateHandle()
 
                     updateWidgetState(
                         balance = uiState.data.balance,
@@ -115,8 +113,13 @@ class HomeViewModel @Inject constructor(
                 _homeUiState.value = _homeUiState.value.copy(
                     error = e.message
                 )
+                updateSavedStateHandle()
             }
         }
+    }
+
+    private fun updateSavedStateHandle(){
+        savedStateHandle[UI_SAVED_STATE_KEY] = _homeUiState.value
     }
 
 
@@ -129,6 +132,7 @@ class HomeViewModel @Inject constructor(
     }
 
 
+    //TODO move to WidgetManager class
     private suspend fun updateWidgetState(balance: Float, isPrivateMode: Boolean) {
         try {
             val glanceIds = GlanceAppWidgetManager(context).getGlanceIds(WalletWidget::class.java)
@@ -144,5 +148,10 @@ class HomeViewModel @Inject constructor(
         } catch (e: Exception) {
             debugLog("updateWidgetState exception: ${e.message}")
         }
+    }
+
+
+    companion object {
+        private val UI_SAVED_STATE_KEY = "uiState"
     }
 }

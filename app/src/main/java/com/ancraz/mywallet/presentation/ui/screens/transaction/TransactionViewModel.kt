@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.viewModels
+package com.ancraz.mywallet.presentation.ui.screens.transaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -51,21 +51,21 @@ class TransactionViewModel @Inject constructor(
     val createTransactionUiState: StateFlow<CreateTransactionUiState> =
         _createTransactionUiState.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
+            started = SharingStarted.Companion.WhileSubscribed(5000L),
             initialValue = CreateTransactionUiState()
         )
 
     private var _transactionListUiState = MutableStateFlow(TransactionListUiState())
     val transactionListUiState = _transactionListUiState.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
+        started = SharingStarted.Companion.WhileSubscribed(5000L),
         initialValue = TransactionListUiState()
     )
 
     private var _transactionInfoUiState = MutableStateFlow(TransactionInfoUiState())
     val transactionInfoUiState = _transactionInfoUiState.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
+        started = SharingStarted.Companion.WhileSubscribed(5000L),
         initialValue = TransactionInfoUiState()
     )
 

@@ -30,10 +30,10 @@ import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.T
 import com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet.CreateWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListScreen
-import com.ancraz.mywallet.presentation.viewModels.AnalyticsViewModel
-import com.ancraz.mywallet.presentation.viewModels.HomeViewModel
-import com.ancraz.mywallet.presentation.viewModels.TransactionViewModel
-import com.ancraz.mywallet.presentation.viewModels.WalletViewModel
+import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsViewModel
+import com.ancraz.mywallet.presentation.ui.screens.home.HomeViewModel
+import com.ancraz.mywallet.presentation.ui.screens.transaction.TransactionViewModel
+import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletViewModel
 
 @Composable
 fun AppNavigation(

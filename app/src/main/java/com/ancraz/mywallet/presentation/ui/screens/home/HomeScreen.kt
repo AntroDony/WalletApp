@@ -61,10 +61,6 @@ fun HomeScreen(
     modifier: Modifier,
     onEvent: (HomeUiEvent) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        debugLog("composable HomeScreen")
-    }
-
     Column(
         modifier = modifier
             .fillMaxSize()

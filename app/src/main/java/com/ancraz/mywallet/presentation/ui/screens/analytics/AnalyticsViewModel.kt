@@ -1,4 +1,4 @@
-package com.ancraz.mywallet.presentation.viewModels
+package com.ancraz.mywallet.presentation.ui.screens.analytics
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -16,7 +16,6 @@ import com.ancraz.mywallet.presentation.mapper.toTransactionUi
 import com.ancraz.mywallet.presentation.models.AnalyticsPeriod
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
-import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsUiState
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +45,7 @@ class AnalyticsViewModel @Inject constructor(
         MutableStateFlow(savedStateHandle[UI_SAVED_STATE_KEY] ?: AnalyticsUiState())
     val analyticsUiState = _analyticsUiState.stateIn(
         viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Companion.WhileSubscribed(5000),
         initialValue = savedStateHandle[UI_SAVED_STATE_KEY] ?: AnalyticsUiState()
     )
 
@@ -192,7 +191,6 @@ class AnalyticsViewModel @Inject constructor(
     }
 
     companion object {
-
         private val UI_SAVED_STATE_KEY = "uiState"
     }
 }

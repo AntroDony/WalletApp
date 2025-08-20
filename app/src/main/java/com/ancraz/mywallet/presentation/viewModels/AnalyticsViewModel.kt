@@ -4,9 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.models.Transaction
-import com.ancraz.mywallet.domain.models.TransactionCategory
 import com.ancraz.mywallet.domain.useCases.analytics.GetExpenseSumUseCase
 import com.ancraz.mywallet.domain.useCases.analytics.GetIncomeSumUseCase
 import com.ancraz.mywallet.domain.useCases.analytics.GetTransactionsByPeriodUseCase
@@ -25,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,14 +41,21 @@ class AnalyticsViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private val _analyticsUiState = MutableStateFlow(savedStateHandle[UI_SAVED_STATE_KEY] ?: AnalyticsUiState())
+    private val _analyticsUiState =
+        MutableStateFlow(savedStateHandle[UI_SAVED_STATE_KEY] ?: AnalyticsUiState())
     val analyticsUiState = _analyticsUiState.stateIn(
         viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = savedStateHandle[UI_SAVED_STATE_KEY] ?: AnalyticsUiState()
     )
 
-    private val transactionCategoryListFlow: Flow<List<TransactionCategory>> = getTransactionCategoriesUseCase()
+    private val transactionCategoryListFlow: Flow<List<TransactionCategoryUi>> =
+        getTransactionCategoriesUseCase()
+            .map { list ->
+                list.map { category ->
+                    category.toCategoryUi()
+                }
+            }
     private val allTransactionsListFlow: Flow<List<Transaction>> = getAllTransactionsUseCase()
 
     private var transactionList = emptyList<TransactionUi>()
@@ -58,12 +64,41 @@ class AnalyticsViewModel @Inject constructor(
         fetchData()
     }
 
-    fun filterAnalyticsData(
-        transactionType: TransactionType?,
-        transactionCategory: TransactionCategoryUi?,
-        period: AnalyticsPeriod,
+    fun filterAnalyticsByPeriod(
+        period: AnalyticsPeriod
+    ) {
+        filterAnalyticsData(
+            period = period,
+            periodOffset = 0
+        )
+    }
+
+    fun filterAnalyticsByPeriodOffset(
         periodOffset: Int
-    ){
+    ) {
+        filterAnalyticsData(
+            periodOffset = periodOffset
+        )
+    }
+
+    fun filterAnalyticsByTransactionType(
+        type: TransactionType?
+    ) {
+        filterAnalyticsData(transactionType = type)
+    }
+
+    fun filterAnalyticsByCategory(
+        category: TransactionCategoryUi?
+    ) {
+        filterAnalyticsData(transactionCategory = category)
+    }
+
+    private fun filterAnalyticsData(
+        transactionType: TransactionType? = _analyticsUiState.value.data.transactionType,
+        transactionCategory: TransactionCategoryUi? = _analyticsUiState.value.data.transactionCategory,
+        period: AnalyticsPeriod = _analyticsUiState.value.data.period,
+        periodOffset: Int = _analyticsUiState.value.data.periodOffset
+    ) {
         viewModelScope.launch(ioDispatcher) {
 
             val filteredByCategoryTransactionList = transactionCategory?.let { category ->
@@ -88,7 +123,7 @@ class AnalyticsViewModel @Inject constructor(
                 }
 
                 _analyticsUiState.update {
-                    savedStateHandle[UI_SAVED_STATE_KEY]  = _analyticsUiState.value
+                    savedStateHandle[UI_SAVED_STATE_KEY] = _analyticsUiState.value
                     it.copy(
                         data = _analyticsUiState.value.data.copy(
                             totalBalanceInUsd = incomeSum - expenseSum,
@@ -128,7 +163,7 @@ class AnalyticsViewModel @Inject constructor(
                         isLoading = false,
                         data = AnalyticsUiState.AnalyticsScreenData(
                             filteredTransactionList = transactionList,
-                            transactionCategoryList = categoryList.map { it.toCategoryUi() }
+                            transactionCategoryList = categoryList
                         )
                     )
                 }.collect { uiState ->

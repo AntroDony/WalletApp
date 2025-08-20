@@ -59,7 +59,9 @@ fun TransactionListScreen(
 
         HorizontalSpacer(height = 30.dp)
 
+        //todo change this null hardcode
         TransactionTypeSelector(
+            selectedType = null,
             onTypeSelected = { type ->
                 onEvent(TransactionListUiEvent.GetTransactionsByType(type))
             }

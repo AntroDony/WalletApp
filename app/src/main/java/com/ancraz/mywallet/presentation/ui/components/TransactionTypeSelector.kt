@@ -28,7 +28,7 @@ import com.ancraz.mywallet.presentation.ui.theme.secondaryColor
 
 @Composable
 fun TransactionTypeSelector(
-    selectedType: TransactionType? = null,
+    selectedType: TransactionType?,
     modifier: Modifier = Modifier,
     onTypeSelected: (TransactionType?) -> Unit
 ){

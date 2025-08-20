@@ -29,11 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,41 +78,14 @@ fun AnalyticsScreen(
     modifier: Modifier,
     onEvent: (AnalyticsUiEvent) -> Unit
 ) {
-    val screenJustStarted = remember { mutableStateOf(true) }
 
-    val selectedPeriodState = remember { mutableStateOf(uiState.data.period) }
-    val selectedTypeState = remember { mutableStateOf(uiState.data.transactionType) }
+   val selectedType= uiState.data.transactionType
+    val selectedFilterCategory = uiState.data.transactionCategory
+    val datePageNumber = uiState.data.periodOffset
+    val categoryList = uiState.data.transactionCategoryList
+    val period = uiState.data.period
 
     val isCategoryListOpen = rememberSaveable { mutableStateOf(false) }
-    val categoryList = uiState.data.transactionCategoryList
-    val selectedFilterCategoryState = remember { mutableStateOf(uiState.data.transactionCategory) }
-
-    val datePageNumber = remember { mutableIntStateOf(uiState.data.periodOffset) }
-
-    LaunchedEffect(selectedPeriodState.value) {
-        datePageNumber.value = 0
-    }
-
-    LaunchedEffect(
-        selectedPeriodState.value,
-        selectedTypeState.value,
-        selectedFilterCategoryState.value,
-        datePageNumber.value
-    ) {
-        if (screenJustStarted.value){
-            screenJustStarted.value = false
-            return@LaunchedEffect
-        }
-
-        onEvent(
-            AnalyticsUiEvent.FilterAnalyticsData(
-                type = selectedTypeState.value,
-                category = selectedFilterCategoryState.value,
-                period = selectedPeriodState.value,
-                periodOffset = datePageNumber.value
-            )
-        )
-    }
 
     Column(
         modifier = modifier
@@ -145,8 +114,11 @@ fun AnalyticsScreen(
                 CategoryListMenu(
                     categories = categoryList,
                     onSelect = { category ->
-                        selectedFilterCategoryState.value = category
-
+                        onEvent(
+                            AnalyticsUiEvent.FilterAnalyticsDataByCategory(
+                                category
+                            )
+                        )
                         isCategoryListOpen.value = false
                     },
                     onClose = {
@@ -158,14 +130,19 @@ fun AnalyticsScreen(
 
             TotalBalanceView(
                 uiState = uiState,
-                period = selectedPeriodState.value,
-                offset = datePageNumber.value
+                period = period,
+                offset = datePageNumber
             )
 
             HorizontalSpacer(height = 30.dp)
 
             PeriodSelector(
-                selectedPeriodState = selectedPeriodState,
+                selectedPeriod = period,
+                onPeriodSelected = { selectedPeriod ->
+                    onEvent(
+                        AnalyticsUiEvent.FilterAnalyticsDataByPeriod(selectedPeriod)
+                    )
+                }
             )
 
             HorizontalSpacer(height = 30.dp)
@@ -174,32 +151,47 @@ fun AnalyticsScreen(
                 uiState = uiState,
                 pageState = datePageNumber,
                 onPreviousPageClick = {
-                    datePageNumber.value -= 1
-
-                    debugLog("pageNumber: ${datePageNumber.value}")
+                    onEvent(
+                        AnalyticsUiEvent.FilterAnalyticsDataByPeriodOffset(
+                            datePageNumber-1
+                        )
+                    )
                 },
                 onNextPageClick = {
-                    datePageNumber.value += 1
-
-                    debugLog("pageNumber: ${datePageNumber.value}")
+                    onEvent(
+                        AnalyticsUiEvent.FilterAnalyticsDataByPeriodOffset(
+                            datePageNumber+1
+                        )
+                    )
                 }
             )
 
             HorizontalSpacer()
 
             FilterAnalyticsView(
-                filterCategoryState = selectedFilterCategoryState,
-                onSelectCategory = {
+                filterCategory = selectedFilterCategory,
+                onClickToSelectCategory = {
                     isCategoryListOpen.value = true
+                },
+                onClickToDeleteCategory = {
+                    onEvent(
+                        AnalyticsUiEvent.FilterAnalyticsDataByCategory(null)
+                    )
                 }
             )
 
             HorizontalSpacer()
 
             TransactionListView(
+                selectedType = selectedType,
                 transactionList = uiState.data.filteredTransactionList,
                 onTransactionTypeSelected = { selectedTransactionType ->
-                    selectedTypeState.value = selectedTransactionType
+                    onEvent(
+                        AnalyticsUiEvent.FilterAnalyticsDataByTransactionType(
+                            selectedTransactionType
+                        )
+                    )
+                    //selectedTypeState.value = selectedTransactionType
                 },
                 onClickTransaction = { transaction ->
                     onEvent(AnalyticsUiEvent.ShowTransactionInfo(transaction))
@@ -261,7 +253,8 @@ private fun TotalBalanceView(
 
 @Composable
 private fun PeriodSelector(
-    selectedPeriodState: MutableState<AnalyticsPeriod>,
+    selectedPeriod: AnalyticsPeriod,
+    onPeriodSelected: (AnalyticsPeriod) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -282,10 +275,10 @@ private fun PeriodSelector(
         periodList.forEach { period ->
             PeriodItem(
                 title = period.name,
-                isSelected = period == selectedPeriodState.value,
+                isSelected = period == selectedPeriod,
                 modifier = Modifier.weight(1f),
                 onClick = {
-                    selectedPeriodState.value = period
+                    onPeriodSelected(period)
                 }
             )
         }
@@ -327,12 +320,12 @@ private fun PeriodItem(
 @Composable
 private fun AnalyticsDataView(
     uiState: AnalyticsUiState,
-    pageState: MutableState<Int>,
+    pageState: Int,
     modifier: Modifier = Modifier,
     onPreviousPageClick: () -> Unit,
     onNextPageClick: () -> Unit
 ) {
-    val isNextPageButtonActive = pageState.value < 0
+    val isNextPageButtonActive = pageState < 0
 
     Row(
         modifier = modifier
@@ -372,7 +365,7 @@ private fun AnalyticsDataView(
 
         Image(
             imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
-            contentDescription = "Previous page",
+            contentDescription = "Next page",
             colorFilter = if (isNextPageButtonActive) {
                 ColorFilter.tint(color = primaryColor)
             } else {
@@ -434,9 +427,10 @@ private fun AnalyticsView(
 
 @Composable
 private fun FilterAnalyticsView(
-    filterCategoryState: MutableState<TransactionCategoryUi?>,
+    filterCategory: TransactionCategoryUi?,
     modifier: Modifier = Modifier,
-    onSelectCategory: () -> Unit
+    onClickToSelectCategory: () -> Unit,
+    onClickToDeleteCategory: () -> Unit
 ){
     Card(
         modifier = modifier
@@ -465,7 +459,7 @@ private fun FilterAnalyticsView(
             VerticalSpacer(width = 20.dp)
 
             Text(
-                text = filterCategoryState.value?.name ?:stringResource(R.string.filter_no_title),
+                text = filterCategory?.name ?: stringResource(R.string.filter_no_title),
                 color = onBackgroundColor,
                 fontSize = 16.sp,
                 maxLines = 1,
@@ -485,7 +479,7 @@ private fun FilterAnalyticsView(
                     modifier = Modifier
                         .size(24.dp)
                         .clickable{
-                            onSelectCategory()
+                            onClickToSelectCategory()
                         }
                 )
 
@@ -499,7 +493,7 @@ private fun FilterAnalyticsView(
                         .size(24.dp)
                         .clip(CircleShape)
                         .clickable {
-                            filterCategoryState.value = null
+                            onClickToDeleteCategory
                         }
                 )
             }
@@ -510,12 +504,14 @@ private fun FilterAnalyticsView(
 
 @Composable
 private fun TransactionListView(
+    selectedType: TransactionType?,
     transactionList: List<TransactionUi>,
     modifier: Modifier = Modifier,
     onTransactionTypeSelected: (TransactionType?) -> Unit,
     onClickTransaction: (TransactionUi) -> Unit
 ) {
     TransactionTypeSelector(
+        selectedType = selectedType,
         onTypeSelected = { type ->
             onTransactionTypeSelected(
                 type

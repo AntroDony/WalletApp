@@ -71,10 +71,20 @@ sealed class WalletInfoUiEvent {
 }
 
 sealed class AnalyticsUiEvent{
-    data class FilterAnalyticsData(
-        val type: TransactionType?,
-        val category: TransactionCategoryUi?,
-        val period: AnalyticsPeriod,
+
+    data class FilterAnalyticsDataByTransactionType(
+        val transactionType: TransactionType?
+    ): AnalyticsUiEvent()
+
+    data class FilterAnalyticsDataByCategory(
+        val transactionCategory: TransactionCategoryUi?
+    ): AnalyticsUiEvent()
+
+    data class FilterAnalyticsDataByPeriod(
+        val period: AnalyticsPeriod
+    ): AnalyticsUiEvent()
+
+    data class FilterAnalyticsDataByPeriodOffset(
         val periodOffset: Int
     ): AnalyticsUiEvent()
 

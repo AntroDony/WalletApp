@@ -343,17 +343,22 @@ fun AppNavigation(
                                 )
                             }
 
-                            is AnalyticsUiEvent.FilterAnalyticsData -> {
-                                analyticsViewModel.filterAnalyticsData(
-                                    transactionType = event.type,
-                                    transactionCategory = event.category,
-                                    period = event.period,
-                                    periodOffset = event.periodOffset
-                                )
-                            }
-
                             is AnalyticsUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
+                            }
+
+                            is AnalyticsUiEvent.FilterAnalyticsDataByPeriod -> {
+                                analyticsViewModel.filterAnalyticsByPeriod(event.period)
+                            }
+
+                            is AnalyticsUiEvent.FilterAnalyticsDataByPeriodOffset -> {
+                                analyticsViewModel.filterAnalyticsByPeriodOffset(event.periodOffset)
+                            }
+                            is AnalyticsUiEvent.FilterAnalyticsDataByCategory -> {
+                                analyticsViewModel.filterAnalyticsByCategory(event.transactionCategory)
+                            }
+                            is AnalyticsUiEvent.FilterAnalyticsDataByTransactionType -> {
+                                analyticsViewModel.filterAnalyticsByTransactionType(event.transactionType)
                             }
                         }
                     }

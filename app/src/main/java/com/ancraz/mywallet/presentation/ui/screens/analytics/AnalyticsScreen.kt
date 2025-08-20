@@ -482,7 +482,7 @@ private fun FilterAnalyticsView(
                         }
                 )
 
-                VerticalSpacer(width = 20.dp)
+                VerticalSpacer(width = 10.dp)
 
                 Image(
                     imageVector = Icons.Filled.Delete,

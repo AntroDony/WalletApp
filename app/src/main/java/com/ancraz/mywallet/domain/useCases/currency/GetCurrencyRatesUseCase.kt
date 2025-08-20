@@ -38,7 +38,6 @@ class GetCurrencyRatesUseCase @Inject constructor(
                             rateValue = rate
                         )
                     )
-
                 }
 
                 emit(resultList)

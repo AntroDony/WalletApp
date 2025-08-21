@@ -24,6 +24,7 @@ import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionUiState
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionInfo.TransactionInfoUiState
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.TransactionListUiState
+import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -62,12 +63,7 @@ class TransactionViewModel @Inject constructor(
         initialValue = TransactionListUiState()
     )
 
-    private var _transactionInfoUiState = MutableStateFlow(TransactionInfoUiState())
-    val transactionInfoUiState = _transactionInfoUiState.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Companion.WhileSubscribed(5000L),
-        initialValue = TransactionInfoUiState()
-    )
+
 
 
     private val totalBalanceFlow: Flow<Float> = dataStoreManager.getTotalBalance()
@@ -101,45 +97,10 @@ class TransactionViewModel @Inject constructor(
         }
     }
 
-    fun getTransactionById(id: Long) {
-        viewModelScope.launch(ioDispatcher) {
-            transactionManager.getTransactionById(id).let { result ->
-                when (result) {
-                    is DataResult.Success -> {
-                        _transactionInfoUiState.update {
-                            it.copy(
-                                isLoading = false,
-                                transaction = result.data?.toTransactionUi()
-                            )
-                        }
-                    }
-
-                    is DataResult.Loading -> {
-                        _transactionInfoUiState.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is DataResult.Error -> {
-                        _transactionInfoUiState.update {
-                            it.copy(
-                                error = result.errorMessage
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
 
 
-    fun deleteTransactionById(id: Long) {
-        viewModelScope.launch(ioDispatcher) {
-            transactionManager.deleteTransaction(id)
-        }
-    }
+
+
 
 
     fun getTransactionsByType(type: TransactionType?) {
@@ -179,12 +140,16 @@ class TransactionViewModel @Inject constructor(
                     val wallets = values[6] as List<Wallet>
                     val currencyRates = values[7] as List<CurrencyRate>
 
+                    debugLog("currencyRates: $currencyRates")
+                    debugLog("recentWalletId: $recentWalletId")
+                    debugLog("recentCurrency: $recentCurrency")
+
                     transactionList = transactions.map { it.toTransactionUi() }
 
                     CreateTransactionUiState(
                         isLoading = false,
                         data = CreateTransactionUiState.TransactionScreenData(
-                            totalBalance = totalBalance,
+                            totalBalance = totalBalance.toFormattedString(),
                             incomeCategories = incomeCategories.map { it.toCategoryUi() },
                             expenseCategories = expenseCategories.map { it.toCategoryUi() },
                             currencyRates = currencyRates.map { it.toCurrencyRateUi() },

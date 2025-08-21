@@ -16,7 +16,7 @@ data class CreateTransactionUiState(
 
     @Stable
     data class TransactionScreenData(
-        val totalBalance: Float = 0f,
+        val totalBalance: String = "0.00",
         val incomeCategories: List<TransactionCategoryUi> = emptyList(),
         val expenseCategories: List<TransactionCategoryUi> = emptyList(),
         val currencyRates: List<CurrencyRateUi> = emptyList(),

@@ -150,7 +150,7 @@ fun CreateTransactionScreen(
             TransactionConfigContainer(
                 valueState = inputValueState,
                 currencyState = currencyState,
-                title = "Total balance: ${uiState.data.totalBalance.toFormattedString()}",
+                title = "Total balance: ${uiState.data.totalBalance}",
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally),
@@ -468,7 +468,7 @@ private fun TransactionInputScreenPreview() {
         CreateTransactionScreen(
             uiState = CreateTransactionUiState(
                 data = CreateTransactionUiState.TransactionScreenData(
-                    totalBalance = 5000f,
+                    totalBalance = "5000.00",
                     currencyRates = listOf(
                         CurrencyRateUi(CurrencyCode.EUR, 1.2f),
                         CurrencyRateUi(CurrencyCode.KZT, 0.11f),

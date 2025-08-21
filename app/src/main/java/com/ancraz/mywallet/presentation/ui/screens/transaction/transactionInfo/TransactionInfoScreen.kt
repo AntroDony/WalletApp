@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
@@ -38,7 +41,6 @@ import com.ancraz.mywallet.presentation.ui.components.InfoRow
 import com.ancraz.mywallet.presentation.ui.components.LoadingIndicator
 import com.ancraz.mywallet.presentation.ui.components.NavigationToolbar
 import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
-import com.ancraz.mywallet.presentation.ui.events.TransactionInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.errorColor
@@ -51,10 +53,29 @@ import java.util.Calendar
 
 @Composable
 fun TransactionInfoScreen(
+    paddingValues: PaddingValues,
+    onBack: () -> Unit,
+    viewModel: TransactionInfoViewModel = viewModel<TransactionInfoViewModel>()
+) {
+
+    TransactionInfoContainer(
+        uiState = viewModel.transactionInfoUiState.collectAsStateWithLifecycle().value,
+        modifier = Modifier.padding(paddingValues),
+        onDeleteButtonClicked = { transactionId ->
+            viewModel.deleteTransactionById(transactionId)
+        },
+        onBack = onBack
+    )
+
+}
+
+@Composable
+private fun TransactionInfoContainer(
     uiState: TransactionInfoUiState,
     modifier: Modifier = Modifier,
-    onEvent: (TransactionInfoUiEvent) -> Unit
-) {
+    onDeleteButtonClicked: (Long) -> Unit,
+    onBack: () -> Unit
+){
 
     val isDeleteDialogOpened = remember { mutableStateOf(false) }
 
@@ -69,7 +90,7 @@ fun TransactionInfoScreen(
         NavigationToolbar(
             title = stringResource(R.string.transaction_info_screen_title),
             onClickBack = {
-                onEvent(TransactionInfoUiEvent.GoBack)
+                onBack()
             }
         )
 
@@ -120,10 +141,8 @@ fun TransactionInfoScreen(
                     text = stringResource(R.string.delete_transaction_dialog_text),
                     onConfirm = {
                         isDeleteDialogOpened.value = false
-                        onEvent(
-                            TransactionInfoUiEvent.DeleteTransaction(
-                                transaction = uiState.transaction
-                            )
+                        onDeleteButtonClicked(
+                            uiState.transaction.id
                         )
                     },
                     onDismiss = {
@@ -257,9 +276,9 @@ private fun TransactionValueText(
 
 @Preview
 @Composable
-private fun TransactionInfoScreenPreview() {
+private fun TransactionInfoContainerPreview() {
     MyWalletTheme {
-        TransactionInfoScreen(
+        TransactionInfoContainer(
             modifier = Modifier.background(backgroundColor),
             uiState = TransactionInfoUiState(
                 isLoading = false,
@@ -277,7 +296,8 @@ private fun TransactionInfoScreenPreview() {
                     )
                 ),
             ),
-            onEvent = {}
+            onDeleteButtonClicked = {},
+            onBack = {}
         )
     }
 }

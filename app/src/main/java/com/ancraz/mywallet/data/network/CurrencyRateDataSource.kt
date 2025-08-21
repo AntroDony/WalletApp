@@ -39,7 +39,7 @@ class CurrencyRateDataSource(
             }
         } catch (e: Exception){
             debugLog("getDesiredCurrenciesRate exception: ${e.message}")
-            return Result.Error(error = NetworkError.UNKNOWN)
+            return Result.Error(error = NetworkError.NO_INTERNET)
         }
 
     }

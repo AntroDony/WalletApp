@@ -69,11 +69,6 @@ class WalletInfoViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             updateWalletUseCase(wallet.toWallet())
 
-            //TODO refactor this code
-            _walletUiState.value = _walletUiState.value.copy(
-                wallet = null
-            )
-
             updateWalletSavedStateHandle()
         }
     }

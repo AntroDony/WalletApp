@@ -24,7 +24,6 @@ class GetCurrencyRatesUseCase @Inject constructor(
             if (currencyLastUpdateTime == null || needUpdateCurrencyRates(currencyLastUpdateTime)) {
                 getCurrencyRatesFromApi { onError: DataResult<List<CurrencyRate>> ->
                     debugLog("getCurrencyRatesFromApi error: ${onError.errorMessage}")
-                    emit(emptyList())
                 }
             }
 

@@ -16,6 +16,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -52,13 +53,13 @@ fun WalletConfigContainer(
 ) {
 
     val context = LocalContext.current
-    val isWalletEditMode by remember { mutableStateOf(uiState.wallet != null) }
+    val isWalletEditMode by rememberSaveable { mutableStateOf(uiState.wallet != null) }
 
-    val nameState = remember { mutableStateOf(uiState.wallet?.name) }
-    val descriptionState = remember { mutableStateOf(uiState.wallet?.description) }
-    val selectedTypeState = remember { mutableStateOf(uiState.wallet?.walletType) }
+    val nameState = rememberSaveable { mutableStateOf(uiState.wallet?.name) }
+    val descriptionState = rememberSaveable { mutableStateOf(uiState.wallet?.description) }
+    val selectedTypeState = rememberSaveable { mutableStateOf(uiState.wallet?.walletType) }
     val currencyListState =
-        remember {
+        rememberSaveable {
             mutableStateOf(
                 uiState.wallet?.accounts ?: listOf(
                     WalletUi.CurrencyAccountUi(

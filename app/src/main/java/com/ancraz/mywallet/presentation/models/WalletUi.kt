@@ -18,6 +18,6 @@ data class WalletUi(
     @Parcelize
     data class CurrencyAccountUi(
         val currency: CurrencyCode = CurrencyCode.USD,
-        val moneyValue: String = ""
+        val moneyValue: String = "0.00"
     ): Parcelable
 }

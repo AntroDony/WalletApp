@@ -1,10 +1,9 @@
-package com.ancraz.mywallet.presentation.ui.screens.transaction
+package com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
-import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.manager.DataStoreManager
 import com.ancraz.mywallet.domain.manager.TransactionCategoryManager
@@ -21,9 +20,6 @@ import com.ancraz.mywallet.presentation.mapper.toTransaction
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
 import com.ancraz.mywallet.presentation.mapper.toWalletUi
 import com.ancraz.mywallet.presentation.models.TransactionUi
-import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionUiState
-import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionInfo.TransactionInfoUiState
-import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.TransactionListUiState
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,12 +29,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TransactionViewModel @Inject constructor(
+class CreateTransactionViewModel @Inject constructor(
     private val getCurrencyRatesUseCase: GetCurrencyRatesUseCase,
     private val transactionManager: TransactionManager,
     private val transactionCategoryManager: TransactionCategoryManager,
@@ -48,9 +43,9 @@ class TransactionViewModel @Inject constructor(
 
     private val ioDispatcher = Dispatchers.IO
 
-    private var _createTransactionUiState = MutableStateFlow(CreateTransactionUiState())
-    val createTransactionUiState: StateFlow<CreateTransactionUiState> =
-        _createTransactionUiState.stateIn(
+    private var _uiState = MutableStateFlow(CreateTransactionUiState())
+    val uiState: StateFlow<CreateTransactionUiState> =
+        _uiState.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Companion.WhileSubscribed(5000L),
             initialValue = CreateTransactionUiState()
@@ -128,12 +123,12 @@ class TransactionViewModel @Inject constructor(
                         )
                     )
                 }.collect {
-                    _createTransactionUiState.value = it
+                    _uiState.value = it
                 }
             } catch (e: Exception) {
                 debugLog("fetchData exception: ${e.message}")
 
-                _createTransactionUiState.value = _createTransactionUiState.value.copy(
+                _uiState.value = _uiState.value.copy(
                     error = e.message
                 )
             }

@@ -13,9 +13,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
-class TransactionInfoViewModel(
+class TransactionInfoViewModel @Inject constructor(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase
 ): ViewModel() {

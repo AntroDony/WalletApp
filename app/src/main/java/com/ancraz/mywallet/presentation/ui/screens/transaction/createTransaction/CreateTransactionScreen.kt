@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
@@ -70,26 +73,51 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
 fun CreateTransactionScreen(
-    uiState: CreateTransactionUiState,
     transactionType: TransactionType,
-    modifier: Modifier,
+    paddingValues: PaddingValues,
+    viewModel: CreateTransactionViewModel = viewModel(),
     onEvent: (CreateTransactionUiEvent) -> Unit
 ) {
+
+    CreateTransactionContainer(
+        uiState = viewModel.uiState.collectAsStateWithLifecycle().value,
+        transactionType = transactionType,
+        modifier = Modifier.padding(paddingValues),
+        onAddTransactionClicked = { transaction ->
+            viewModel.addNewTransaction(transaction)
+            onEvent(
+                CreateTransactionUiEvent.GoBack
+            )
+        },
+        onEvent = onEvent
+    )
+}
+
+
+@Composable
+private fun CreateTransactionContainer(
+    uiState: CreateTransactionUiState,
+    transactionType: TransactionType,
+    modifier: Modifier = Modifier,
+    onAddTransactionClicked: (TransactionUi) -> Unit,
+    onEvent: (CreateTransactionUiEvent) -> Unit
+) {
+
     val context = LocalContext.current
 
-    val inputValueState = remember { mutableStateOf(0f.toFormattedString()) }
-    val descriptionState = remember { mutableStateOf<String?>(null) }
+    val inputValueState = rememberSaveable { mutableStateOf(0f.toFormattedString()) }
+    val descriptionState = rememberSaveable { mutableStateOf<String?>(null) }
 
     val isCategoryListOpen = rememberSaveable { mutableStateOf(false) }
     val isWalletListOpen = rememberSaveable { mutableStateOf(false) }
     val isWalletAccountsDialogOpen = rememberSaveable { mutableStateOf(false) }
 
-    val currencyState = remember { mutableStateOf(CurrencyCode.USD) }
-    val selectedWallet = remember {
+    val currencyState = rememberSaveable { mutableStateOf(CurrencyCode.USD) }
+    val selectedWallet = rememberSaveable {
         mutableStateOf<WalletUi?>(null)
     }
 
-    val selectedWalletCurrencyAccount = remember {
+    val selectedWalletCurrencyAccount = rememberSaveable {
         mutableStateOf<WalletUi.CurrencyAccountUi?>(null)
     }
 
@@ -241,9 +269,7 @@ fun CreateTransactionScreen(
                             wallet = selectedWallet.value,
                             selectedAccount = selectedWalletCurrencyAccount.value,
                             onSuccess = { transactionObject ->
-                                onEvent(
-                                    CreateTransactionUiEvent.AddTransaction(transactionObject)
-                                )
+                                onAddTransactionClicked(transactionObject)
                             },
                             onError = { message ->
                                 Toast.makeText(
@@ -465,7 +491,7 @@ private fun SelectWalletAccountDialog(
 @Composable
 private fun TransactionInputScreenPreview() {
     MyWalletTheme {
-        CreateTransactionScreen(
+        CreateTransactionContainer(
             uiState = CreateTransactionUiState(
                 data = CreateTransactionUiState.TransactionScreenData(
                     totalBalance = "5000.00",
@@ -613,6 +639,7 @@ private fun TransactionInputScreenPreview() {
             ),
             TransactionType.INCOME,
             modifier = Modifier.background(backgroundColor),
+            onAddTransactionClicked = {},
             onEvent = {}
         )
     }

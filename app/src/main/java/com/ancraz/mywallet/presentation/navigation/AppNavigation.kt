@@ -29,7 +29,6 @@ import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoS
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListScreen
 import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsViewModel
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeViewModel
-import com.ancraz.mywallet.presentation.ui.screens.transaction.TransactionViewModel
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.EditWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoViewModel
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListViewModel
@@ -142,32 +141,11 @@ fun AppNavigation(
             }
 
             entry<NavigationRoute.TransactionInputScreen> { key ->
-                val transactionViewModel: TransactionViewModel =
-                    hiltViewModel<TransactionViewModel>()
-
-                val transactionType = key.transactionType
-
                 CreateTransactionScreen(
-                    uiState = transactionViewModel.createTransactionUiState.collectAsStateWithLifecycle().value,
-                    transactionType = transactionType,
-                    modifier = Modifier.padding(innerPadding),
+                    transactionType = key.transactionType,
+                    paddingValues = innerPadding,
                     onEvent = { event: CreateTransactionUiEvent ->
                         when (event) {
-                            is CreateTransactionUiEvent.AddTransaction -> {
-                                transactionViewModel.addNewTransaction(event.transaction)
-                                backStack.apply {
-                                    if (this.toList().size == 1) {
-                                        add(
-                                            NavigationRoute.HomeScreen
-                                        )
-                                        remove(key)
-                                    } else {
-                                        removeLastOrNull()
-                                    }
-
-                                }
-                            }
-
                             is CreateTransactionUiEvent.CreateWallet -> {
                                 backStack.add(
                                     NavigationRoute.CreateWalletScreen

@@ -30,7 +30,6 @@ sealed class EditBalanceUiEvent{
 }
 
 sealed class CreateTransactionUiEvent{
-    data class AddTransaction(val transaction: TransactionUi): CreateTransactionUiEvent()
     data object CreateWallet: CreateTransactionUiEvent()
 
     data object GoBack: CreateTransactionUiEvent()

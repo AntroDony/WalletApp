@@ -8,12 +8,13 @@ import androidx.compose.material.icons.filled.Money
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.WaterfallChart
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
 
 
 internal fun WalletType.getImageByWalletType(): ImageVector {
-    return when(this){
+    return when (this) {
         WalletType.CARD -> Icons.Filled.CreditCard
         WalletType.CASH -> Icons.Filled.Money
         WalletType.BANK_ACCOUNT -> Icons.Filled.AccountBalance
@@ -24,8 +25,17 @@ internal fun WalletType.getImageByWalletType(): ImageVector {
 }
 
 
-internal fun WalletUi.getWalletCurrenciesString(): String{
+internal fun WalletUi.getWalletCurrenciesString(): String {
     val currencyList = this.accounts.map { it.currency }
 
     return currencyList.joinToString(", ")
+}
+
+
+internal fun getTestCurrencyAccountList(): List<WalletUi.CurrencyAccountUi> {
+    return listOf(
+        WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, "2000.00"),
+        WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, "567.20"),
+        WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, "2000")
+    )
 }

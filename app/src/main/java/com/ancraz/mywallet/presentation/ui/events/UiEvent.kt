@@ -29,11 +29,11 @@ sealed class EditBalanceUiEvent{
     data object GoBack: EditBalanceUiEvent()
 }
 
-sealed class CreateWalletUiEvent{
-    data class AddWallet(val wallet: WalletUi): CreateWalletUiEvent()
-    data class UpdateWallet(val wallet: WalletUi): CreateWalletUiEvent()
+sealed class WalletUiEvent{
+    data class AddWallet(val wallet: WalletUi): WalletUiEvent()
+    data class UpdateWallet(val wallet: WalletUi): WalletUiEvent()
 
-    data object GoBack: CreateWalletUiEvent()
+    data object GoBack: WalletUiEvent()
 }
 
 sealed class CreateTransactionUiEvent{

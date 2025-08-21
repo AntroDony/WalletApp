@@ -24,7 +24,6 @@ import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +37,6 @@ import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.models.WalletType
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.TransactionUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.components.CreateWalletButton
@@ -53,6 +51,7 @@ import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
+import com.ancraz.mywallet.presentation.ui.utils.getTestCurrencyAccountList
 import java.util.Calendar
 
 @Composable
@@ -353,33 +352,21 @@ fun HomeScreenPreview() {
                             name = "TBC Card",
                             description = "TBC Bank physic account",
                             walletType = WalletType.CARD,
-                            accounts = listOf(
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                            ),
-                            totalBalance = 2400f
+                            accounts = getTestCurrencyAccountList(),
+                            totalBalance = "2400 USD"
                         ),
                         WalletUi(
                             name = "Cash",
                             description = "TBC Bank physic account",
                             walletType = WalletType.CASH,
-                            accounts = listOf(
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                            ),
-                            totalBalance = 2400f
+                            accounts = getTestCurrencyAccountList(),
+                            totalBalance = "2400 USD"
                         ),
                         WalletUi(
                             name = "Trust Wallet 1",
                             walletType = WalletType.CRYPTO_WALLET,
-                            accounts = listOf(
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                            ),
-                            totalBalance = 2400f
+                            accounts = getTestCurrencyAccountList(),
+                            totalBalance = "2400 USD"
                         )
                     )
                 )

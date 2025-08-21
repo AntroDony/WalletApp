@@ -4,7 +4,7 @@ import com.ancraz.mywallet.domain.models.Wallet
 import com.ancraz.mywallet.domain.repository.WalletRepository
 import javax.inject.Inject
 
-class AddNewWalletUseCase @Inject constructor(
+class AddWalletUseCase @Inject constructor(
     private val repository: WalletRepository
 ) {
 

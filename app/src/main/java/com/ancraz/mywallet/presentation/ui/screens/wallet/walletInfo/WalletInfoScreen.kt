@@ -47,6 +47,7 @@ import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onPrimaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
+import com.ancraz.mywallet.presentation.ui.utils.getTestCurrencyAccountList
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
@@ -152,7 +153,7 @@ fun WalletInfoScreen(
 
             InfoRow(
                 title = stringResource(R.string.wallet_info_total_balance_title),
-                info = "${uiState.wallet.totalBalance.toFormattedString()} USD"
+                info = uiState.wallet.totalBalance
             )
 
             HorizontalSpacer()
@@ -173,7 +174,7 @@ fun WalletInfoScreen(
                 items(uiState.wallet.accounts) { account ->
                     InfoRow(
                         title = "${account.currency.name}:",
-                        info = account.moneyValue.toFormattedString(),
+                        info = account.moneyValue,
                     )
 
                     HorizontalSpacer()
@@ -236,12 +237,8 @@ private fun WalletInfoScreenPreview() {
                     name = "TBC Card",
                     description = "TBC Bank physic account",
                     walletType = WalletType.CARD,
-                    accounts = listOf(
-                        WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                        WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                        WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                    ),
-                    totalBalance = 2400f
+                    accounts = getTestCurrencyAccountList(),
+                    totalBalance = "2400 USD"
                 ),
             ),
             onEvent = {}

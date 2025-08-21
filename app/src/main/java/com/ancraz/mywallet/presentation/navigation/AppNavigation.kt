@@ -12,7 +12,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.ancraz.mywallet.presentation.ui.events.AnalyticsUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
-import com.ancraz.mywallet.presentation.ui.events.CreateWalletUiEvent
 import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.events.TransactionInfoUiEvent
@@ -32,8 +31,9 @@ import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListS
 import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsViewModel
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeViewModel
 import com.ancraz.mywallet.presentation.ui.screens.transaction.TransactionViewModel
-import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletViewModel
+import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.EditWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoViewModel
+import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListViewModel
 
 @Composable
 fun AppNavigation(
@@ -193,7 +193,7 @@ fun AppNavigation(
             }
 
             entry<NavigationRoute.WalletListScreen> {
-                val walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>()
+                val walletViewModel: WalletListViewModel = hiltViewModel<WalletListViewModel>()
 
                 WalletListScreen(
                     modifier = Modifier
@@ -208,7 +208,6 @@ fun AppNavigation(
                             }
 
                             is WalletListUiEvent.CreateWallet -> {
-                                walletViewModel.resetWalletState()
                                 backStack.add(
                                     NavigationRoute.CreateWalletScreen
                                 )
@@ -223,32 +222,24 @@ fun AppNavigation(
             }
 
             entry<NavigationRoute.CreateWalletScreen> {
-                val walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>()
-
                 CreateWalletScreen(
-                    uiState = walletViewModel.walletUiState.collectAsStateWithLifecycle().value,
-                    modifier = Modifier
-                        .padding(innerPadding),
-                    onEvent = { event: CreateWalletUiEvent ->
-                        when (event) {
-                            is CreateWalletUiEvent.AddWallet -> {
-                                walletViewModel.addWallet(event.wallet)
-                            }
+                    paddingValues = innerPadding,
+                    onBack = {
+                        backStack.removeLastOrNull()
+                    }
+                )
+            }
 
-                            is CreateWalletUiEvent.UpdateWallet -> {
-                                walletViewModel.updateWallet(event.wallet)
-                            }
-
-                            is CreateWalletUiEvent.GoBack -> {
-                                backStack.removeLastOrNull()
-                            }
-                        }
+            entry<NavigationRoute.EditWalletScreen> {
+                EditWalletScreen(
+                    paddingValues = innerPadding,
+                    onBack = {
+                        backStack.removeLastOrNull()
                     }
                 )
             }
 
             entry<NavigationRoute.WalletInfoScreen> { key ->
-                //TODO move key.walletId to viewModel factory
                 val walletInfoViewModel: WalletInfoViewModel = hiltViewModel<WalletInfoViewModel>()
                 walletInfoViewModel.getWalletById(key.walletId)
 
@@ -260,7 +251,7 @@ fun AppNavigation(
                         when (event) {
                             is WalletInfoUiEvent.EditWallet -> {
                                 backStack.add(
-                                    NavigationRoute.CreateWalletScreen
+                                    NavigationRoute.EditWalletScreen(key.walletId)
                                 )
                             }
 
@@ -355,9 +346,11 @@ fun AppNavigation(
                             is AnalyticsUiEvent.FilterAnalyticsDataByPeriodOffset -> {
                                 analyticsViewModel.filterAnalyticsByPeriodOffset(event.periodOffset)
                             }
+
                             is AnalyticsUiEvent.FilterAnalyticsDataByCategory -> {
                                 analyticsViewModel.filterAnalyticsByCategory(event.transactionCategory)
                             }
+
                             is AnalyticsUiEvent.FilterAnalyticsDataByTransactionType -> {
                                 analyticsViewModel.filterAnalyticsByTransactionType(event.transactionType)
                             }

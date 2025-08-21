@@ -28,6 +28,9 @@ sealed class NavigationRoute: NavKey {
     object CreateWalletScreen: NavigationRoute()
 
     @Serializable
+    data class EditWalletScreen(val walletId: Long): NavigationRoute()
+
+    @Serializable
     data class WalletInfoScreen(val walletId: Long): NavigationRoute()
 
     @Serializable

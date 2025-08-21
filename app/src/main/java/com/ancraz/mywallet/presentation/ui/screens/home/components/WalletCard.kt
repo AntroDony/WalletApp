@@ -31,6 +31,7 @@ import com.ancraz.mywallet.presentation.ui.theme.MyWalletTheme
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
+import com.ancraz.mywallet.presentation.ui.utils.getTestCurrencyAccountList
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
@@ -82,7 +83,6 @@ fun WalletCard(
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     modifier = Modifier
-                        //.weight(1f)
                 )
 
                 VerticalSpacer()
@@ -99,7 +99,7 @@ fun WalletCard(
             HorizontalSpacer(height = 8.dp)
 
             Text(
-                text = "${wallet.totalBalance.toFormattedString()} USD",
+                text = wallet.totalBalance,
                 color = onBackgroundColor,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
@@ -117,12 +117,8 @@ private fun WalletCardPreview(){
                 name = "TBC Card",
                 description = "TBC Bank physic account",
                 walletType = WalletType.CARD,
-                accounts = listOf(
-                    WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                    WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                    WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                ),
-                totalBalance = 2400f
+                accounts = getTestCurrencyAccountList(),
+                totalBalance = "2400 USD"
             ),
             onClick = {}
         )

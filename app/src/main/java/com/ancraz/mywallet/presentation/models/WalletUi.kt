@@ -11,13 +11,13 @@ data class WalletUi(
     val name: String,
     val description: String? = null,
     val accounts: List<CurrencyAccountUi>,
-    val totalBalance: Float,
+    val totalBalance: String,
     val walletType: WalletType
 ): Parcelable {
 
     @Parcelize
     data class CurrencyAccountUi(
         val currency: CurrencyCode = CurrencyCode.USD,
-        val moneyValue: Float = 0f
+        val moneyValue: String = ""
     ): Parcelable
 }

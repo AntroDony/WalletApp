@@ -64,6 +64,7 @@ import com.ancraz.mywallet.presentation.ui.theme.onSurfaceColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryContainerColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
+import com.ancraz.mywallet.presentation.ui.utils.getTestCurrencyAccountList
 import com.ancraz.mywallet.presentation.ui.utils.toFloatValue
 import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
@@ -413,7 +414,7 @@ private fun SelectWalletAccountDialog(
                             VerticalSpacer()
 
                             Text(
-                                text = "${account.moneyValue.toFormattedString()} ${account.currency}",
+                                text = "${account.moneyValue} ${account.currency}",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = onBackgroundColor
@@ -591,33 +592,21 @@ private fun TransactionInputScreenPreview() {
                             name = "TBC Card",
                             description = "TBC Bank physic account",
                             walletType = WalletType.CARD,
-                            accounts = listOf(
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                            ),
-                            totalBalance = 2400f
+                            accounts = getTestCurrencyAccountList(),
+                            totalBalance = "2400 USD"
                         ),
                         WalletUi(
                             name = "Cash",
                             description = "TBC Bank physic account",
                             walletType = WalletType.CASH,
-                            accounts = listOf(
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                            ),
-                            totalBalance = 2400f
+                            accounts = getTestCurrencyAccountList(),
+                            totalBalance = "2400 USD"
                         ),
                         WalletUi(
                             name = "Trust Wallet 1",
                             walletType = WalletType.CRYPTO_WALLET,
-                            accounts = listOf(
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.USD, 2000f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.GEL, 567.20f),
-                                WalletUi.CurrencyAccountUi(currency = CurrencyCode.RUB, 2000f)
-                            ),
-                            totalBalance = 2400f
+                            accounts = getTestCurrencyAccountList(),
+                            totalBalance = "2400 USD"
                         )
                     )
                 )
@@ -646,7 +635,7 @@ private fun buildTransactionObject(
         return
     }
     selectedAccount?.let { account ->
-        if (account.moneyValue < value && type == TransactionType.EXPENSE) {
+        if (account.moneyValue.toFloatValue() < value && type == TransactionType.EXPENSE) {
             onError(" You are in a minus. Not enough money on selected account")
         } else if (selectedAccount.currency != currency) {
             onError("Selected currency is incompatible with selected account")

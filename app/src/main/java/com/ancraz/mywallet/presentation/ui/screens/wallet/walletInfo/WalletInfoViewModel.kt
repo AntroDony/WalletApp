@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.domain.useCases.wallet.DeleteWalletUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetWalletByIdUseCase
+import com.ancraz.mywallet.domain.useCases.wallet.UpdateWalletUseCase
+import com.ancraz.mywallet.presentation.mapper.toWallet
 import com.ancraz.mywallet.presentation.mapper.toWalletUi
 import com.ancraz.mywallet.presentation.models.WalletUi
 import com.ancraz.mywallet.presentation.ui.screens.wallet.WalletUiState
@@ -22,7 +24,8 @@ import javax.inject.Inject
 class WalletInfoViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getWalletByIdUseCase: GetWalletByIdUseCase,
-    private val deleteWalletUseCase: DeleteWalletUseCase
+    private val updateWalletUseCase: UpdateWalletUseCase,
+    private val deleteWalletUseCase: DeleteWalletUseCase,
 ): ViewModel() {
 
     private val ioDispatcher = Dispatchers.IO
@@ -60,6 +63,23 @@ class WalletInfoViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun updateWallet(wallet: WalletUi){
+        viewModelScope.launch(ioDispatcher) {
+            updateWalletUseCase(wallet.toWallet())
+
+            //TODO refactor this code
+            _walletUiState.value = _walletUiState.value.copy(
+                wallet = null
+            )
+
+            updateWalletSavedStateHandle()
+        }
+    }
+
+    private fun updateWalletSavedStateHandle(){
+        savedStateHandle[WALLET_SAVED_STATE_KEY] = _walletUiState.value
     }
 
     fun deleteWallet(walletUi: WalletUi){

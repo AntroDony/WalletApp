@@ -272,7 +272,7 @@ private fun TransactionInfoScreenPreview() {
                     wallet = WalletUi(
                         name = "TBC Card",
                         walletType = WalletType.CARD,
-                        totalBalance = 8000f,
+                        totalBalance = "8000 USD",
                         accounts = emptyList()
                     )
                 ),

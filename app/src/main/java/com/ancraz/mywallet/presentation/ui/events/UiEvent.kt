@@ -29,13 +29,6 @@ sealed class EditBalanceUiEvent{
     data object GoBack: EditBalanceUiEvent()
 }
 
-sealed class WalletUiEvent{
-    data class AddWallet(val wallet: WalletUi): WalletUiEvent()
-    data class UpdateWallet(val wallet: WalletUi): WalletUiEvent()
-
-    data object GoBack: WalletUiEvent()
-}
-
 sealed class CreateTransactionUiEvent{
     data class AddTransaction(val transaction: TransactionUi): CreateTransactionUiEvent()
     data object CreateWallet: CreateTransactionUiEvent()
@@ -45,17 +38,8 @@ sealed class CreateTransactionUiEvent{
 
 sealed class TransactionListUiEvent {
     data class ShowTransactionInfo(val transaction: TransactionUi): TransactionListUiEvent()
-    data class GetTransactionsByType(val transactionType: TransactionType?): TransactionListUiEvent()
-
     data object GoBack: TransactionListUiEvent()
 }
-
-sealed class TransactionInfoUiEvent {
-    data class DeleteTransaction(val transaction: TransactionUi): TransactionInfoUiEvent()
-
-    data object GoBack: TransactionInfoUiEvent()
-}
-
 sealed class WalletListUiEvent{
     data object CreateWallet: WalletListUiEvent()
     data class ShowWalletInfo(val wallet: WalletUi): WalletListUiEvent()

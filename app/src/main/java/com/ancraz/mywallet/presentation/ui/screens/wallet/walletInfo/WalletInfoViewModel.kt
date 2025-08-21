@@ -84,6 +84,6 @@ class WalletInfoViewModel @Inject constructor(
     }
 
     companion object {
-        private val WALLET_SAVED_STATE_KEY = "walletUiState"
+        private const val WALLET_SAVED_STATE_KEY = "walletUiState"
     }
 }

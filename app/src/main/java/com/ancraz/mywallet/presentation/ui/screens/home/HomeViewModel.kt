@@ -152,6 +152,6 @@ class HomeViewModel @Inject constructor(
 
 
     companion object {
-        private val UI_SAVED_STATE_KEY = "uiState"
+        private const val UI_SAVED_STATE_KEY = "homeUiState"
     }
 }

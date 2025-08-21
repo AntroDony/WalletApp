@@ -55,6 +55,6 @@ class WalletListViewModel @Inject constructor(
 
 
     companion object {
-        private val WALLET_LIST_SAVED_STATE_KEY = "walletListUiState"
+        private const val WALLET_LIST_SAVED_STATE_KEY = "walletListUiState"
     }
 }

@@ -56,15 +56,6 @@ class TransactionViewModel @Inject constructor(
             initialValue = CreateTransactionUiState()
         )
 
-    private var _transactionListUiState = MutableStateFlow(TransactionListUiState())
-    val transactionListUiState = _transactionListUiState.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Companion.WhileSubscribed(5000L),
-        initialValue = TransactionListUiState()
-    )
-
-
-
 
     private val totalBalanceFlow: Flow<Float> = dataStoreManager.getTotalBalance()
     private val recentWalletIdFlow: Flow<Long> = dataStoreManager.getRecentWalletId()
@@ -77,9 +68,7 @@ class TransactionViewModel @Inject constructor(
     private val walletListFlow: Flow<List<Wallet>> = walletManager.getWallets()
     private val currencyRatesFlow: Flow<List<CurrencyRate>> = getCurrencyRatesUseCase()
 
-
     private var transactionList: List<TransactionUi> = emptyList()
-
 
     init {
         fetchData()
@@ -95,26 +84,6 @@ class TransactionViewModel @Inject constructor(
                 dataStoreManager.updateRecentWalletId(id)
             }
         }
-    }
-
-
-
-
-
-
-
-    fun getTransactionsByType(type: TransactionType?) {
-        viewModelScope.launch(Dispatchers.Default) {
-
-            _transactionListUiState.value = _transactionListUiState.value.copy(
-                transactionList = type?.let {
-                    transactionList.filter { it.type == type }
-                } ?: run {
-                    transactionList
-                }
-            )
-        }
-
     }
 
 
@@ -160,11 +129,6 @@ class TransactionViewModel @Inject constructor(
                     )
                 }.collect {
                     _createTransactionUiState.value = it
-
-                    _transactionListUiState.value = TransactionListUiState(
-                        isLoading = false,
-                        transactionList = transactionList
-                    )
                 }
             } catch (e: Exception) {
                 debugLog("fetchData exception: ${e.message}")
@@ -173,7 +137,6 @@ class TransactionViewModel @Inject constructor(
                     error = e.message
                 )
             }
-
         }
     }
 }

@@ -14,7 +14,6 @@ import com.ancraz.mywallet.presentation.ui.events.AnalyticsUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
 import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
-import com.ancraz.mywallet.presentation.ui.events.TransactionInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
@@ -269,23 +268,14 @@ fun AppNavigation(
             }
 
             entry<NavigationRoute.TransactionListScreen> {
-                val transactionViewModel: TransactionViewModel =
-                    hiltViewModel<TransactionViewModel>()
-
                 TransactionListScreen(
-                    modifier = Modifier
-                        .padding(innerPadding),
-                    uiState = transactionViewModel.transactionListUiState.collectAsStateWithLifecycle().value,
+                    paddingValues = innerPadding,
                     onEvent = { event: TransactionListUiEvent ->
                         when (event) {
                             is TransactionListUiEvent.ShowTransactionInfo -> {
                                 backStack.add(
                                     NavigationRoute.TransactionInfoScreen(event.transaction.id)
                                 )
-                            }
-
-                            is TransactionListUiEvent.GetTransactionsByType -> {
-                                transactionViewModel.getTransactionsByType(event.transactionType)
                             }
 
                             is TransactionListUiEvent.GoBack -> {
@@ -344,7 +334,6 @@ fun AppNavigation(
                     }
                 )
             }
-
         }
     )
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
@@ -38,10 +41,29 @@ import java.util.Calendar
 
 @Composable
 fun TransactionListScreen(
+    paddingValues: PaddingValues,
+    onEvent: (TransactionListUiEvent) -> Unit,
+    viewModel: TransactionListViewModel = viewModel()
+) {
+
+    TransactionListContainer(
+        uiState = viewModel.transactionListUiState.collectAsStateWithLifecycle().value,
+        modifier = Modifier.padding(paddingValues),
+        onFilterTransactionsByType = { type ->
+            viewModel.filterTransactionsByType(type)
+        },
+        onEvent = onEvent
+    )
+}
+
+
+@Composable
+private fun TransactionListContainer(
     uiState: TransactionListUiState,
     modifier: Modifier = Modifier,
+    onFilterTransactionsByType: (TransactionType?) -> Unit,
     onEvent: (TransactionListUiEvent) -> Unit
-) {
+){
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -59,11 +81,10 @@ fun TransactionListScreen(
 
         HorizontalSpacer(height = 30.dp)
 
-        //todo change this null hardcode
         TransactionTypeSelector(
-            selectedType = null,
+            selectedType = uiState.filteredType,
             onTypeSelected = { type ->
-                onEvent(TransactionListUiEvent.GetTransactionsByType(type))
+                onFilterTransactionsByType(type)
             }
         )
 
@@ -119,9 +140,9 @@ fun TransactionListScreen(
 
 @Preview
 @Composable
-private fun TransactionListScreenPreview() {
+private fun TransactionListContainerPreview() {
     MyWalletTheme {
-        TransactionListScreen(
+        TransactionListContainer(
             modifier = Modifier.background(backgroundColor),
             uiState = TransactionListUiState(
                 isLoading = false,
@@ -170,6 +191,7 @@ private fun TransactionListScreenPreview() {
                     ),
                 )
             ),
+            onFilterTransactionsByType = {},
             onEvent = {}
         )
     }

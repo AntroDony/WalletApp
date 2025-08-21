@@ -297,25 +297,11 @@ fun AppNavigation(
             }
 
             entry<NavigationRoute.TransactionInfoScreen> { key ->
-                val transactionViewModel: TransactionViewModel =
-                    hiltViewModel<TransactionViewModel>()
-                transactionViewModel.getTransactionById(key.transactionId)
-
                 TransactionInfoScreen(
-                    uiState = transactionViewModel.transactionInfoUiState.collectAsStateWithLifecycle().value,
-                    modifier = Modifier
-                        .padding(innerPadding),
-                    onEvent = { event: TransactionInfoUiEvent ->
-                        when (event) {
-                            is TransactionInfoUiEvent.DeleteTransaction -> {
-                                transactionViewModel.deleteTransactionById(event.transaction.id)
-                                backStack.removeLastOrNull()
-                            }
-
-                            is TransactionInfoUiEvent.GoBack -> {
-                                backStack.removeLastOrNull()
-                            }
-                        }
+                    transactionId = key.transactionId,
+                    paddingValues = innerPadding,
+                    onBack = {
+                        backStack.removeLastOrNull()
                     }
                 )
             }

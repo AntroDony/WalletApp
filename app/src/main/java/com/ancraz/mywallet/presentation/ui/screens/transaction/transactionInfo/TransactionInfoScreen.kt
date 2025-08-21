@@ -53,20 +53,22 @@ import java.util.Calendar
 
 @Composable
 fun TransactionInfoScreen(
+    transactionId: Long,
     paddingValues: PaddingValues,
     onBack: () -> Unit,
     viewModel: TransactionInfoViewModel = viewModel<TransactionInfoViewModel>()
 ) {
+    viewModel.getTransactionById(transactionId)
 
     TransactionInfoContainer(
         uiState = viewModel.transactionInfoUiState.collectAsStateWithLifecycle().value,
         modifier = Modifier.padding(paddingValues),
         onDeleteButtonClicked = { transactionId ->
             viewModel.deleteTransactionById(transactionId)
+            onBack()
         },
         onBack = onBack
     )
-
 }
 
 @Composable

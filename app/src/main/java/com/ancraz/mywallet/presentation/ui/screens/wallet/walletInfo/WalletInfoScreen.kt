@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.WalletType
@@ -52,10 +55,37 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
 fun WalletInfoScreen(
+    walletId: Long,
+    paddingValues: PaddingValues,
+    onEvent: (WalletInfoUiEvent) -> Unit,
+    viewModel: WalletInfoViewModel = viewModel()
+) {
+    viewModel.getWalletById(walletId)
+
+    WalletInfoContainer(
+        uiState = viewModel.walletUiState.collectAsStateWithLifecycle().value,
+        modifier = Modifier.padding(paddingValues),
+        onEvent = { event ->
+            when(event){
+                is WalletInfoUiEvent.DeleteWallet -> {
+                    viewModel.deleteWallet(event.wallet)
+                    onEvent(WalletInfoUiEvent.GoBack)
+                }
+                else -> {
+                    onEvent(event)
+                }
+            }
+
+        }
+    )
+}
+
+@Composable
+private fun WalletInfoContainer(
     uiState: WalletUiState,
     modifier: Modifier = Modifier,
     onEvent: (WalletInfoUiEvent) -> Unit
-) {
+){
     val isDeleteDialogOpened = remember { mutableStateOf(false) }
 
     Column(
@@ -229,7 +259,7 @@ fun WalletInfoScreen(
 @Composable
 private fun WalletInfoScreenPreview() {
     MyWalletTheme {
-        WalletInfoScreen(
+        WalletInfoContainer(
             modifier = Modifier.background(backgroundColor),
             uiState = WalletUiState(
                 isLoading = false,

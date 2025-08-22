@@ -49,10 +49,16 @@ fun TransactionListScreen(
     TransactionListContainer(
         uiState = viewModel.transactionListUiState.collectAsStateWithLifecycle().value,
         modifier = Modifier.padding(paddingValues),
-        onFilterTransactionsByType = { type ->
-            viewModel.filterTransactionsByType(type)
-        },
-        onEvent = onEvent
+        onEvent = { event ->
+            when(event){
+                is TransactionListUiEvent.FilterTransactionByType -> {
+                    viewModel.filterTransactionsByType(event.transactionType)
+                }
+                else -> {
+                    onEvent(event)
+                }
+            }
+        }
     )
 }
 
@@ -61,7 +67,6 @@ fun TransactionListScreen(
 private fun TransactionListContainer(
     uiState: TransactionListUiState,
     modifier: Modifier = Modifier,
-    onFilterTransactionsByType: (TransactionType?) -> Unit,
     onEvent: (TransactionListUiEvent) -> Unit
 ){
     Column(
@@ -84,7 +89,7 @@ private fun TransactionListContainer(
         TransactionTypeSelector(
             selectedType = uiState.filteredType,
             onTypeSelected = { type ->
-                onFilterTransactionsByType(type)
+                TransactionListUiEvent.FilterTransactionByType(type)
             }
         )
 
@@ -191,7 +196,6 @@ private fun TransactionListContainerPreview() {
                     ),
                 )
             ),
-            onFilterTransactionsByType = {},
             onEvent = {}
         )
     }

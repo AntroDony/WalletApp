@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.WalletType
 import com.ancraz.mywallet.presentation.models.WalletUi
@@ -44,15 +47,27 @@ import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.screenHorizontalPadding
 import com.ancraz.mywallet.presentation.ui.utils.getTestCurrencyAccountList
-import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 @Composable
 fun WalletListScreen(
+    paddingValues: PaddingValues,
+    onEvent: (WalletListUiEvent) -> Unit,
+    viewModel: WalletListViewModel = viewModel()
+) {
+    WalletListContainer(
+        uiState = viewModel.walletListUiState.collectAsStateWithLifecycle().value,
+        modifier = Modifier.padding(paddingValues),
+        onEvent = onEvent
+    )
+}
+
+
+@Composable
+private fun WalletListContainer(
     uiState: WalletListUiState,
     modifier: Modifier = Modifier,
     onEvent: (WalletListUiEvent) -> Unit
-) {
-
+){
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -241,9 +256,10 @@ private fun WalletCard(
 @Composable
 private fun WalletListScreenPreview(){
     MyWalletTheme {
-        WalletListScreen(
+        WalletListContainer(
             modifier = Modifier.background(backgroundColor),
             uiState = WalletListUiState(
+                isLoading = false,
                 walletList = listOf(
                     WalletUi(
                         name = "TBC Card",

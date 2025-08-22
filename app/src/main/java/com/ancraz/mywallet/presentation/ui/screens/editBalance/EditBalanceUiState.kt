@@ -13,7 +13,7 @@ data class EditBalanceUiState(
 
     @Parcelize
     data class EditBalanceScreenData(
-        val currentTotalBalance: Float = 0f,
+        val currentTotalBalance: String = "0.00",
         val currency: CurrencyCode = CurrencyCode.USD
     ): Parcelable
 }

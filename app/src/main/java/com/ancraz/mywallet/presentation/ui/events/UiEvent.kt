@@ -31,11 +31,13 @@ sealed class EditBalanceUiEvent{
 
 sealed class CreateTransactionUiEvent{
     data object CreateWallet: CreateTransactionUiEvent()
+    data class AddTransaction(val transaction: TransactionUi): CreateTransactionUiEvent()
 
     data object GoBack: CreateTransactionUiEvent()
 }
 
 sealed class TransactionListUiEvent {
+    data class FilterTransactionByType(val transactionType: TransactionType?): TransactionListUiEvent()
     data class ShowTransactionInfo(val transaction: TransactionUi): TransactionListUiEvent()
     data object GoBack: TransactionListUiEvent()
 }

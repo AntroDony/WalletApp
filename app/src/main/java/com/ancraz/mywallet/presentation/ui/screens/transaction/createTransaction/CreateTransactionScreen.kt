@@ -83,13 +83,18 @@ fun CreateTransactionScreen(
         uiState = viewModel.uiState.collectAsStateWithLifecycle().value,
         transactionType = transactionType,
         modifier = Modifier.padding(paddingValues),
-        onAddTransactionClicked = { transaction ->
-            viewModel.addNewTransaction(transaction)
-            onEvent(
-                CreateTransactionUiEvent.GoBack
-            )
-        },
-        onEvent = onEvent
+        onEvent = {event ->
+            when (event){
+                is CreateTransactionUiEvent.AddTransaction -> {
+                    viewModel.addNewTransaction(event.transaction)
+                    onEvent(
+                        CreateTransactionUiEvent.GoBack
+                    )
+                } else -> {
+                    onEvent(event)
+                }
+            }
+        }
     )
 }
 
@@ -99,7 +104,6 @@ private fun CreateTransactionContainer(
     uiState: CreateTransactionUiState,
     transactionType: TransactionType,
     modifier: Modifier = Modifier,
-    onAddTransactionClicked: (TransactionUi) -> Unit,
     onEvent: (CreateTransactionUiEvent) -> Unit
 ) {
 
@@ -269,7 +273,7 @@ private fun CreateTransactionContainer(
                             wallet = selectedWallet.value,
                             selectedAccount = selectedWalletCurrencyAccount.value,
                             onSuccess = { transactionObject ->
-                                onAddTransactionClicked(transactionObject)
+                                CreateTransactionUiEvent.AddTransaction(transactionObject)
                             },
                             onError = { message ->
                                 Toast.makeText(
@@ -639,7 +643,6 @@ private fun TransactionInputScreenPreview() {
             ),
             TransactionType.INCOME,
             modifier = Modifier.background(backgroundColor),
-            onAddTransactionClicked = {},
             onEvent = {}
         )
     }

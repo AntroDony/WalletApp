@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
@@ -72,10 +75,45 @@ import java.util.Calendar
 
 @Composable
 fun AnalyticsScreen(
-    uiState: AnalyticsUiState,
-    modifier: Modifier,
-    onEvent: (AnalyticsUiEvent) -> Unit
+    paddingValues: PaddingValues,
+    onEvent: (AnalyticsUiEvent) -> Unit,
+    viewModel: AnalyticsViewModel = viewModel()
 ) {
+    AnalyticsContainer(
+        uiState = viewModel.analyticsUiState.collectAsStateWithLifecycle().value,
+        modifier = Modifier.padding(paddingValues),
+        onEvent = { event ->
+            when(event){
+                is AnalyticsUiEvent.FilterAnalyticsDataByPeriod -> {
+                    viewModel.filterAnalyticsByPeriod(event.period)
+                }
+
+                is AnalyticsUiEvent.FilterAnalyticsDataByPeriodOffset -> {
+                    viewModel.filterAnalyticsByPeriodOffset(event.periodOffset)
+                }
+
+                is AnalyticsUiEvent.FilterAnalyticsDataByCategory -> {
+                    viewModel.filterAnalyticsByCategory(event.transactionCategory)
+                }
+
+                is AnalyticsUiEvent.FilterAnalyticsDataByTransactionType -> {
+                    viewModel.filterAnalyticsByTransactionType(event.transactionType)
+                }
+                else -> {
+                    onEvent(event)
+                }
+            }
+        }
+    )
+
+}
+
+@Composable
+private fun AnalyticsContainer(
+    uiState: AnalyticsUiState,
+    modifier: Modifier = Modifier,
+    onEvent: (AnalyticsUiEvent) -> Unit
+){
 
    val selectedType= uiState.data.transactionType
     val selectedFilterCategory = uiState.data.transactionCategory
@@ -573,7 +611,7 @@ private fun TransactionListView(
 @Composable
 private fun AnalyticsScreenPreview() {
     MyWalletTheme {
-        AnalyticsScreen(
+        AnalyticsContainer(
             uiState = AnalyticsUiState(
                 isLoading = false,
                 data = AnalyticsUiState.AnalyticsScreenData(

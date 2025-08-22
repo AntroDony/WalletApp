@@ -1,4 +1,3 @@
-
 package com.ancraz.mywallet.presentation.ui.screens.home
 
 import androidx.compose.foundation.Image
@@ -7,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
@@ -56,8 +58,36 @@ import java.util.Calendar
 
 @Composable
 fun HomeScreen(
+    paddingValues: PaddingValues,
+    onEvent: (HomeUiEvent) -> Unit,
+    viewModel: HomeViewModel = viewModel()
+) {
+    HomeContainer(
+        uiState = viewModel.homeUiState.collectAsStateWithLifecycle().value,
+        modifier = Modifier.padding(paddingValues),
+        onEvent = { event ->
+            when (event) {
+                is HomeUiEvent.SyncData -> {
+                    viewModel.syncData()
+                }
+
+                is HomeUiEvent.ChangePrivateMode -> {
+                    viewModel.changePrivateMode(event.isPrivate)
+                }
+
+                else -> {
+                    onEvent(event)
+                }
+            }
+        }
+    )
+}
+
+
+@Composable
+private fun HomeContainer(
     uiState: HomeUiState,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onEvent: (HomeUiEvent) -> Unit
 ) {
     Column(
@@ -298,7 +328,7 @@ private fun TransactionListContainer(
 @Composable
 fun HomeScreenPreview() {
     MyWalletTheme {
-        HomeScreen(
+        HomeContainer(
             uiState = HomeUiState(
                 isLoading = true,
                 data = HomeUiState.HomeScreenData(

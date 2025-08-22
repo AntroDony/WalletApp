@@ -1,11 +1,7 @@
 package com.ancraz.mywallet.presentation.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -19,7 +15,6 @@ import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
 import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsScreen
 import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceScreen
-import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceUiState
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionInfo.TransactionInfoScreen
@@ -27,18 +22,13 @@ import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionList.T
 import com.ancraz.mywallet.presentation.ui.screens.wallet.createWallet.CreateWalletScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoScreen
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListScreen
-import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsViewModel
-import com.ancraz.mywallet.presentation.ui.screens.home.HomeViewModel
 import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.EditWalletScreen
-import com.ancraz.mywallet.presentation.ui.screens.wallet.walletInfo.WalletInfoViewModel
-import com.ancraz.mywallet.presentation.ui.screens.wallet.walletList.WalletListViewModel
 
 @Composable
 fun AppNavigation(
     startDestination: NavigationRoute,
     innerPadding: PaddingValues
 ) {
-
     val backStack = rememberNavBackStack(startDestination)
 
     NavDisplay(
@@ -48,11 +38,8 @@ fun AppNavigation(
         },
         entryProvider = entryProvider {
             entry<NavigationRoute.HomeScreen> {
-                val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
-
                 HomeScreen(
-                    uiState = homeViewModel.homeUiState.collectAsStateWithLifecycle().value,
-                    modifier = Modifier.padding(innerPadding),
+                    paddingValues = innerPadding,
                     onEvent = { event ->
                         when (event) {
                             is HomeUiEvent.CreateTransaction -> {
@@ -102,39 +89,24 @@ fun AppNavigation(
                                     NavigationRoute.CreateWalletScreen
                                 )
                             }
-
-                            is HomeUiEvent.SyncData -> {
-                                homeViewModel.syncData()
-                            }
-
-                            is HomeUiEvent.ChangePrivateMode -> {
-                                homeViewModel.changePrivateMode(event.isPrivate)
-                            }
+                            else -> Unit
                         }
                     },
                 )
             }
 
             entry<NavigationRoute.EditBalanceScreen> { key ->
-                val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
                 val currentBalance = key.totalBalance
 
                 EditBalanceScreen(
-                    uiState = EditBalanceUiState(
-                        data = EditBalanceUiState.EditBalanceScreenData(
-                            currentTotalBalance = currentBalance
-                        )
-                    ),
-                    modifier = Modifier.padding(innerPadding),
+                    totalBalance = currentBalance,
+                    paddingValues = innerPadding,
                     onEvent = { event: EditBalanceUiEvent ->
                         when (event) {
-                            is EditBalanceUiEvent.UpdateBalanceValue -> {
-                                homeViewModel.editTotalBalance(event.newBalance)
-                            }
-
                             is EditBalanceUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
+                            else -> Unit
                         }
                     }
                 )
@@ -164,18 +136,15 @@ fun AppNavigation(
                                     }
                                 }
                             }
+                            else -> Unit
                         }
                     },
                 )
             }
 
             entry<NavigationRoute.WalletListScreen> {
-                val walletViewModel: WalletListViewModel = hiltViewModel<WalletListViewModel>()
-
                 WalletListScreen(
-                    modifier = Modifier
-                        .padding(innerPadding),
-                    uiState = walletViewModel.walletListUiState.collectAsStateWithLifecycle().value,
+                    paddingValues = innerPadding,
                     onEvent = { event: WalletListUiEvent ->
                         when (event) {
                             is WalletListUiEvent.ShowWalletInfo -> {
@@ -217,13 +186,9 @@ fun AppNavigation(
             }
 
             entry<NavigationRoute.WalletInfoScreen> { key ->
-                val walletInfoViewModel: WalletInfoViewModel = hiltViewModel<WalletInfoViewModel>()
-                walletInfoViewModel.getWalletById(key.walletId)
-
                 WalletInfoScreen(
-                    uiState = walletInfoViewModel.walletUiState.collectAsStateWithLifecycle().value,
-                    modifier = Modifier
-                        .padding(innerPadding),
+                    walletId = key.walletId,
+                    paddingValues = innerPadding,
                     onEvent = { event: WalletInfoUiEvent ->
                         when (event) {
                             is WalletInfoUiEvent.EditWallet -> {
@@ -231,15 +196,10 @@ fun AppNavigation(
                                     NavigationRoute.EditWalletScreen(key.walletId)
                                 )
                             }
-
                             is WalletInfoUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
-
-                            is WalletInfoUiEvent.DeleteWallet -> {
-                                walletInfoViewModel.deleteWallet(event.wallet)
-                                backStack.removeLastOrNull()
-                            }
+                            else -> Unit
                         }
                     }
                 )
@@ -259,6 +219,7 @@ fun AppNavigation(
                             is TransactionListUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
+                            else -> Unit
                         }
                     }
                 )
@@ -275,12 +236,8 @@ fun AppNavigation(
             }
 
             entry<NavigationRoute.AnalyticsScreen> {
-                val analyticsViewModel = hiltViewModel<AnalyticsViewModel>()
-
                 AnalyticsScreen(
-                    uiState = analyticsViewModel.analyticsUiState.collectAsStateWithLifecycle().value,
-                    modifier = Modifier
-                        .padding(innerPadding),
+                    paddingValues =innerPadding,
                     onEvent = { event: AnalyticsUiEvent ->
                         when (event) {
                             is AnalyticsUiEvent.ShowTransactionInfo -> {
@@ -292,22 +249,7 @@ fun AppNavigation(
                             is AnalyticsUiEvent.GoBack -> {
                                 backStack.removeLastOrNull()
                             }
-
-                            is AnalyticsUiEvent.FilterAnalyticsDataByPeriod -> {
-                                analyticsViewModel.filterAnalyticsByPeriod(event.period)
-                            }
-
-                            is AnalyticsUiEvent.FilterAnalyticsDataByPeriodOffset -> {
-                                analyticsViewModel.filterAnalyticsByPeriodOffset(event.periodOffset)
-                            }
-
-                            is AnalyticsUiEvent.FilterAnalyticsDataByCategory -> {
-                                analyticsViewModel.filterAnalyticsByCategory(event.transactionCategory)
-                            }
-
-                            is AnalyticsUiEvent.FilterAnalyticsDataByTransactionType -> {
-                                analyticsViewModel.filterAnalyticsByTransactionType(event.transactionType)
-                            }
+                            else -> Unit
                         }
                     }
                 )

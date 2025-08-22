@@ -42,8 +42,6 @@ import com.ancraz.mywallet.presentation.ui.theme.onSecondaryColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
 import com.ancraz.mywallet.presentation.ui.theme.surfaceColor
 
-
-
 @Composable
 fun CategoryListMenu(
     categories: List<TransactionCategoryUi>,

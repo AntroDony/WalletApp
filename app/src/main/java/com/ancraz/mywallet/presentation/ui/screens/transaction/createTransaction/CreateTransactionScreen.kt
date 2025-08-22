@@ -83,7 +83,8 @@ fun CreateTransactionScreen(
         uiState = viewModel.uiState.collectAsStateWithLifecycle().value,
         transactionType = transactionType,
         modifier = Modifier.padding(paddingValues),
-        onEvent = {event ->
+        onEvent = { event ->
+            debugLog("event: $event")
             when (event){
                 is CreateTransactionUiEvent.AddTransaction -> {
                     viewModel.addNewTransaction(event.transaction)
@@ -273,7 +274,9 @@ private fun CreateTransactionContainer(
                             wallet = selectedWallet.value,
                             selectedAccount = selectedWalletCurrencyAccount.value,
                             onSuccess = { transactionObject ->
-                                CreateTransactionUiEvent.AddTransaction(transactionObject)
+                                onEvent(
+                                    CreateTransactionUiEvent.AddTransaction(transactionObject)
+                                )
                             },
                             onError = { message ->
                                 Toast.makeText(
@@ -298,8 +301,6 @@ private fun CreateTransactionContainer(
                     onSelect = { wallet ->
                         selectedWallet.value = wallet
                         isWalletAccountsDialogOpen.value = true
-
-                        debugLog("isWalletAccountsDialogOpen.value = true")
 
                     },
                     onClose = {

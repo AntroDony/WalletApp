@@ -109,4 +109,8 @@
     <string name="filter_by_category_title">By category</string>
 
 
+<!--  Currency api error  -->
+    <string name="no_internet_error_message">Can not load a currency rates. Check your Internet connection.</string>
+
+
 </resources>

@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -79,12 +81,15 @@ fun CreateTransactionScreen(
     onEvent: (CreateTransactionUiEvent) -> Unit
 ) {
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchData()
+    }
+
     CreateTransactionContainer(
         uiState = viewModel.uiState.collectAsStateWithLifecycle().value,
         transactionType = transactionType,
         modifier = Modifier.padding(paddingValues),
         onEvent = { event ->
-            debugLog("event: $event")
             when (event){
                 is CreateTransactionUiEvent.AddTransaction -> {
                     viewModel.addNewTransaction(event.transaction)
@@ -189,41 +194,30 @@ private fun CreateTransactionContainer(
                     .align(Alignment.CenterHorizontally),
             )
 
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(
-                        width = 1.dp,
-                        color = primaryColor,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .clickable {
+            if (!uiState.error.isNullOrEmpty()){
+                ErrorText(
+                    uiState.error
+                )
+            } else {
+                WalletSelectionButton(
+                    selectedWallet = selectedWallet.value,
+                    selectedWalletCurrencyAccount = selectedWalletCurrencyAccount.value,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally),
+                    onClicked = {
                         isWalletListOpen.value = true
                     }
-            ) {
-                Text(
-                    text = (
-                            getSelectedWalletInfoString(
-                                selectedWallet.value,
-                                selectedWalletCurrencyAccount.value
-                            ) ?: stringResource(R.string.edit_transaction_no_wallet_title)
-                            ).uppercase(),
-                    color = primaryColor,
-                    fontSize = 18.sp,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
                 )
-            }
 
-            HorizontalSpacer()
-
-            if (currencyState.value != CurrencyCode.USD) {
-                RateInfoText(
-                    currentCurrencyState = currencyState.value,
-                    rates = uiState.data.currencyRates
-                )
                 HorizontalSpacer()
+
+                if (currencyState.value != CurrencyCode.USD) {
+                    RateInfoText(
+                        currentCurrencyState = currencyState.value,
+                        rates = uiState.data.currencyRates
+                    )
+                    HorizontalSpacer()
+                }
             }
         }
 
@@ -265,28 +259,29 @@ private fun CreateTransactionContainer(
                 CategoryListMenu(
                     categories = categoryList,
                     onSelect = { category ->
-                        buildTransactionObject(
-                            value = inputValueState.value.toFloatValue(),
-                            currency = currencyState.value,
-                            type = transactionType,
-                            description = descriptionState.value ?: category.name,
-                            category = category,
-                            wallet = selectedWallet.value,
-                            selectedAccount = selectedWalletCurrencyAccount.value,
-                            onSuccess = { transactionObject ->
-                                onEvent(
-                                    CreateTransactionUiEvent.AddTransaction(transactionObject)
-                                )
-                            },
-                            onError = { message ->
-                                Toast.makeText(
-                                    context,
-                                    message,
-                                    Toast.LENGTH_LONG
-                                )
-                                    .show()
-                            }
-                        )
+                        if (!uiState.error.isNullOrEmpty()){
+                            showToast(context, "Fix the error to add a new transaction")
+                        } else {
+                            buildTransactionObject(
+                                value = inputValueState.value.toFloatValue(),
+                                currency = currencyState.value,
+                                type = transactionType,
+                                description = descriptionState.value ?: category.name,
+                                category = category,
+                                wallet = selectedWallet.value,
+                                selectedAccount = selectedWalletCurrencyAccount.value,
+                                onSuccess = { transactionObject ->
+                                    onEvent(
+                                        CreateTransactionUiEvent.AddTransaction(transactionObject)
+                                    )
+                                },
+                                onError = { message ->
+                                    showToast(
+                                        context, message
+                                    )
+                                }
+                            )
+                        }
                     },
                     onClose = {
                         isCategoryListOpen.value = false
@@ -341,6 +336,40 @@ private fun RateInfoText(
             fontSize = 18.sp,
             color = onSurfaceColor,
             fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+private fun WalletSelectionButton(
+    selectedWallet: WalletUi?,
+    selectedWalletCurrencyAccount: WalletUi.CurrencyAccountUi?,
+    modifier: Modifier = Modifier,
+    onClicked: () -> Unit
+){
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .border(
+                width = 1.dp,
+                color = primaryColor,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .clickable {
+                onClicked()
+            }
+    ) {
+        Text(
+            text = (
+                    getSelectedWalletInfoString(
+                        selectedWallet,
+                        selectedWalletCurrencyAccount
+                    ) ?: stringResource(R.string.edit_transaction_no_wallet_title)
+                    ).uppercase(),
+            color = primaryColor,
+            fontSize = 18.sp,
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 8.dp)
         )
     }
 }
@@ -491,6 +520,23 @@ private fun SelectWalletAccountDialog(
     }
 }
 
+@Composable
+private fun ErrorText(
+    text: String,
+    modifier: Modifier = Modifier
+){
+    Text(
+        text = stringResource(R.string.no_internet_error_message),
+        color = MaterialTheme.colorScheme.error,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(20.dp)
+    )
+}
+
 
 @Preview
 @Composable
@@ -498,6 +544,7 @@ private fun TransactionInputScreenPreview() {
     MyWalletTheme {
         CreateTransactionContainer(
             uiState = CreateTransactionUiState(
+                error = "Can not load currency rates.",
                 data = CreateTransactionUiState.TransactionScreenData(
                     totalBalance = "5000.00",
                     currencyRates = listOf(
@@ -665,9 +712,12 @@ private fun buildTransactionObject(
         onError("Transaction value cannot be 0")
         return
     }
+    if (wallet == null){
+        onError("Need to select a wallet")
+    }
     selectedAccount?.let { account ->
         if (account.moneyValue.toFloatValue() < value && type == TransactionType.EXPENSE) {
-            onError(" You are in a minus. Not enough money on selected account")
+            onError("You are in a minus. Not enough money on selected account")
         } else if (selectedAccount.currency != currency) {
             onError("Selected currency is incompatible with selected account")
             return
@@ -700,4 +750,17 @@ private fun getSelectedWalletInfoString(
     } ?: ""
 
     return "${wallet.name} $currencyText".trim()
+}
+
+
+private fun showToast(
+    context: Context,
+    message: String
+){
+    Toast.makeText(
+        context,
+        message,
+        Toast.LENGTH_LONG
+    )
+        .show()
 }

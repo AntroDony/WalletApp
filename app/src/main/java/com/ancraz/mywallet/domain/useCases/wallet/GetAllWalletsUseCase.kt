@@ -37,7 +37,7 @@ class GetAllWalletsUseCase @Inject constructor(
         var totalBalance = 0f
 
         currencyAccountList.forEach { account ->
-            totalBalance += currencyConverter.convertToUsd(account.value, account.currencyCode)
+            totalBalance += currencyConverter.convertToUsd(account.value, account.currencyCode) ?: 0f
         }
 
         return totalBalance

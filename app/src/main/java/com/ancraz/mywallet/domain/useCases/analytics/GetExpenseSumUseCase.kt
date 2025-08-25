@@ -16,7 +16,7 @@ class GetExpenseSumUseCase @Inject constructor(
         return transactions
             .filter { it.transactionType == TransactionType.EXPENSE }
             .map { transaction ->
-                currencyConverter.convertToUsd(transaction.value, transaction.currencyCode)
+                currencyConverter.convertToUsd(transaction.value, transaction.currencyCode) ?: 0f
             }.sum()
     }
 }

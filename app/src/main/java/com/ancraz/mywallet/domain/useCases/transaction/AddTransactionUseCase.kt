@@ -39,7 +39,7 @@ class AddTransactionUseCase @Inject constructor(
             currencyConverter.convertToUsd(
                 value = transaction.value,
                 currencyCode = transaction.currencyCode
-            )
+            ) ?: 0f
         )
 
         transaction.updateWalletBalance(
@@ -55,7 +55,7 @@ class AddTransactionUseCase @Inject constructor(
             currencyConverter.convertToUsd(
                 value = transaction.value,
                 currencyCode = transaction.currencyCode
-            )
+            ) ?: 0f
         )
 
         transaction.updateWalletBalance(

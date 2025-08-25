@@ -18,12 +18,14 @@ class GetCurrencyRatesUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) {
 
-    operator fun invoke(): Flow<List<CurrencyRate>> {
+    @Suppress("UNCHECKED_CAST")
+    operator fun <T> invoke(): Flow<DataResult<T>> {
         return flow {
             val currencyLastUpdateTime = dataStoreRepository.getCurrencyLastUpdateTime()
             if (currencyLastUpdateTime == null || needUpdateCurrencyRates(currencyLastUpdateTime)) {
-                getCurrencyRatesFromApi { onError: DataResult<List<CurrencyRate>> ->
+                getCurrencyRatesFromApi { onError: DataResult<T> ->
                     debugLog("getCurrencyRatesFromApi error: ${onError.errorMessage}")
+                    emit(DataResult.Error(onError.errorMessage ?: ""))
                 }
             }
 
@@ -31,17 +33,21 @@ class GetCurrencyRatesUseCase @Inject constructor(
                 val resultList = mutableListOf<CurrencyRate>()
                 CurrencyCode.entries.forEach { code ->
                     val rate = dataStoreRepository.getCurrencyRateToUsd(code)
-                    resultList.add(
-                        CurrencyRate(
-                            currencyCode = code,
-                            rateValue = rate
+                    if (rate != null){
+                        resultList.add(
+                            CurrencyRate(
+                                currencyCode = code,
+                                rateValue = rate
+                            )
                         )
-                    )
+                    }
                 }
-
-                emit(resultList)
+                if (resultList.isNotEmpty() && resultList.size > 1) {
+                    emit(DataResult.Success(resultList as T))
+                }
             } catch (e: Exception) {
                 debugLog("GetCurrencyRatesUseCase exception: ${e.message}")
+                emit(DataResult.Error(e.message ?: ""))
             }
         }
     }

@@ -7,7 +7,7 @@ class CurrencyConverter(
     private val dataStore: DataStoreRepository
 ){
 
-    suspend fun convertToUsd(value: Float, currencyCode: CurrencyCode): Float{
+    suspend fun convertToUsd(value: Float, currencyCode: CurrencyCode): Float?{
         val currentRate = when(currencyCode){
             CurrencyCode.EUR -> dataStore.getCurrencyRateToUsd(CurrencyCode.EUR)
             CurrencyCode.RUB -> dataStore.getCurrencyRateToUsd(CurrencyCode.RUB)
@@ -15,7 +15,8 @@ class CurrencyConverter(
             CurrencyCode.KZT -> dataStore.getCurrencyRateToUsd(CurrencyCode.KZT)
             CurrencyCode.USD -> 1f
         }
-
-        return value / currentRate
+        return currentRate?.let {
+            value / currentRate
+        }
     }
 }

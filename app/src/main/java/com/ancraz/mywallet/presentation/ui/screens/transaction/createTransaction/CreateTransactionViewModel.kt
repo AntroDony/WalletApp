@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.manager.DataStoreManager
 import com.ancraz.mywallet.domain.manager.TransactionCategoryManager
@@ -61,13 +62,9 @@ class CreateTransactionViewModel @Inject constructor(
         transactionCategoryManager.getCategories(TransactionType.EXPENSE)
     private val transactionListFlow: Flow<List<Transaction>> = transactionManager.getTransactions()
     private val walletListFlow: Flow<List<Wallet>> = walletManager.getWallets()
-    private val currencyRatesFlow: Flow<List<CurrencyRate>> = getCurrencyRatesUseCase()
+    private val currencyRatesDataResultFlow: Flow<DataResult<List<CurrencyRate>>> = getCurrencyRatesUseCase()
 
     private var transactionList: List<TransactionUi> = emptyList()
-
-    init {
-        fetchData()
-    }
 
     fun addNewTransaction(transactionUi: TransactionUi) {
         viewModelScope.launch(ioDispatcher) {
@@ -82,7 +79,7 @@ class CreateTransactionViewModel @Inject constructor(
     }
 
 
-    private fun fetchData() {
+    fun fetchData() {
         viewModelScope.launch(ioDispatcher) {
             try {
                 combine(
@@ -93,7 +90,7 @@ class CreateTransactionViewModel @Inject constructor(
                     expenseTransactionCategoriesFlow,
                     transactionListFlow,
                     walletListFlow,
-                    currencyRatesFlow
+                    currencyRatesDataResultFlow
                 ) { values: Array<Any?> ->
                     val totalBalance = values[0] as Float
                     val recentWalletId = values[1] as Long
@@ -102,26 +99,35 @@ class CreateTransactionViewModel @Inject constructor(
                     val expenseCategories = values[4] as List<TransactionCategory>
                     val transactions = values[5] as List<Transaction>
                     val wallets = values[6] as List<Wallet>
-                    val currencyRates = values[7] as List<CurrencyRate>
+                    val currencyRatesDataResult = values[7] as DataResult<List<CurrencyRate>>
 
-                    debugLog("currencyRates: $currencyRates")
                     debugLog("recentWalletId: $recentWalletId")
                     debugLog("recentCurrency: $recentCurrency")
 
                     transactionList = transactions.map { it.toTransactionUi() }
 
-                    CreateTransactionUiState(
-                        isLoading = false,
-                        data = CreateTransactionUiState.TransactionScreenData(
-                            totalBalance = totalBalance.toFormattedString(),
-                            incomeCategories = incomeCategories.map { it.toCategoryUi() },
-                            expenseCategories = expenseCategories.map { it.toCategoryUi() },
-                            currencyRates = currencyRates.map { it.toCurrencyRateUi() },
-                            walletList = wallets.map { it.toWalletUi() },
-                            recentWalletId = recentWalletId,
-                            recentCurrency = recentCurrency
+                    if (currencyRatesDataResult.errorMessage != null){
+                        CreateTransactionUiState(
+                            isLoading = false,
+                            error = currencyRatesDataResult.errorMessage
                         )
-                    )
+                    } else if (currencyRatesDataResult.data != null) {
+                        CreateTransactionUiState(
+                            isLoading = false,
+                            data = CreateTransactionUiState.TransactionScreenData(
+                                totalBalance = totalBalance.toFormattedString(),
+                                incomeCategories = incomeCategories.map { it.toCategoryUi() },
+                                expenseCategories = expenseCategories.map { it.toCategoryUi() },
+                                currencyRates = currencyRatesDataResult.data.map { it.toCurrencyRateUi() },
+                                walletList = wallets.map { it.toWalletUi() },
+                                recentWalletId = recentWalletId,
+                                recentCurrency = recentCurrency
+                            ),
+                            error = null
+                        )
+                    } else {
+                        CreateTransactionUiState()
+                    }
                 }.collect {
                     _uiState.value = it
                 }

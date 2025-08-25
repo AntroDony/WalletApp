@@ -48,7 +48,6 @@ import com.ancraz.mywallet.R
 import com.ancraz.mywallet.core.models.CurrencyCode
 import com.ancraz.mywallet.core.models.TransactionType
 import com.ancraz.mywallet.core.models.WalletType
-import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.presentation.models.CurrencyRateUi
 import com.ancraz.mywallet.presentation.models.TransactionCategoryUi
 import com.ancraz.mywallet.presentation.models.TransactionUi

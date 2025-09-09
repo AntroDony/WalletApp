@@ -24,8 +24,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -52,16 +54,9 @@ class HomeViewModel @Inject constructor(
     private val totalBalanceFlow = dataStoreManager.getTotalBalance()
     private val walletListFlow: Flow<List<Wallet>> = getAllWalletsUseCase()
     private val transactionListFlow: Flow<List<Transaction>> = getAllTransactionsUseCase()
-    private val currencyRatesUpdateResult: Flow<DataResult<String?>> = updateCurrencyRatesUseCase()
 
     init {
         fetchData()
-    }
-
-    fun editTotalBalance(value: Float, code: CurrencyCode = CurrencyCode.USD) {
-        viewModelScope.launch(ioDispatcher) {
-            dataStoreManager.editTotalBalance(value, code)
-        }
     }
 
     fun changePrivateMode(isPrivate: Boolean) {
@@ -86,6 +81,7 @@ class HomeViewModel @Inject constructor(
 
     private fun fetchData() {
         syncDataAfterWalletListUpdated()
+        fetchCurrencyRatesData()
         viewModelScope.launch(ioDispatcher) {
             try {
                 combine(
@@ -93,8 +89,7 @@ class HomeViewModel @Inject constructor(
                     totalBalanceFlow,
                     walletListFlow,
                     transactionListFlow,
-                    currencyRatesUpdateResult
-                ) { privateModeStatus, totalBalance, walletList, transactionList, currencyRatesResult ->
+                ) { privateModeStatus, totalBalance, walletList, transactionList ->
                     HomeUiState(
                         isLoading = false,
                         data = HomeUiState.HomeScreenData(
@@ -102,13 +97,7 @@ class HomeViewModel @Inject constructor(
                             balance = totalBalance,
                             wallets = walletList.map { it.toWalletUi() },
                             transactions = transactionList.map { it.toTransactionUi() }
-                        ),
-                        error = when(currencyRatesResult){
-                            is DataResult.Error<*> -> {
-                                currencyRatesResult.errorMessage
-                            }
-                            else -> null
-                        }
+                        )
                     )
                 }.collect { uiState ->
                     _homeUiState.value = uiState
@@ -125,6 +114,23 @@ class HomeViewModel @Inject constructor(
                     error = e.message
                 )
                 updateSavedStateHandle()
+            }
+        }
+    }
+
+    private fun fetchCurrencyRatesData(){
+        viewModelScope.launch(ioDispatcher) {
+            updateCurrencyRatesUseCase().collectLatest { currencyRatesResult ->
+                when(currencyRatesResult){
+                    is DataResult.Error<*> -> {
+                        _homeUiState.update {
+                            it.copy(
+                                error = currencyRatesResult.errorMessage
+                            )
+                        }
+                    }
+                    else -> Unit
+                }
             }
         }
     }

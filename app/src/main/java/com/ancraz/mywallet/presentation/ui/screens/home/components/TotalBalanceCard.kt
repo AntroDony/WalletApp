@@ -143,13 +143,6 @@ fun TotalBalanceCard(
                 }
 
                 TotalBalanceActionButton(
-                    text = stringResource(R.string.home_card_edit_button),
-                    icon = Icons.Filled.Edit
-                ) {
-                    onEvent(HomeUiEvent.EditTotalBalance(state.data.balance))
-                }
-
-                TotalBalanceActionButton(
                     text = stringResource(R.string.home_card_analytics_button),
                     icon = Icons.AutoMirrored.Outlined.TrendingUp
                 ) {

@@ -18,10 +18,6 @@ class AddTransactionCategoryUseCase @Inject constructor(
             TransactionType.EXPENSE -> {
                 transactionRepository.addNewExpenseCategory(category)
             }
-
-            TransactionType.TRANSFER -> {
-                //to categories for this type
-            }
         }
     }
 }

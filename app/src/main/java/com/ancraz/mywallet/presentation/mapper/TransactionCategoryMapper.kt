@@ -13,7 +13,6 @@ fun TransactionCategory.toCategoryUi(): TransactionCategoryUi{
         transactionType = when(this.categoryType){
             TransactionType.INCOME -> TransactionType.INCOME
             TransactionType.EXPENSE -> TransactionType.EXPENSE
-            TransactionType.TRANSFER -> TransactionType.TRANSFER
         }
     )
 }
@@ -26,7 +25,6 @@ fun TransactionCategoryUi.toTransactionCategory(): TransactionCategory{
         categoryType = when(this.transactionType){
             TransactionType.INCOME -> TransactionType.INCOME
             TransactionType.EXPENSE -> TransactionType.EXPENSE
-            TransactionType.TRANSFER -> TransactionType.TRANSFER
         }
     )
 }

@@ -25,10 +25,6 @@ class AddTransactionUseCase @Inject constructor(
             TransactionType.EXPENSE -> {
                 addExpenseTransaction(transaction)
             }
-
-            TransactionType.TRANSFER -> {
-                //todo implement
-            }
         }
     }
 
@@ -81,10 +77,6 @@ class AddTransactionUseCase @Inject constructor(
                         selectedAccount = this.selectedWalletAccount,
                         value = this.value
                     )
-                }
-
-                TransactionType.TRANSFER -> {
-                    //todo implement
                 }
             }
         }

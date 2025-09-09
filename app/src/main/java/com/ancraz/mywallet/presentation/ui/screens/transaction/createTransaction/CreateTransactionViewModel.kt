@@ -62,7 +62,7 @@ class CreateTransactionViewModel @Inject constructor(
         transactionCategoryManager.getCategories(TransactionType.EXPENSE)
     private val transactionListFlow: Flow<List<Transaction>> = transactionManager.getTransactions()
     private val walletListFlow: Flow<List<Wallet>> = walletManager.getWallets()
-    private val currencyRatesDataResultFlow: Flow<DataResult<List<CurrencyRate>>> = getCurrencyRatesUseCase()
+    private val currencyRatesDataResultFlow: Flow<List<CurrencyRate>?> = getCurrencyRatesUseCase()
 
     private var transactionList: List<TransactionUi> = emptyList()
 
@@ -99,35 +99,23 @@ class CreateTransactionViewModel @Inject constructor(
                     val expenseCategories = values[4] as List<TransactionCategory>
                     val transactions = values[5] as List<Transaction>
                     val wallets = values[6] as List<Wallet>
-                    val currencyRatesDataResult = values[7] as DataResult<List<CurrencyRate>>
-
-                    debugLog("recentWalletId: $recentWalletId")
-                    debugLog("recentCurrency: $recentCurrency")
+                    val currencyRates = values[7] as List<CurrencyRate>?
 
                     transactionList = transactions.map { it.toTransactionUi() }
 
-                    if (currencyRatesDataResult.errorMessage != null){
-                        CreateTransactionUiState(
-                            isLoading = false,
-                            error = currencyRatesDataResult.errorMessage
-                        )
-                    } else if (currencyRatesDataResult.data != null) {
-                        CreateTransactionUiState(
-                            isLoading = false,
-                            data = CreateTransactionUiState.TransactionScreenData(
-                                totalBalance = totalBalance.toFormattedString(),
-                                incomeCategories = incomeCategories.map { it.toCategoryUi() },
-                                expenseCategories = expenseCategories.map { it.toCategoryUi() },
-                                currencyRates = currencyRatesDataResult.data.map { it.toCurrencyRateUi() },
-                                walletList = wallets.map { it.toWalletUi() },
-                                recentWalletId = recentWalletId,
-                                recentCurrency = recentCurrency
-                            ),
-                            error = null
-                        )
-                    } else {
-                        CreateTransactionUiState()
-                    }
+                    CreateTransactionUiState(
+                        isLoading = false,
+                        data = CreateTransactionUiState.TransactionScreenData(
+                            totalBalance = totalBalance.toFormattedString(),
+                            incomeCategories = incomeCategories.map { it.toCategoryUi() },
+                            expenseCategories = expenseCategories.map { it.toCategoryUi() },
+                            currencyRates = currencyRates?.map { it.toCurrencyRateUi() } ?: emptyList(),
+                            walletList = wallets.map { it.toWalletUi() },
+                            recentWalletId = recentWalletId,
+                            recentCurrency = recentCurrency
+                        ),
+                        error = null
+                    )
                 }.collect {
                     _uiState.value = it
                 }

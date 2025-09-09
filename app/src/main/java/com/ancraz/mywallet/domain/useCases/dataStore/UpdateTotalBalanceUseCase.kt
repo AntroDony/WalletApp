@@ -23,20 +23,20 @@ class UpdateTotalBalanceUseCase @Inject constructor(
                 }
             }
             CurrencyCode.RUB -> {
-                val balanceInRub = currencyConverter.convertToUsd(value, CurrencyCode.RUB)
-                balanceInRub?.let {
+                val balanceInUsd = currencyConverter.convertToUsd(value, CurrencyCode.RUB)
+                balanceInUsd?.let {
                     updateBalance(it)
                 }
             }
             CurrencyCode.GEL -> {
-                val balanceInGel = currencyConverter.convertToUsd(value, CurrencyCode.GEL)
-                balanceInGel?.let {
+                val balanceInUsd = currencyConverter.convertToUsd(value, CurrencyCode.GEL)
+                balanceInUsd?.let {
                     updateBalance(it)
                 }
             }
             CurrencyCode.KZT -> {
-                val balanceInKzt = currencyConverter.convertToUsd(value, CurrencyCode.KZT)
-                balanceInKzt?.let{
+                val balanceInUsd = currencyConverter.convertToUsd(value, CurrencyCode.KZT)
+                balanceInUsd?.let{
                     updateBalance(it)
                 }
             }

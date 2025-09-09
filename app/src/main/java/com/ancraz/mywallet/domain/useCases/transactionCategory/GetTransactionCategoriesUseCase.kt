@@ -31,10 +31,6 @@ class GetTransactionCategoriesUseCase @Inject constructor(
                         }
                     }
 
-                    TransactionType.TRANSFER -> {
-                        send(emptyList())
-                    }
-
                     null -> {
                         combine(
                             transactionRepository.getExpenseCategoryList(),

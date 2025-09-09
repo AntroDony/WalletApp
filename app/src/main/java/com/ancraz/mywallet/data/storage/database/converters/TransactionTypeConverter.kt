@@ -10,7 +10,6 @@ class TransactionTypeConverter {
         return when(type){
             TransactionType.INCOME -> TransactionType.INCOME.name
             TransactionType.EXPENSE -> TransactionType.EXPENSE.name
-            TransactionType.TRANSFER -> TransactionType.TRANSFER.name
         }
     }
 
@@ -19,7 +18,6 @@ class TransactionTypeConverter {
     fun stringToTransactionType(typeStr: String): TransactionType {
         return when(typeStr){
             TransactionType.EXPENSE.name -> TransactionType.EXPENSE
-            TransactionType.TRANSFER.name -> TransactionType.TRANSFER
             else -> TransactionType.INCOME
         }
     }

@@ -13,7 +13,6 @@ fun CategoryEntity.toTransactionCategory(): TransactionCategory{
         categoryType = when(this.categoryType){
             CategoryTransactionType.INCOME -> TransactionType.INCOME
             CategoryTransactionType.EXPENSE -> TransactionType.EXPENSE
-            CategoryTransactionType.TRANSFER -> TransactionType.TRANSFER
         }
     )
 }
@@ -27,7 +26,6 @@ fun TransactionCategory.toCategoryEntity(): CategoryEntity{
         categoryType = when (this.categoryType){
             TransactionType.INCOME -> CategoryTransactionType.INCOME
             TransactionType.EXPENSE -> CategoryTransactionType.EXPENSE
-            TransactionType.TRANSFER -> CategoryTransactionType.TRANSFER
         }
     )
 }

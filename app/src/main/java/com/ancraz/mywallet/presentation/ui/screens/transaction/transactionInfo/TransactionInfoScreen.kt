@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachMoney
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -58,13 +59,15 @@ fun TransactionInfoScreen(
     onBack: () -> Unit,
     viewModel: TransactionInfoViewModel = viewModel<TransactionInfoViewModel>()
 ) {
-    viewModel.getTransactionById(transactionId)
+    LaunchedEffect(transactionId) {
+        viewModel.getTransactionById(transactionId)
+    }
 
     TransactionInfoContainer(
         uiState = viewModel.transactionInfoUiState.collectAsStateWithLifecycle().value,
         modifier = Modifier.padding(paddingValues),
         onDeleteButtonClicked = { transactionId ->
-            viewModel.deleteTransactionById(transactionId)
+            viewModel.deleteTransaction(transactionId)
             onBack()
         },
         onBack = onBack
@@ -75,7 +78,7 @@ fun TransactionInfoScreen(
 private fun TransactionInfoContainer(
     uiState: TransactionInfoUiState,
     modifier: Modifier = Modifier,
-    onDeleteButtonClicked: (Long) -> Unit,
+    onDeleteButtonClicked: (TransactionUi) -> Unit,
     onBack: () -> Unit
 ){
 
@@ -144,7 +147,7 @@ private fun TransactionInfoContainer(
                     onConfirm = {
                         isDeleteDialogOpened.value = false
                         onDeleteButtonClicked(
-                            uiState.transaction.id
+                            uiState.transaction
                         )
                     },
                     onDismiss = {

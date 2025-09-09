@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.domain.useCases.transaction.DeleteTransactionUseCase
 import com.ancraz.mywallet.domain.useCases.transaction.GetTransactionByIdUseCase
+import com.ancraz.mywallet.presentation.mapper.toTransaction
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
+import com.ancraz.mywallet.presentation.models.TransactionUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,9 +65,9 @@ class TransactionInfoViewModel @Inject constructor(
         }
     }
 
-    fun deleteTransactionById(id: Long) {
+    fun deleteTransaction(transaction: TransactionUi) {
         viewModelScope.launch(ioDispatcher) {
-            deleteTransactionUseCase(id)
+            deleteTransactionUseCase(transaction.toTransaction())
         }
     }
 }

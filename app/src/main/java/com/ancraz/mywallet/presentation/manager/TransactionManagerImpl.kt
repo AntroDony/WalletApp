@@ -4,6 +4,7 @@ import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.domain.manager.TransactionManager
 import com.ancraz.mywallet.domain.models.Transaction
 import com.ancraz.mywallet.domain.useCases.transaction.AddTransactionUseCase
+import com.ancraz.mywallet.domain.useCases.transaction.DeleteTransactionByIdUseCase
 import com.ancraz.mywallet.domain.useCases.transaction.DeleteTransactionUseCase
 import com.ancraz.mywallet.domain.useCases.transaction.GetAllTransactionsUseCase
 import com.ancraz.mywallet.domain.useCases.transaction.GetTransactionByIdUseCase
@@ -14,7 +15,8 @@ class TransactionManagerImpl @Inject constructor(
     private val getAllTransactionsUseCase: GetAllTransactionsUseCase,
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val deleteTransactionUseCase: DeleteTransactionUseCase
+    private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val deleteTransactionByIdUseCase: DeleteTransactionByIdUseCase
 ): TransactionManager {
 
     override fun getTransactions(): Flow<List<Transaction>> {
@@ -29,7 +31,11 @@ class TransactionManagerImpl @Inject constructor(
         addTransactionUseCase(transaction)
     }
 
-    override suspend fun deleteTransaction(id: Long) {
-        deleteTransactionUseCase(id)
+    override suspend fun deleteTransaction(transaction: Transaction) {
+        deleteTransactionUseCase(transaction)
+    }
+
+    override suspend fun deleteTransactionById(id: Long) {
+        deleteTransactionByIdUseCase(id)
     }
 }

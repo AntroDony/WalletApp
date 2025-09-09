@@ -1,10 +1,13 @@
 package com.ancraz.mywallet.data.repository
 
+import com.ancraz.mywallet.core.models.TransactionType
+import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.data.mappers.toCategoryEntity
 import com.ancraz.mywallet.data.mappers.toTransaction
 import com.ancraz.mywallet.data.mappers.toTransactionCategory
 import com.ancraz.mywallet.data.mappers.toTransactionEntity
 import com.ancraz.mywallet.data.mappers.toWallet
+import com.ancraz.mywallet.data.mappers.toWalletEntity
 import com.ancraz.mywallet.data.storage.database.dao.CategoryDao
 import com.ancraz.mywallet.data.storage.database.dao.TransactionDao
 import com.ancraz.mywallet.data.storage.database.dao.WalletDao
@@ -20,9 +23,9 @@ class TransactionRepositoryImpl @Inject constructor(
     private val transactionDao: TransactionDao,
     private val categoryDao: CategoryDao,
     private val walletDao: WalletDao
-): TransactionRepository {
+) : TransactionRepository {
 
-    override fun getTransactionList(): Flow<List<Transaction>>{
+    override fun getTransactionList(): Flow<List<Transaction>> {
         return transactionDao.getAllTransactions().map { list ->
             list.map { transaction ->
                 val wallet = getWalletById(transaction.walletId)
@@ -37,7 +40,7 @@ class TransactionRepositoryImpl @Inject constructor(
         return transaction.toTransaction(wallet)
     }
 
-    override suspend fun addNewTransaction(transaction: Transaction){
+    override suspend fun addNewTransaction(transaction: Transaction) {
         transactionDao.insertTransaction(transaction.toTransactionEntity())
     }
 
@@ -47,6 +50,14 @@ class TransactionRepositoryImpl @Inject constructor(
 
     override suspend fun deleteTransaction(transaction: Transaction) {
         transactionDao.deleteTransaction(transaction.toTransactionEntity())
+
+        val wallet = getWalletById(transaction.wallet?.id)
+        wallet?.let {
+            updateWalletAfterTransactionWasDeleted(
+                it,
+                transaction
+            )
+        }
     }
 
     override suspend fun deleteTransactionById(id: Long) {
@@ -87,12 +98,46 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
 
-    private suspend fun getWalletById(walletId: Long?): Wallet?{
-        if (walletId == null){
+    private suspend fun getWalletById(walletId: Long?): Wallet? {
+        if (walletId == null) {
             return null
         }
 
-        return walletDao.getWalletById(walletId).toWallet()
+        return try {
+            walletDao.getWalletById(walletId).toWallet()
+        } catch (e: IllegalStateException) {
+            debugLog("cannot get wallet by id: ${e.message}")
+            null
+        } catch (e: Exception) {
+            debugLog("cannot get wallet by id: ${e.message}")
+            null
+        }
+    }
+
+    private suspend fun updateWalletAfterTransactionWasDeleted(
+        wallet: Wallet,
+        transaction: Transaction
+    ) {
+        if (!wallet.currencyAccountList.map { it.currencyCode }
+                .contains(transaction.currencyCode)
+        ) {
+            debugLog("cannot updateWallet: wallet account is not found")
+            return
+        }
+
+        run {
+            wallet.currencyAccountList.forEach { updatedCurrencyAccount ->
+                if (updatedCurrencyAccount.currencyCode == transaction.currencyCode){
+                    if (transaction.transactionType == TransactionType.INCOME){
+                        updatedCurrencyAccount.value -= transaction.value
+                    } else if (transaction.transactionType == TransactionType.EXPENSE){
+                        updatedCurrencyAccount.value += transaction.value
+                    }
+                    return@run
+                }
+            }
+        }
+        walletDao.updateWallet(wallet.toWalletEntity())
     }
 
 }

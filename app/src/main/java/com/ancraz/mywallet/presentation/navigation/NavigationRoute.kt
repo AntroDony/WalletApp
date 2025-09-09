@@ -10,9 +10,6 @@ sealed class NavigationRoute: NavKey {
     object HomeScreen: NavigationRoute()
 
     @Serializable
-    data class EditBalanceScreen(val totalBalance: Float): NavigationRoute()
-
-    @Serializable
     data class TransactionInputScreen(val transactionType: TransactionType): NavigationRoute()
 
     @Serializable

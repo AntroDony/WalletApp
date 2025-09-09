@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachMoney
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -60,7 +61,9 @@ fun WalletInfoScreen(
     onEvent: (WalletInfoUiEvent) -> Unit,
     viewModel: WalletInfoViewModel = viewModel()
 ) {
-    viewModel.getWalletById(walletId)
+    LaunchedEffect(walletId) {
+        viewModel.getWalletById(walletId)
+    }
 
     WalletInfoContainer(
         uiState = viewModel.walletUiState.collectAsStateWithLifecycle().value,

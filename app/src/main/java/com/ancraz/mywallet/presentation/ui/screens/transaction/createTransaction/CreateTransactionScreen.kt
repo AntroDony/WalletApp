@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ancraz.mywallet.R
@@ -78,7 +79,7 @@ import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 fun CreateTransactionScreen(
     transactionType: TransactionType,
     paddingValues: PaddingValues,
-    viewModel: CreateTransactionViewModel = viewModel(),
+    viewModel: CreateTransactionViewModel = hiltViewModel<CreateTransactionViewModel>(),
     onEvent: (CreateTransactionUiEvent) -> Unit
 ) {
 
@@ -132,7 +133,7 @@ private fun CreateTransactionContainer(
         mutableStateOf<WalletUi.CurrencyAccountUi?>(null)
     }
 
-    LaunchedEffect(uiState.data.recentWalletId) {
+    LaunchedEffect(uiState.data) {
         currencyState.value = uiState.data.recentCurrency
 
         selectedWallet.value = uiState.data.recentWalletId?.let { walletId ->

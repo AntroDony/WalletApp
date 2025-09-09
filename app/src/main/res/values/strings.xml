@@ -19,11 +19,6 @@
     <string name="home_card_analytics_button">Analytics</string>
 
 
-<!--  Edit Balance Screen  -->
-    <string name="edit_balance_screen_title">Edit Balance</string>
-    <string name="edit_balance_total_balance_title">Total Balance</string>
-    <string name="edit_balance_update_button">Update</string>
-
 <!-- Transaction Screen  -->
     <string name="create_transaction_select_category_button">Select category</string>
     <string name="create_transaction_currency_rate_base_text">1 USD =</string>

@@ -8,13 +8,11 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.ancraz.mywallet.presentation.ui.events.AnalyticsUiEvent
 import com.ancraz.mywallet.presentation.ui.events.CreateTransactionUiEvent
-import com.ancraz.mywallet.presentation.ui.events.EditBalanceUiEvent
 import com.ancraz.mywallet.presentation.ui.events.HomeUiEvent
 import com.ancraz.mywallet.presentation.ui.events.TransactionListUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletInfoUiEvent
 import com.ancraz.mywallet.presentation.ui.events.WalletListUiEvent
 import com.ancraz.mywallet.presentation.ui.screens.analytics.AnalyticsScreen
-import com.ancraz.mywallet.presentation.ui.screens.editBalance.EditBalanceScreen
 import com.ancraz.mywallet.presentation.ui.screens.home.HomeScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.createTransaction.CreateTransactionScreen
 import com.ancraz.mywallet.presentation.ui.screens.transaction.transactionInfo.TransactionInfoScreen
@@ -45,12 +43,6 @@ fun AppNavigation(
                             is HomeUiEvent.CreateTransaction -> {
                                 backStack.add(
                                     NavigationRoute.TransactionInputScreen(event.transactionType)
-                                )
-                            }
-
-                            is HomeUiEvent.EditTotalBalance -> {
-                                backStack.add(
-                                    NavigationRoute.EditBalanceScreen(event.currentBalance)
                                 )
                             }
 
@@ -92,23 +84,6 @@ fun AppNavigation(
                             else -> Unit
                         }
                     },
-                )
-            }
-
-            entry<NavigationRoute.EditBalanceScreen> { key ->
-                val currentBalance = key.totalBalance
-
-                EditBalanceScreen(
-                    totalBalance = currentBalance,
-                    paddingValues = innerPadding,
-                    onEvent = { event: EditBalanceUiEvent ->
-                        when (event) {
-                            is EditBalanceUiEvent.GoBack -> {
-                                backStack.removeLastOrNull()
-                            }
-                            else -> Unit
-                        }
-                    }
                 )
             }
 

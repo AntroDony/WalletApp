@@ -8,7 +8,6 @@ import com.ancraz.mywallet.presentation.models.WalletUi
 
 sealed class HomeUiEvent{
     data class CreateTransaction(val transactionType: TransactionType): HomeUiEvent()
-    data class EditTotalBalance(val currentBalance: Float): HomeUiEvent()
 
     data class ShowWalletInfo(val wallet: WalletUi): HomeUiEvent()
     data class ShowTransactionInfo(val transaction: TransactionUi): HomeUiEvent()
@@ -21,12 +20,6 @@ sealed class HomeUiEvent{
     data object ShowAllWallets: HomeUiEvent()
     data object ShowAllTransactions: HomeUiEvent()
     data object ShowAnalytics: HomeUiEvent()
-}
-
-sealed class EditBalanceUiEvent{
-    data class UpdateBalanceValue(val newBalance: Float): EditBalanceUiEvent()
-
-    data object GoBack: EditBalanceUiEvent()
 }
 
 sealed class CreateTransactionUiEvent{

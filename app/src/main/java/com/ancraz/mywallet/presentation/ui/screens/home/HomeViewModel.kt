@@ -120,7 +120,7 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception){
-                debugLog("fetchData exception: ${e.message}")
+                debugLog("fetchHomeData exception: ${e.message}")
                 _homeUiState.value = _homeUiState.value.copy(
                     error = e.message
                 )

@@ -120,7 +120,7 @@ class CreateTransactionViewModel @Inject constructor(
                     _uiState.value = it
                 }
             } catch (e: Exception) {
-                debugLog("fetchData exception: ${e.message}")
+                debugLog("fetchCreateTransactionData exception: ${e.message}")
 
                 _uiState.value = _uiState.value.copy(
                     error = e.message

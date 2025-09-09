@@ -16,6 +16,18 @@ fun Float.toFormattedString(): String{
     return String.format(Locale.US, "%.2f", this)
 }
 
+fun String.toFormattedString(): String{
+    return try {
+        if (this.isEmpty()){
+            String.format(Locale.US, "%.2f", 0.toFloat())
+        }
+        String.format(Locale.US, "%.2f", this.toFloat())
+    } catch (e: Exception){
+        debugLog("toFormattedString exception: ${e.message}")
+        this
+    }
+}
+
 
 fun Long.timeToString(): String {
     val dateFormat = SimpleDateFormat("dd MMM, HH:mm", Locale.US)

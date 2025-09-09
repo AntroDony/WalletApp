@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,7 +42,6 @@ fun TransactionConfigContainer(
             color = onSurfaceColor,
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier
         )
 
         HorizontalSpacer()
@@ -50,7 +50,8 @@ fun TransactionConfigContainer(
             text = valueState.value.ifEmpty { "0.00" },
             color = onSurfaceColor,
             fontSize = 60.sp,
-            modifier = Modifier
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         CurrencyDropDownMenu(

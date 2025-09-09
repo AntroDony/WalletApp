@@ -1,7 +1,6 @@
 package com.ancraz.mywallet.presentation.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -18,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,13 +84,16 @@ fun TransactionCard(
             Column(
                 modifier = Modifier
                     .weight(1f)
+                    .widthIn(min = 300.dp)
                     .padding(horizontal = 8.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
                     text = transaction.category?.name ?: "",
                     fontSize = 16.sp,
-                    color = onBackgroundColor
+                    color = onBackgroundColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 HorizontalSpacer(modifier = Modifier.height(4.dp))
@@ -96,10 +101,16 @@ fun TransactionCard(
                 Text(
                     text = transaction.time.timeToString(),
                     fontSize = 14.sp,
-                    color = onBackgroundColor
+                    color = onBackgroundColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-            TransactionValueText(transaction)
+            TransactionValueText(
+                transaction,
+                modifier = Modifier
+                    .weight(1f)
+            )
         }
     }
 }
@@ -107,7 +118,10 @@ fun TransactionCard(
 
 
 @Composable
-private fun TransactionValueText(transaction: TransactionUi){
+private fun TransactionValueText(
+    transaction: TransactionUi,
+    modifier: Modifier = Modifier
+){
     val textColor = if (transaction.type == TransactionType.INCOME) primaryColor else errorColor
     val valuePrefix = if (transaction.type == TransactionType.INCOME){
         "+"
@@ -122,7 +136,11 @@ private fun TransactionValueText(transaction: TransactionUi){
     Text(
         text = "$valuePrefix${transaction.value.toFormattedString()} $valueSuffix",
         fontSize = 16.sp,
-        color = textColor
+        textAlign = TextAlign.End,
+        color = textColor,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
     )
 }
 

@@ -68,7 +68,7 @@ fun WalletInfoScreen(
         onEvent = { event ->
             when(event){
                 is WalletInfoUiEvent.DeleteWallet -> {
-                    viewModel.deleteWallet(event.wallet)
+                    viewModel.deleteWallet(event.walletId)
                     onEvent(WalletInfoUiEvent.GoBack)
                 }
                 else -> {
@@ -149,7 +149,7 @@ private fun WalletInfoContainer(
                     text = stringResource(R.string.delete_wallet_dialog_text),
                     onConfirm = {
                         isDeleteDialogOpened.value = false
-                        onEvent(WalletInfoUiEvent.DeleteWallet(uiState.wallet))
+                        onEvent(WalletInfoUiEvent.DeleteWallet(uiState.wallet.id))
                     },
                     onDismiss = {
                         isDeleteDialogOpened.value = false
@@ -243,7 +243,7 @@ private fun WalletInfoContainer(
                         modifier = Modifier
                             .weight(1f),
                         onClick = {
-                            onEvent(WalletInfoUiEvent.EditWallet(uiState.wallet))
+                            onEvent(WalletInfoUiEvent.EditWallet(uiState.wallet.id))
                         }
                     )
                 }

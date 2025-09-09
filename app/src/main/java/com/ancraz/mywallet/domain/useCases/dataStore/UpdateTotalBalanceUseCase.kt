@@ -18,33 +18,27 @@ class UpdateTotalBalanceUseCase @Inject constructor(
             }
             CurrencyCode.EUR -> {
                 val balanceInUsd = currencyConverter.convertToUsd(value, CurrencyCode.EUR)
-                balanceInUsd?.let {
-                    updateBalance(it)
-                }
+                updateBalance(balanceInUsd)
             }
             CurrencyCode.RUB -> {
                 val balanceInUsd = currencyConverter.convertToUsd(value, CurrencyCode.RUB)
-                balanceInUsd?.let {
-                    updateBalance(it)
-                }
+                updateBalance(balanceInUsd)
             }
             CurrencyCode.GEL -> {
                 val balanceInUsd = currencyConverter.convertToUsd(value, CurrencyCode.GEL)
-                balanceInUsd?.let {
-                    updateBalance(it)
-                }
+                updateBalance(balanceInUsd)
             }
             CurrencyCode.KZT -> {
                 val balanceInUsd = currencyConverter.convertToUsd(value, CurrencyCode.KZT)
-                balanceInUsd?.let{
-                    updateBalance(it)
-                }
+                updateBalance(balanceInUsd)
             }
         }
     }
 
 
-    private suspend fun updateBalance(value: Float){
-        dataStoreRepository.updateTotalBalanceInUsd(value)
+    private suspend fun updateBalance(value: Float?){
+        value?.let {
+            dataStoreRepository.updateTotalBalanceInUsd(it)
+        }
     }
 }

@@ -77,9 +77,9 @@ class WalletInfoViewModel @Inject constructor(
         savedStateHandle[WALLET_SAVED_STATE_KEY] = _walletUiState.value
     }
 
-    fun deleteWallet(walletUi: WalletUi){
+    fun deleteWallet(walletId: Long){
         viewModelScope.launch(ioDispatcher) {
-            deleteWalletUseCase(walletUi.id)
+            deleteWalletUseCase(walletId)
         }
     }
 

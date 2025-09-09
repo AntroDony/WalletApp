@@ -35,6 +35,7 @@ import com.ancraz.mywallet.presentation.ui.components.VerticalSpacer
 import com.ancraz.mywallet.presentation.ui.theme.backgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.onBackgroundColor
 import com.ancraz.mywallet.presentation.ui.theme.primaryColor
+import com.ancraz.mywallet.presentation.ui.utils.toFormattedString
 
 
 @Composable
@@ -154,7 +155,7 @@ private fun CurrencyAccountItem(
             VerticalSpacer(width = 20.dp)
 
             Text(
-                text = account.moneyValue,
+                text = account.moneyValue.toFormattedString(),
                 color = onBackgroundColor,
                 fontSize = 16.sp,
                 maxLines = 1,

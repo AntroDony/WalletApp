@@ -49,8 +49,8 @@ sealed class WalletListUiEvent{
 }
 
 sealed class WalletInfoUiEvent {
-    data class EditWallet(val wallet: WalletUi): WalletInfoUiEvent()
-    data class DeleteWallet(val wallet: WalletUi): WalletInfoUiEvent()
+    data class EditWallet(val walletId: Long): WalletInfoUiEvent()
+    data class DeleteWallet(val walletId: Long): WalletInfoUiEvent()
 
     data object GoBack: WalletInfoUiEvent()
 }

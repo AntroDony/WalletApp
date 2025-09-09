@@ -176,8 +176,9 @@ fun AppNavigation(
                 )
             }
 
-            entry<NavigationRoute.EditWalletScreen> {
+            entry<NavigationRoute.EditWalletScreen> { key ->
                 EditWalletScreen(
+                    walletId = key.walletId,
                     paddingValues = innerPadding,
                     onBack = {
                         backStack.removeLastOrNull()

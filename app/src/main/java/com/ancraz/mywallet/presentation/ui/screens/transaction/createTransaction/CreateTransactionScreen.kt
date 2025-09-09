@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -378,13 +380,14 @@ private fun TransactionDescriptionTextField(
     modifier: Modifier = Modifier
 ) {
     val textStyle = TextStyle(fontSize = 16.sp)
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     OutlinedTextField(
         value = textState.value ?: "",
         onValueChange = {
             textState.value = it
         },
-        maxLines = 1,
+        singleLine = true,
         textStyle = textStyle,
         placeholder = {
             Text(
@@ -392,6 +395,11 @@ private fun TransactionDescriptionTextField(
                 fontSize = 16.sp
             )
         },
+        keyboardActions = KeyboardActions(
+            onDone = {
+                keyboardController?.hide()
+            }
+        ),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = backgroundColor,
             unfocusedContainerColor = backgroundColor,
@@ -459,7 +467,13 @@ private fun SelectWalletAccountDialog(
                     accounts.forEach { account ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start
+                            horizontalArrangement = Arrangement.Start,
+                            modifier = Modifier
+                                .padding(vertical = 2.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable{
+                                    selectedAccountState.value = account
+                                }
                         ) {
                             RadioButton(
                                 selected = account == selectedAccountState.value,
@@ -474,7 +488,9 @@ private fun SelectWalletAccountDialog(
                                 text = "${account.moneyValue} ${account.currency}",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = onBackgroundColor
+                                color = onBackgroundColor,
+                                modifier = Modifier
+                                    .padding(end = 10.dp)
                             )
                         }
                     }

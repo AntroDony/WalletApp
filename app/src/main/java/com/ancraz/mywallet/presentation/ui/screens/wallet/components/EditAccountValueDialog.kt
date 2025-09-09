@@ -52,7 +52,7 @@ fun EditAccountValueDialog(
     val textFieldValue = remember {
         mutableStateOf(
             TextFieldValue(
-                text = value
+                text = if (value.toFloat() == 0f) "" else value
             )
         )
     }

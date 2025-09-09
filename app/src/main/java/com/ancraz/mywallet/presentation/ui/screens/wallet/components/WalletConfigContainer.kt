@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -19,8 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -53,6 +59,7 @@ fun WalletConfigContainer(
 ) {
 
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val isWalletEditMode by rememberSaveable { mutableStateOf(uiState.wallet != null) }
 
     val nameState = rememberSaveable { mutableStateOf(uiState.wallet?.name) }
@@ -62,10 +69,7 @@ fun WalletConfigContainer(
         rememberSaveable {
             mutableStateOf(
                 uiState.wallet?.accounts ?: listOf(
-                    WalletUi.CurrencyAccountUi(
-                        currency = CurrencyCode.USD,
-                        moneyValue = ""
-                    )
+                    WalletUi.CurrencyAccountUi()
                 )
             )
         }
@@ -97,7 +101,8 @@ fun WalletConfigContainer(
         InputTextField(
             textState = nameState,
             placeholderText = stringResource(R.string.wallet_name_placeholder_title),
-            maxLines = 1
+            maxLines = 1,
+            keyboardController = keyboardController
         )
 
         HorizontalSpacer()
@@ -111,7 +116,8 @@ fun WalletConfigContainer(
         InputTextField(
             textState = descriptionState,
             placeholderText = stringResource(R.string.wallet_description_placeholder_title),
-            maxLines = 3
+            maxLines = 3,
+            keyboardController = keyboardController
         )
 
         HorizontalSpacer()
@@ -189,14 +195,26 @@ private fun InputTextField(
     textState: MutableState<String?>,
     placeholderText: String,
     maxLines: Int,
+    keyboardController: SoftwareKeyboardController?,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 16.sp,
 ) {
+    val focusManager = LocalFocusManager.current
+
     OutlinedTextField(
         value = textState.value ?: "",
         onValueChange = { text ->
             textState.value = text
         },
+        keyboardActions = KeyboardActions(
+            onDone = {
+                keyboardController?.hide()
+                focusManager.clearFocus()
+            }
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done
+        ),
         maxLines = maxLines,
         textStyle = TextStyle(
             fontSize = fontSize,

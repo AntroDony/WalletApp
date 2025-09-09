@@ -45,13 +45,15 @@ fun InputNumberKeyboard(
             KeyboardButton(key, onClick = { action ->
                 when (action) {
                     is KeyboardAction.Number -> {
-                        if (inputValueState.value.isEmpty() || inputValueState.value.toFloat() == 0f) {
-                            inputValueState.value = action.number.toString()
-                        } else {
-                            inputValueState.value += action.number
+                        if (inputValueState.value.length <= 10){
+                            if (inputValueState.value.isEmpty() || inputValueState.value.toFloat() == 0f) {
+                                inputValueState.value = action.number.toString()
+                            } else {
+                                inputValueState.value += action.number
+                            }
                         }
                     }
-
+ 
                     is KeyboardAction.Decimal -> {
                         if (!inputValueState.value.contains(".") && inputValueState.value.isNotEmpty()) {
                             inputValueState.value += "."

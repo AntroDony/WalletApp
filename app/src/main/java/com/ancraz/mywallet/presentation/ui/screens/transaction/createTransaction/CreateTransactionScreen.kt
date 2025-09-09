@@ -194,9 +194,7 @@ private fun CreateTransactionContainer(
             )
 
             if (!uiState.error.isNullOrEmpty()){
-                ErrorText(
-                    uiState.error
-                )
+                ErrorText()
             } else {
                 WalletSelectionButton(
                     selectedWallet = selectedWallet.value,
@@ -521,11 +519,10 @@ private fun SelectWalletAccountDialog(
 
 @Composable
 private fun ErrorText(
-    text: String,
     modifier: Modifier = Modifier
 ){
     Text(
-        text = stringResource(R.string.no_internet_error_message),
+        text = stringResource(R.string.currency_rates_loading_error_message),
         color = MaterialTheme.colorScheme.error,
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,

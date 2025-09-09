@@ -118,7 +118,7 @@ class DataStoreRepository(
                     preferences[KZT_RATE_TO_USD] = rate.rateValue
                 }
 
-                CurrencyCode.USD -> {}
+                CurrencyCode.USD -> Unit
             }
         }
     }

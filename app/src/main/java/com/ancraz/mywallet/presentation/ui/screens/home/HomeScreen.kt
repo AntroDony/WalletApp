@@ -1,5 +1,6 @@
 package com.ancraz.mywallet.presentation.ui.screens.home
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ancraz.mywallet.R
@@ -90,6 +93,16 @@ private fun HomeContainer(
     modifier: Modifier = Modifier,
     onEvent: (HomeUiEvent) -> Unit
 ) {
+    val context = LocalContext.current
+
+    uiState.error?.let {
+        Toast.makeText(
+            context,
+            stringResource(R.string.currency_rates_loading_error_message),
+            Toast.LENGTH_LONG
+        ).show()
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()

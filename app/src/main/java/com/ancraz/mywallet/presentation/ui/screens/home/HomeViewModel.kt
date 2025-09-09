@@ -7,10 +7,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ancraz.mywallet.core.models.CurrencyCode
+import com.ancraz.mywallet.core.result.DataResult
 import com.ancraz.mywallet.core.utils.debugLog
 import com.ancraz.mywallet.domain.manager.DataStoreManager
 import com.ancraz.mywallet.domain.models.Transaction
 import com.ancraz.mywallet.domain.models.Wallet
+import com.ancraz.mywallet.domain.useCases.currency.UpdateCurrencyRatesUseCase
 import com.ancraz.mywallet.domain.useCases.transaction.GetAllTransactionsUseCase
 import com.ancraz.mywallet.domain.useCases.wallet.GetAllWalletsUseCase
 import com.ancraz.mywallet.presentation.mapper.toTransactionUi
@@ -33,6 +35,7 @@ class HomeViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getAllTransactionsUseCase: GetAllTransactionsUseCase,
     private val getAllWalletsUseCase: GetAllWalletsUseCase,
+    private val updateCurrencyRatesUseCase: UpdateCurrencyRatesUseCase,
     private val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
@@ -49,6 +52,7 @@ class HomeViewModel @Inject constructor(
     private val totalBalanceFlow = dataStoreManager.getTotalBalance()
     private val walletListFlow: Flow<List<Wallet>> = getAllWalletsUseCase()
     private val transactionListFlow: Flow<List<Transaction>> = getAllTransactionsUseCase()
+    private val currencyRatesUpdateResult: Flow<DataResult<String?>> = updateCurrencyRatesUseCase()
 
     init {
         fetchData()
@@ -88,8 +92,9 @@ class HomeViewModel @Inject constructor(
                     privateModeStatusFlow,
                     totalBalanceFlow,
                     walletListFlow,
-                    transactionListFlow
-                ) { privateModeStatus, totalBalance, walletList, transactionList ->
+                    transactionListFlow,
+                    currencyRatesUpdateResult
+                ) { privateModeStatus, totalBalance, walletList, transactionList, currencyRatesResult ->
                     HomeUiState(
                         isLoading = false,
                         data = HomeUiState.HomeScreenData(
@@ -97,7 +102,13 @@ class HomeViewModel @Inject constructor(
                             balance = totalBalance,
                             wallets = walletList.map { it.toWalletUi() },
                             transactions = transactionList.map { it.toTransactionUi() }
-                        )
+                        ),
+                        error = when(currencyRatesResult){
+                            is DataResult.Error<*> -> {
+                                currencyRatesResult.errorMessage
+                            }
+                            else -> null
+                        }
                     )
                 }.collect { uiState ->
                     _homeUiState.value = uiState
